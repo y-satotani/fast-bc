@@ -10,9 +10,9 @@ double l2_norm(igraph_vector_t* v1, igraph_vector_t* v2);
 
 int main(void) {
 
-  igraph_vector_t Btrain, Btest, Btesttmp;
+  igraph_vector_t Btrain, Btest;
+  igraph_matrix_t Btesttmp;
   igraph_t G;
-  long int source;
   clock_t start, end;
   double sec;
 
@@ -26,16 +26,15 @@ int main(void) {
   sec = (double)(end - start) / CLOCKS_PER_SEC;
   printf("train: "); /* print_vector(&Btrain); */ printf("%f\n", sec);
 
-  // calculate test BC
+  // calculate test BC (bfs)
   igraph_vector_init(&Btest, igraph_vcount(&G));
-  igraph_vector_init(&Btesttmp, igraph_vcount(&G));
+  igraph_matrix_init(&Btesttmp, igraph_vcount(&G), igraph_vcount(&G));
   start = clock();
-  for(source = 0; source < igraph_vcount(&G); source++) {
-    bc_partial(&G, &Btesttmp, source);
-    igraph_vector_add(&Btest, &Btesttmp);
-  }
+  partial_bc_bfs(&G, &Btesttmp, igraph_vss_all());
+  igraph_matrix_colsum(&Btesttmp, &Btest);
   igraph_vector_scale(&Btest, 0.5); // divide by 2 manually
   end = clock();
+
   sec = (double)(end - start) / CLOCKS_PER_SEC;
   printf("test : "); /* print_vector(&Btest); */ printf("%f\n", sec);
 
@@ -43,7 +42,7 @@ int main(void) {
 
   igraph_vector_destroy(&Btrain);
   igraph_vector_destroy(&Btest);
-  igraph_vector_destroy(&Btesttmp);
+  igraph_matrix_destroy(&Btesttmp);
   igraph_destroy(&G);
 
   return 0;

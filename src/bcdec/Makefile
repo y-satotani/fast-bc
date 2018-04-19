@@ -2,7 +2,7 @@ CC := gcc
 IDIR := /usr/include/igraph
 LDIR := /usr/lib/x86_64-linux-gnu/
 LIBS := -lm -ligraph
-CFLAGS := -fpic -g -Ofast -Wall \
+CFLAGS := -fpic -g -O3 -march=native -Wall \
           $(addprefix -I,$(IDIR)) $(addprefix -L,$(LDIR))
 
 OBJ := $(patsubst %.c,%.o,$(shell ls | egrep ".\c$$"))

@@ -11,7 +11,7 @@ install:
 	cp exp/*.out test/*.out bin
 
 clean:
-	$(MAKE) -C bcec clean
+	$(MAKE) -C bcdec clean
 	$(MAKE) -C exp clean
 	$(MAKE) -C test clean
 

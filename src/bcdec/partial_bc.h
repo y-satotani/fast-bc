@@ -4,6 +4,6 @@
 
 #include <igraph.h>
 
-int bc_partial(igraph_t* G,igraph_vector_t* Bi, long int source);
+void partial_bc_bfs(igraph_t* G, igraph_matrix_t* Delta, igraph_vs_t vs);
 
 #endif // _PARTIAL_BC_H_
