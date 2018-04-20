@@ -1,7 +1,16 @@
 SRCS=$(wildcard *.Rmd)
 PDFS=$(SRCS:.Rmd=.pdf)
+MDS=$(SRCS:.Rmd=.md)
 
-all: $(PDFS)
+.PHONY: all clean
+
+all: $(PDFS) $(MDS)
 
 %.pdf: %.Rmd
 	R --vanilla -e 'rmarkdown::render("$<", output_format = "pdf_document")'
+
+%.md: %.Rmd
+	R --vanilla -e 'rmarkdown::render("$<", output_format = "md_document")'
+
+clean:
+	rm -f *.pdf *.md

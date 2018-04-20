@@ -1,0 +1,142 @@
+---
+title: "研究進捗報告"
+author: "里谷 佳紀"
+date: "平成30年4月24日"
+documentclass: bxjsarticle
+classoption: xelatex,ja=standard,11pt
+geometry: no
+output:
+  pdf_document:
+    latex_engine: xelatex
+    number_sections: yes
+    fig_caption: yes
+    includes:
+      in_header: header.sty
+  github_document: default
+---
+
+```{r setup, include = FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(viridis)
+theme_set(theme_minimal())
+knitr::opts_knit$get('rmarkdown.pandoc.to')
+if(knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex') {
+  devname <- 'cairo_pdf'
+} else {
+  devname <- 'png'
+}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.height = 2.7, fig.width = 8, fig.align = 'center',
+  dev = devname
+)
+```
+
+```{r readin, include = FALSE}
+data_time <- read_csv('../res/data/bc-20180419.csv') %>%
+  filter(query == 'delete') %>%
+  gather(key = 'calc-type', value = 'time', `time-update`, `time-noupdate`) %>%
+  group_by(graph, n, k, `calc-type`) %>%
+  summarise(time = mean(time)) %>%
+  ungroup()
+data_ratio <- read_csv('../res/data/bc-20180419.csv') %>%
+  filter(query == 'delete') %>%
+  mutate(`time-ratio` = `time-update` / `time-noupdate`)
+```
+
+# 研究全体の目的
+グラフと全頂点間距離と最短経路の数およびペア依存度が与えられたとき，グラフの辺が削除されたとする．
+このときの全頂点間距離と最短経路の数とペア依存度を高速に更新する方法を開発する．
+また，実験と理論の両方から既存の方法と比較することで，新方法の有用性を検証する．
+
+# 前回打ち合わせ時に定めた短期目標
+1. 電子情報通信学会の原稿執筆
+2. 一辺削除時の全頂点の媒介中心性の更新の実験
+
+# 本日までの進捗状況
+1. ほぼ完成した．
+2. 実験を行った．結果を次の節で示す．
+
+# 一辺削除時の全頂点の媒介中心性の更新の実験
+今回は，一辺削除時の全頂点の媒介中心性の更新に関する実験を行った．
+次の二方法を比較した．
+
+1. 再計算：グラフから辺を削除し，すべての頂点の媒介中心性を再計算する方法
+2. 更新：辺$e=\{\alpha,\beta\}$が削除されるとき，$d_{v\alpha}\neq d_{v\beta}$
+なる頂点$v$のペア依存度の更新のみを行う方法
+
+次の三種のネットワークに対して実験を行った．
+
+1. BA：Barabási–Albertモデル
+2. ER：Erdős–Rényiモデル
+3. RRG：ランダム正則グラフ
+
+\newpage
+
+## 頂点数と実行時間
+
+次数を10で固定し，頂点数を変化させたときの二つのアルゴリズムの
+実行時間を示す．結果から，更新を行う方法が有効であると言える．
+```{r fig1}
+data_fig1 <- data_time %>% filter(n >= 100, k == 10)
+ggplot(data_fig1, aes(n, time, colour = `calc-type`)) +
+  facet_wrap(~graph) + geom_point() +
+  xlab('頂点数') + ylab('平均実行時間(s)') +
+  scale_colour_discrete(
+    '計算方法',
+    labels = c('time-noupdate' = '再計算', 'time-update' = '更新')
+  )
+```
+
+## 次数と実行時間
+
+頂点数を100で固定し，次数を変化させたときの二つのアルゴリズムの
+実行時間を示す．結果から，BAネットワークでは平均次数が高くなれば計算時間が
+長くなるが，ERネットワークとRRGではそうならないことが言える．
+```{r fig2}
+data_fig2 <- data_time %>% filter(n == 100, k >= 10)
+ggplot(data_fig2, aes(k, time, colour = `calc-type`)) +
+  facet_wrap(~graph) + geom_point() +
+  xlab('平均次数') + ylab('平均実行時間(s)') +
+  scale_colour_discrete(
+    '計算方法',
+    labels = c('time-noupdate' = '再計算', 'time-update' = '更新')
+  )
+```
+
+\newpage
+
+## 頂点数と次数と実行時間比
+
+頂点数と次数と実行時間比(更新の実行時間を再計算の実行時間で割ったもの)
+の平均の関係を示す．結果から，最良で2割程度の計算時間で媒介中心性を更新できる
+ことが分かる．
+```{r fig3}
+data_fig3 <- data_ratio %>% filter(n >= 100, k >= 10) %>%
+  group_by(graph, n, k) %>%
+  summarise(`time-ratio` = mean(`time-ratio`)) %>%
+  ungroup()
+ggplot(data_fig3, aes(n, k, fill = `time-ratio`)) +
+  facet_wrap(~graph) + geom_tile() +
+  xlab('頂点数') + ylab('平均次数') +
+  scale_fill_gradientn(
+    '平均実行時間比',
+    colours = rev(viridis(10))
+  )
+```
+
+## 再計算された頂点の割合と実行時間
+
+頂点数が100,平均次数が10のとき，ペア依存度が更新された頂点の割合
+（更新頂点割合）と実行時間の関係を示す．結果から，これらの量には
+正の相関関係があると言える．
+```{r fig4, fig.width = 7}
+data_fig4 <- data_ratio %>% filter(n == 100, k == 10)
+ggplot(data_fig4, aes(`update-frac`, `time-update`, colour = 'coral')) +
+  facet_wrap(~graph) + geom_point() +
+  xlab('更新頂点割合') + ylab('実行時間') +
+  theme(legend.position = 'none')
+```
