@@ -5,94 +5,43 @@ void arg_dist(igraph_matrix_t* D,
               igraph_matrix_t* Sigma,
               igraph_t* G) {
 
-  igraph_vector_t nrgeo;
-  igraph_vector_ptr_t paths;
-  int row, pi;
+  igraph_integer_t n = igraph_vcount(G);
+  igraph_adjlist_t adjlist_out;
+  igraph_dqueue_t queue;
+  igraph_adjlist_init(G, &adjlist_out, IGRAPH_ALL);
+  igraph_dqueue_init(&queue, 0);
 
-  int n = igraph_vcount(G);
   igraph_matrix_init(D, n, n);
   igraph_matrix_init(Sigma, n, n);
 
-  for(row = 0; row < igraph_vcount(G); row++) {
-    igraph_vector_ptr_init(&paths, 0);
-    igraph_vector_init(&nrgeo, 0);
-
-    igraph_get_all_shortest_paths(G, &paths, &nrgeo,
-                                  row, igraph_vss_all(),
-                                  IGRAPH_ALL);
-
-    // calculate row of D and Sigma
-    int col = 0, tail = 0;
-    while(col < igraph_vcount(G)) {
-      igraph_vector_t* path = (igraph_vector_t*)
-        igraph_vector_ptr_e(&paths, tail);
-      if(igraph_vector_e(&nrgeo, col) > 0)
-        igraph_matrix_set(D, row, col, igraph_vector_size(path)-1);
-      else
-        igraph_matrix_set(D, row, col, IGRAPH_INFINITY);
-      igraph_matrix_set(Sigma, row, col, igraph_vector_e(&nrgeo, col));
-      tail += igraph_vector_e(&nrgeo, col);
-      col++;
+  for(igraph_integer_t source = 0; source < n; source++) {
+    for(igraph_integer_t t = 0; t < n; t++) {
+      MATRIX(*D, source, t) = MATRIX(*D, t, source) = IGRAPH_INFINITY;
+      MATRIX(*Sigma, source, t) = MATRIX(*Sigma, t, source) = 0;
     }
+    MATRIX(*D, source, source) = 0;
+    MATRIX(*Sigma, source, source) = 1;
+    igraph_dqueue_push(&queue, source);
 
-    for(pi = 0; pi < igraph_vector_ptr_size(&paths); pi++) {
-      igraph_vector_destroy((igraph_vector_t*)
-                            igraph_vector_ptr_e(&paths, pi));
-      free(igraph_vector_ptr_e(&paths, pi));
-      igraph_vector_ptr_set(&paths, pi, 0);
-    }
-    igraph_vector_ptr_destroy(&paths);
-    igraph_vector_destroy(&nrgeo);
-  }
-}
-
-void edge_set(igraph_vector_ptr_t* E,
-              igraph_t* G) {
-
-  igraph_vector_t nrgeo;
-  igraph_vector_ptr_t paths;
-  int row, pi, vi;
-
-  int n = igraph_vcount(G);
-
-  igraph_vector_ptr_init(E, 0);
-  igraph_vector_ptr_set_item_destructor
-    (E, (igraph_finally_func_t*)igraph_vector_destroy);
-
-  for(row = 0; row < igraph_vcount(G); row++) {
-    igraph_vector_ptr_init(&paths, 0);
-    igraph_vector_init(&nrgeo, 0);
-
-    igraph_get_all_shortest_paths(G, &paths, &nrgeo,
-                                  row, igraph_vss_all(),
-                                  IGRAPH_ALL);
-
-    // calculate elements of E
-    igraph_vector_t *edges = (igraph_vector_t*)
-      malloc(sizeof(igraph_vector_t));
-    igraph_vector_init(edges, 0);
-    for(pi = 0; pi < igraph_vector_ptr_size(&paths); pi++) {
-      igraph_vector_t* path = (igraph_vector_t*)
-        igraph_vector_ptr_e(&paths, pi);
-      for(vi = 0; vi < igraph_vector_size(path)-1; vi++) {
-        igraph_integer_t e = vi*n*n +
-          (igraph_integer_t)igraph_vector_e(path, vi)*n +
-          (igraph_integer_t)igraph_vector_e(path, vi+1);
-        long int pos;
-        if(!igraph_vector_binsearch(edges, e, &pos))
-          igraph_vector_insert(edges, pos, e);
+    while(!igraph_dqueue_empty(&queue)) {
+      igraph_integer_t v = igraph_dqueue_pop(&queue);
+      igraph_vector_int_t* neis = igraph_adjlist_get(&adjlist_out, v);
+      long int nneis = igraph_vector_int_size(neis);
+      for(igraph_integer_t i = 0; i < nneis; i++) {
+        igraph_integer_t w = VECTOR(*neis)[i];
+        if(MATRIX(*D, source, w) == IGRAPH_INFINITY) {
+          igraph_dqueue_push(&queue, w);
+          MATRIX(*D, source, w) = MATRIX(*D, w, source) =
+            MATRIX(*D, source, v) + 1;
+        }
+        if(MATRIX(*D, source, w) == MATRIX(*D, source, v) + 1) {
+          MATRIX(*Sigma, source, w) = MATRIX(*Sigma, w, source) =
+            MATRIX(*Sigma, source, w) + MATRIX(*Sigma, source, v);
+        }
       }
     }
-    igraph_vector_ptr_push_back(E, edges);
-
-    for(pi = 0; pi < igraph_vector_ptr_size(&paths); pi++) {
-      igraph_vector_destroy((igraph_vector_t*)
-                            igraph_vector_ptr_e(&paths, pi));
-      free(igraph_vector_ptr_e(&paths, pi));
-      igraph_vector_ptr_set(&paths, pi, 0);
-    }
-    igraph_vector_ptr_destroy(&paths);
-    igraph_vector_destroy(&nrgeo);
   }
 
+  igraph_adjlist_destroy(&adjlist_out);
+  igraph_dqueue_destroy(&queue);
 }
