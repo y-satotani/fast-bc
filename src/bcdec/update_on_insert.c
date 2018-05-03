@@ -15,31 +15,24 @@ void update_on_insert(igraph_matrix_t* D, igraph_matrix_t* Sigma,
     } else {
       a = v; b = u;
     }
-    igraph_integer_t dsa, ssa;
-    dsa = MATRIX(*D, s, a);
-    ssa = MATRIX(*Sigma, s, a);
 
     for(t = s+1; t < N; t++) {
       if(MATRIX(*D, b, t) == IGRAPH_INFINITY) {
         continue;
       }
-      igraph_integer_t dbt, dst, sbt, sst;
-      dbt = MATRIX(*D, b, t);
-      dst = MATRIX(*D, s, t);
-      sbt = MATRIX(*Sigma, b, t);
-      sst = MATRIX(*Sigma, s, t);
-
-      if(MATRIX(*D, s, t) == IGRAPH_INFINITY ||
-         dsa + dbt + 1 < dst) {
-        dst = dsa + dbt + 1;
-        sst = ssa * sbt;
-      } else if(dsa + dbt + 1 == dst) {
-        sst = sst + ssa * sbt;
-      } else {
+      igraph_integer_t dsabt =
+        (igraph_integer_t)MATRIX(*D, s, a) +
+        (igraph_integer_t)MATRIX(*D, b, t) + 1;
+      igraph_integer_t ssabt =
+        (igraph_integer_t)MATRIX(*Sigma, s, a) *
+        (igraph_integer_t)MATRIX(*Sigma, b, t);
+      if(MATRIX(*D, s, t) == IGRAPH_INFINITY || dsabt < MATRIX(*D, s, t)) {
+        MATRIX(*D, s, t) = MATRIX(*D, t, s) = dsabt;
+        MATRIX(*Sigma, s, t) = MATRIX(*Sigma, t, s) = ssabt;
+      } else if(dsabt == MATRIX(*D, s, t)) {
+        MATRIX(*Sigma, s, t) = MATRIX(*Sigma, t, s) =
+          (igraph_integer_t)MATRIX(*Sigma, s, t) + ssabt;
       }
-
-      MATRIX(*D, s, t) = MATRIX(*D, t, s) = dst;
-      MATRIX(*Sigma, s, t) = MATRIX(*Sigma, t, s) = sst;
     }
   }
 }
