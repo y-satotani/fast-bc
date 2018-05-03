@@ -27,10 +27,10 @@ int main(int argc, char* argv[]) {
 
   // Choose edge to insert/delete then update
   igraph_integer_t u, v;
-  if(strcmp(mode, "insert")) {
+  if(strcmp(mode, "insert") == 0) {
     choice_noadjacent_pair(&G, &u, &v);
     igraph_add_edge(&G, u, v);
-  } else if(strcmp(mode, "delete")) {
+  } else if(strcmp(mode, "delete") == 0) {
     igraph_integer_t eid = igraph_rng_get_integer
       (igraph_rng_default(), 0, igraph_ecount(&G)-1);
     igraph_edge(&G, eid, &u, &v);
@@ -40,11 +40,11 @@ int main(int argc, char* argv[]) {
   // Update
   clock_t start, end;
   double time_update;
-  if(strcmp(mode, "insert")) {
+  if(strcmp(mode, "insert") == 0) {
     start = clock();
     update_on_insert(&D, &Sigma, u, v);
     end = clock();
-  } else if(strcmp(mode, "delete")) {
+  } else if(strcmp(mode, "delete") == 0) {
     start = clock();
     update_on_delete(&D, &Sigma, u, v);
     end = clock();
