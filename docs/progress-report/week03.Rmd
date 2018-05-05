@@ -31,7 +31,7 @@ if(knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex') {
 }
 knitr::opts_chunk$set(
   echo = FALSE,
-  fig.height = 2.7, fig.width = 8, fig.align = 'center',
+  fig.height = 2, fig.width = 6, fig.align = 'center',
   dev = devname
 )
 ```
@@ -44,7 +44,7 @@ data_time <- read_csv('../res/data/bc-20180419.csv') %>%
   summarise(time = mean(time)) %>%
   ungroup()
 data_ratio <- read_csv('../res/data/bc-20180419.csv') %>%
-  filter(query == 'delete') %>%
+  filter(query == 'insert') %>%
   mutate(`time-ratio` = `time-update` / `time-noupdate`)
 ```
 
@@ -134,7 +134,7 @@ ggplot(data_fig3, aes(n, k, fill = `time-ratio`)) +
 頂点数が100,平均次数が10のとき，ペア依存度が更新された頂点の割合
 （更新頂点割合）と実行時間の関係を示す．結果から，これらの量には
 正の相関関係があると言える．
-```{r fig4, fig.width = 7}
+```{r fig4}
 data_fig4 <- data_ratio %>% filter(n == 100, k == 10)
 ggplot(data_fig4, aes(`update-frac`, `time-update`, colour = 'coral')) +
   facet_wrap(~graph) + geom_point() +
