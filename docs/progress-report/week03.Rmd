@@ -33,8 +33,13 @@ if(knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex') {
 }
 knitr::opts_chunk$set(
   echo = FALSE,
+<<<<<<< HEAD
   fig.height = 2.3, fig.width = 6, fig.align = 'center',
   dev = devname, dev.args = devargs, dpi = 150
+=======
+  fig.height = 2, fig.width = 6, fig.align = 'center',
+  dev = devname
+>>>>>>> 6d1aa34185fccc591f1a00bd610f9c4ef1802d04
 )
 ```
 
@@ -46,7 +51,7 @@ data_time <- read_csv('../res/data/bc-20180419.csv') %>%
   summarise(time = mean(time)) %>%
   ungroup()
 data_ratio <- read_csv('../res/data/bc-20180419.csv') %>%
-  filter(query == 'delete') %>%
+  filter(query == 'insert') %>%
   mutate(`time-ratio` = `time-update` / `time-noupdate`)
 ```
 
