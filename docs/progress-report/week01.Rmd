@@ -8,10 +8,13 @@ geometry: no
 output:
   pdf_document:
     latex_engine: xelatex
+    template: mytemplate.tex
     number_sections: yes
+    fig_caption: yes
     includes:
       in_header: header.sty
-  github_document: default
+  github_document:
+    html_preview: no
 ---
 
 # 研究全体の目的

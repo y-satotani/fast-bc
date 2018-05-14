@@ -13,7 +13,8 @@ output:
     fig_caption: yes
     includes:
       in_header: header.sty
-  github_document: default
+  github_document:
+    html_preview: no
 ---
 
 ```{r setup, include = FALSE}
@@ -22,17 +23,18 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(viridis)
-theme_set(theme_minimal())
-knitr::opts_knit$get('rmarkdown.pandoc.to')
+theme_set(theme_light(base_size = 11, base_family = 'IPAexGothic'))
 if(knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex') {
   devname <- 'cairo_pdf'
+  devargs <- c()
 } else {
   devname <- 'png'
+  devargs <- c('type' = 'cairo-png')
 }
 knitr::opts_chunk$set(
   echo = FALSE,
-  fig.height = 2.7, fig.width = 8, fig.align = 'center',
-  dev = devname
+  fig.height = 2.3, fig.width = 6, fig.align = 'center',
+  dev = devname, dev.args = devargs, dpi = 150
 )
 ```
 
@@ -134,7 +136,7 @@ ggplot(data_fig3, aes(n, k, fill = `time-ratio`)) +
 頂点数が100,平均次数が10のとき，ペア依存度が更新された頂点の割合
 （更新頂点割合）と実行時間の関係を示す．結果から，これらの量には
 正の相関関係があると言える．
-```{r fig4, fig.width = 7}
+```{r fig4}
 data_fig4 <- data_ratio %>% filter(n == 100, k == 10)
 ggplot(data_fig4, aes(`update-frac`, `time-update`, colour = 'coral')) +
   facet_wrap(~graph) + geom_point() +

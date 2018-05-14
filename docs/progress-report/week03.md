@@ -1,7 +1,7 @@
 研究進捗報告
 ================
 里谷 佳紀
-平成30年4月24日
+平成30年5月8日
 
 # 研究全体の目的
 
@@ -11,13 +11,13 @@
 
 # 前回打ち合わせ時に定めた短期目標
 
-1.  電子情報通信学会の原稿執筆
-2.  一辺削除時の全頂点の媒介中心性の更新の実験
+1.  データの整理
 
 # 本日までの進捗状況
 
-1.  ほぼ完成した．
-2.  実験を行った．結果を次の節で示す．
+1.  実験用プログラムにバグが見つかり，挿入と削除が入れ替わっていたことが分かった．
+    そのため，先週の報告書で示した結果は一辺挿入時のものである．
+    今週は一辺削除時の結果を示す．
 
 # 一辺削除時の全頂点の媒介中心性の更新の実験
 
@@ -36,23 +36,23 @@
 ## 頂点数と実行時間
 
 次数を10で固定し，頂点数を変化させたときの二つのアルゴリズムの 実行時間を示す．結果から，更新を行う方法が有効であると言える．
-<img src="week02_files/figure-gfm/fig1-1.png" style="display: block; margin: auto;" />
+<img src="week03_files/figure-gfm/fig1-1.png" style="display: block; margin: auto;" />
 
 ## 次数と実行時間
 
 頂点数を100で固定し，次数を変化させたときの二つのアルゴリズムの 実行時間を示す．結果から，BAネットワークでは平均次数が高くなれば計算時間が
 長くなるが，ERネットワークとRRGではそうならないことが言える．
-<img src="week02_files/figure-gfm/fig2-1.png" style="display: block; margin: auto;" />
+<img src="week03_files/figure-gfm/fig2-1.png" style="display: block; margin: auto;" />
 
 ## 頂点数と次数と実行時間比
 
 頂点数と次数と実行時間比(更新の実行時間を再計算の実行時間で割ったもの)
 の平均の関係を示す．結果から，最良で2割程度の計算時間で媒介中心性を更新できる
 ことが分かる．
-<img src="week02_files/figure-gfm/fig3-1.png" style="display: block; margin: auto;" />
+<img src="week03_files/figure-gfm/fig3-1.png" style="display: block; margin: auto;" />
 
 ## 再計算された頂点の割合と実行時間
 
 頂点数が100,平均次数が10のとき，ペア依存度が更新された頂点の割合 （更新頂点割合）と実行時間の関係を示す．結果から，これらの量には
 正の相関関係があると言える．
-<img src="week02_files/figure-gfm/fig4-1.png" style="display: block; margin: auto;" />
+<img src="week03_files/figure-gfm/fig4-1.png" style="display: block; margin: auto;" />
