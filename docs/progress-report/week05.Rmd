@@ -1,7 +1,7 @@
 ---
 title: "研究進捗報告"
 author: "里谷 佳紀"
-date: "平成30年5月12日"
+date: "平成30年5月22日"
 documentclass: bxjsarticle
 classoption: xelatex,ja=standard,11pt
 geometry: no
