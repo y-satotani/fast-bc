@@ -5,6 +5,7 @@ from numpy import linspace
 from itertools import product
 import requests
 from bs4 import BeautifulSoup
+from geopy.distance import geodesic
 import networkx as nx
 
 try:
@@ -21,6 +22,9 @@ lat_center, lon_center = float(s.place['lat']), float(s.place['lon'])
 lat_delta, lon_delta = radius / 110.574, radius / (111.320*cos(radians(lat_center)))
 lat_min, lat_max = lat_center-lat_delta, lat_center+lat_delta
 lon_min, lon_max = lon_center-lon_delta, lon_center+lon_delta
+
+
+
 lat_s = linspace(lat_min, lat_max, 2*ceil(radius)+1)
 lon_s = linspace(lon_min, lon_max, 2*ceil(radius)+1)
 N = (len(lat_s)-1)*(len(lon_s)-1)
@@ -40,8 +44,13 @@ for i, (lat_p, lon_p) in\
     for way in filter(lambda elem: elem.name == 'way' and\
                       any(map(lambda p: p['k'] == 'highway', elem.find_all('tag'))),
                       s.osm):
+        waytype = next(p['v'] for p in way.find_all('tag') if p['k'] == 'highway')
         nodes = [nd['ref'] for nd in way.find_all('nd')]
-        G.add_edges_from(zip(nodes, nodes[1:]))
+        for u, v in zip(nodes, nodes[1:]):
+            distance = geodesic(
+                (G.nodes[u]['lat'], G.nodes[u]['lon']),
+                (G.nodes[v]['lat'], G.nodes[v]['lon'])).meters
+            G.add_edge(u, v, waytype=waytype, distance=distance)
 
 G.remove_nodes_from([node for node in G.nodes if
                      G.degree(node) == 0 or\
