@@ -1,0 +1,219 @@
+\chapter{一辺削除時の媒介中心性の変化量}
+本章では，まず一辺削除時の最短経路の長さと個数の変化量について説明し，一辺削除時の媒介中心性の変化量について説明する．
+
+次の補題は，ある二頂点間の最短経路の個数と，その経路に含まれる
+短い最短経路の個数との関係を示す．
+\begin{lemma}
+  \label{lemma:number-of-paths}
+  $G=(V,E)$の異なる二頂点$\{s,t\}\in V$について，$v$を$d_{st}=d_{sv}+d_{vt}$
+  である頂点(ただし$v\neq s,t$)とすると，次が成り立つ．
+  \begin{equation}
+    \label{eq:number-of-paths}
+    \sigma_{st}=\frac{\sum_{v}\sigma_{sv}\sigma_{vt}}{d_{st}-1}
+  \end{equation}
+\end{lemma}
+\begin{proof}
+  $s$と$t$の間の一般的な経路を図\ref{fig:proof-number-of-paths}に示す．
+  \begin{figure}
+    \centering
+    \def\svgwidth{.5\columnwidth}
+    \input{proof-number-of-paths.pdf_tex}
+    \caption{$s$と$t$の一般的な最短経路}
+    \label{fig:proof-number-of-paths}
+  \end{figure}
+  $s$からの距離が一定の頂点を並べて，一つの層とする．$d_{sv}=k$なる頂点
+  $v$の集合を，第$k$層と定義し，$L_k$と表す．
+  $L_k$に属する頂点の数を$n_k$，$L_k$に属する$l$番目の頂点を$v_{kl}$と表す．
+  ここで，第$k$層に属する頂点$v$は，隣接する層(第$k-1$層と第$k+1$層)
+  以外の層に属する頂点$w$と隣接しないことに注意する．
+  もしそのような頂点が存在すると，最短経路長が変化する．
+  式\ref{eq:number-of-paths}の両辺に$d_{st}-1$を掛けて，
+  次の式\ref{eq:number-of-paths1}を得る．
+  \begin{equation}
+    \sigma_{st}(d_{st}-1)=\sum_{v}\sigma_{sv}\sigma_{vt}
+    \label{eq:number-of-paths1}
+  \end{equation}
+  式\ref{eq:number-of-paths1}の右辺を，
+  図\ref{fig:proof-number-of-paths}にならって表すと，
+  \begin{equation}
+    \sum_{v}\sigma_{sv}\sigma_{vt}=
+    \sum_{k=1}^m\sum_{l=1}^{n_k}\sigma_{sv_{kl}}\sigma_{v_{kl}t}
+    \label{eq:number-of-paths2}
+  \end{equation}
+  が得られる．ここで，二つの頂点$v$と$w$について，次の隣接を表す記号$a$を導入する．
+  \begin{align*}
+    a_{vw}=
+    \begin{cases}
+      1 & vとwが隣接しているとき \\
+      0 & vとwが隣接していないとき
+    \end{cases}
+  \end{align*}
+  各々の$\sigma_{sv_{kl}}\sigma_{v_{kl}t}$について議論する．
+  $a$の定義を用いて式を変形すると，
+  \begin{align}
+    &\sigma_{sv_{kl}}\sigma_{v_{kl}t}\nonumber\\
+    =&\left(\sum_{v'\in L_{k-1}}\sigma_{sv'}a_{v'v_{kl}}\right)
+    \left(\sum_{v'\in L_{k+1}}\sigma_{v_{kl}v'}a_{v't}\right)
+    \nonumber\\
+    =&\left(\sum_{v''\in L_{k-2}}\sum_{v'\in L_{k-1}}
+    \sigma_{sv''}a_{v''v'}a_{v'v_{kl}}\right)
+    \left(\sum_{v'\in L_{k+1}}\sum_{v''\in L_{k+2}}
+    a_{v_{kl}v'}a_{v'v''}\sigma_{v''t}\right)
+    \nonumber\\
+    &\vdots\nonumber\\
+    =&\left(\sum_{(v_1,\ldots,v_{k-1})\in L_1\times\cdots\times L_{k-1}}
+    a_{sv_1}\cdots a_{v_{k-1}v_{kl}}\right)
+    \left(\sum_{(v_{k+1},\ldots,v_m)\in L_{k+1}\times\cdots\times L_m}
+    a_{v_{kl}v_{k+1}}\cdots a_{v_mv_t}\right)\nonumber\\
+    =&\sum_{(v_1,\ldots,v_{k-1},v_{k+1},\ldots,v_m)\in L_1\times\cdots\times L_{k-1}\times L_{k+1}\times\cdots\times L_m}
+    a_{sv_1}\cdots a_{v_{k-1}v_{kl}}a_{v_{kl}v_{k+1}}\cdots a_{v_mt}
+    \label{eq:number-of-paths3}
+  \end{align}
+  が得られる．式\ref{eq:number-of-paths3}を式\ref{eq:number-of-paths2}に
+  代入すると，
+  \begin{align}
+    &\sum_{k=1}^m\sum_{l=1}^{n_k}\sigma_{sv_{kl}}\sigma_{v_{kl}t}\nonumber\\
+    =&\sum_{k=1}^m\sum_{l=1}^{n_k}\sum_{
+      (v_1,\ldots,v_{k-1},v_{k+1},\ldots,v_m)\in
+      L_1\times\cdots\times L_{k-1}\times L_{k+1}\times\cdots\times L_m
+    }a_{sv_1}\cdots a_{v_{k-1}v_{kl}}a_{v_{kl}v_{k+1}}\cdots a_{v_mt}\nonumber\\
+    =&\sum_{k=1}^m\sum_{(v_1,\ldots,v_m)\in L_1\times\cdots\times L_m}
+    a_{sv_1}\cdots a_{v_mt}\nonumber\\
+    =&m\left(\sum_{(v_1,\ldots,v_m)\in L_1\times\cdots\times L_m}
+    a_{sv_1}\cdots a_{v_mt}\right)
+    \label{eq:number-of-paths4}
+  \end{align}
+  と変形できる．式\ref{eq:number-of-paths4}の総和の対象が$1$となるのは，
+  $a_{sv_1},\ldots,a_{v_mt}$のすべてが$1$のとき，
+  すなわち，$s$と$v_1$,$v_1$と$v_2$,$\ldots$,$v_m$と$t$がすべて隣接している
+  とき，すなわち，$s$と$t$の最短経路となっているときである．
+  従って，総和の値は$s$と$t$の最短経路の数と一致し，
+  式\ref{eq:number-of-paths4}は$\sigma_{st}(d_{st}-1)$と等しい．
+  従って，補題が成り立つ．
+\end{proof}
+
+\subsection*{辺の削除に対する頂点間距離の更新}
+$G$から辺$e=\{\alpha,\beta\}\in E(G)$を削除した後の頂点間距離$d'_{st}$と
+最短経路数$\sigma'_{st}$を求める．次の定理が成り立つ．
+\begin{theorem}
+  \label{thm:update-distance-on-delete}
+  グラフ$G=(V,E)$から辺$\{\alpha,\beta\}\in E$を削除した後の
+  頂点間距離$d'_{st}$と最短経路数$\sigma'_{st}$について，次が成り立つ．
+  ただし，$d_{s\alpha}\leq d_{s\beta}$とする．
+  $\sigma_{st}(\alpha,\beta)$は$s$と$t$の最短経路のうち，有向辺$(\alpha,\beta)$を通るものの個数である．
+  \begin{enumerate}
+  \item $\sigma_{st}(\alpha,\beta)=0$ならば，次が成り立つ．
+    \[ d'_{st}=d_{st},\:\sigma'_{st}=\sigma_{st} \]
+  \item $0<\sigma_{st}(\alpha,\beta)<\sigma_{st}$ならば，次が成り立つ．
+    \[ d'_{st}=d_{st},\:\sigma'_{st}=\sigma_{st}-\sigma_{st}(\alpha,\beta) \]
+  \item $\sigma_{st}(\alpha,\beta)=\sigma_{st}>0$ならば，次が成り立つ．
+    \begin{equation*}
+      \begin{aligned}
+        d'_{st}&=\min\{d_{sv}+d_{vt}\,|\,v\in V,\,
+        \sigma_{sv}>\sigma_{sv}(\alpha,\beta),\,
+        \sigma_{vt}>\sigma_{vt}(\alpha,\beta) \\
+        \sigma'_{st}&=\frac{\sum_v(\sigma'_{sv}\sigma'_{vt})}{d'_{st}-1}\:
+        (v\in V,\,v\neq s,t,\,d'_{st}=d'_{sv}+d'_{vt})
+      \end{aligned}
+    \end{equation*}
+  \end{enumerate}
+\end{theorem}
+\begin{proof}
+  辺削除による更新の操作は次の三種類である．
+  \begin{enumerate}
+  \item 削除による影響はなく，何も行わない
+  \item 削除により最短経路数を更新する
+  \item 削除により頂点間距離を更新し，さらに最短経路数を再計算する
+  \end{enumerate}
+
+  一つ目の操作が実施される場合は，有向辺$(\alpha,\beta)$が$s$と$t$との
+  最短経路に含まれていないときである．これは，補題\ref{lemma:path-num-2}より，
+  $\sigma_{st}(\alpha,\beta)=0$のときと言い換えられる．
+
+  二つ目の操作が実施される場合は，
+  $s$と$t$との最短経路の集合$P\neq\varnothing$と，
+  $P$の中で有向辺$(\alpha,\beta)$を含む経路の集合$P'\neq\varnothing$に対して，
+  $P'\subset P$のときである．
+  言い換えると，補題\ref{lemma:path-num-2}より，
+  $0<\sigma_{st}(\alpha,\beta)<\sigma_{st}$のときである．
+  このとき，削除により$P'$に属する最短経路がなくなるため，
+  その数($\sigma_{st}(\alpha,\beta)$)だけ$\sigma_{st}$から引いた値とする．
+
+  三つ目の操作が実施される場合は，
+  $s$と$t$との最短経路の集合$P\neq\varnothing$と，
+  $P$の中で辺$\{\alpha,\beta\}$を含む経路の集合$P'\neq\varnothing$に対して，
+  $P'=P$のときである．
+  言い換えると，補題\ref{lemma:path-num-2}より，
+  $\sigma_{st}(\alpha,\beta)=\sigma_{st}>0$のときである．
+  このとき，削除により$P$に属する最短経路がすべて無効になるため，頂点間距離を
+  再計算する．補題\ref{lemma:distance-1}より，
+  新しい頂点間距離$d'_{st}$を計算できる．このとき，中間の頂点$v$は
+  削除による頂点間距離の更新が起こらない頂点を選ぶ．
+  また，新しい最短経路数$\sigma'_{st}$は補題\ref{lemma:number-of-paths}により
+  計算できる．
+\end{proof}
+
+定理\ref{thm:update-distance-on-delete}より，一辺削除時の頂点間距離の
+更新の方法が分かる．
+その手順ををアルゴリズム\ref{algo:update-distance-on-delete}に示す．
+\begin{algorithm}[H]
+  \caption{辺$\{\alpha,\beta\}$が削除されたときの$d'_{st}$と$\sigma'_{st}$の
+    更新}\label{algo:update-distance-on-delete}
+  \begin{algorithmic}[1]
+    \Require $G=(V,E),\ d_{st},\,\sigma_{st}$
+    \Ensure $d'_{st},\,\sigma'_{st}$
+    \State $P\gets()$
+    \Comment{更新の対象となる頂点組$(s,t)$}
+    \ForAll{$s\in\{1,2,\ldots,N\}$}
+    \ForAll{$t\in\{1,2,\ldots,N\}$}
+    \If{$\sigma_{st}(\alpha,\beta)=0$}
+    \State $d'_{st}=d_{st}$
+    \State $\sigma'_{st}=\sigma_{st}$
+    \ElsIf{$0<\sigma_{st}(\alpha,\beta)<\sigma_{st}$}
+    \State $d'_{st}=d_{st}$
+    \State $\sigma'_{st}=\sigma_{st}-\sigma_{st}(\alpha,\beta)$
+    \ElsIf{$\sigma_{st}(\alpha,\beta)=\sigma_{st}>0$}
+    \Comment{頂点間距離を再計算}
+    \State $d_{\min}\gets \infty$
+    \ForAll{$v\in V,\,\sigma_{sv}>\sigma_{sv}(\alpha,\beta),\,\sigma_{vt}>\sigma_{vt}(\alpha,\beta)$}
+    \State $d_{\min}\gets\min\left\{d_{\min},d_{sv}+d_{vt}\right\}$
+    \EndFor
+    \If{$d_{\min}=\infty$}
+    \State $d'_{st}\gets\infty$
+    \State $\sigma'_{st}\gets0$
+    \Else
+    \State $d'_{st}\gets d_{\min}$
+    \State \parbox[t]{\linewidth}{
+      $P\gets(\ldots,(s_i,t_i),(s,t),(s_{i+1},t_{i+1}),\ldots)$ \\
+      ただし，$d'_{s_i,t_i}\leq d'_{st}\leq d'_{s_{i+1},t_{i+1}},\ \ldots,(s_i,t_i),\ldots\in P$
+    }
+    \EndIf
+    \EndIf
+    \EndFor
+    \EndFor
+    \ForAll{$(s_i,t_i)\in P$}
+    \Comment{最短経路数を再計算}
+    \State $\sigma'\gets0$
+    \ForAll{$v\in V,\:v\neq s_i,t_i,\:d'_{s_i,t_i}=d'_{s_i,v}+d'_{v,t_i}$}
+    \State $\sigma'\gets\sigma'+\sigma'_{s_i,v}\sigma'_{v,t_i}$
+    \EndFor
+    \State $\sigma'_{s_i,t_i}\gets\sigma'/(d'_{s_i,t_i}-1)$
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+アルゴリズム\ref{algo:update-distance-on-delete}では，頂点間距離の
+再計算の対象の組$(s,t)$を$d'_{st}$の昇順になるようにリストに追加している．
+この根拠は次の系\ref{coll:update-distance-on-delete}で与える．
+\begin{corollary}
+  \label{cor:update-distance-on-delete}
+  頂点間距離を再計算した組$(s,t)$について，最短経路数
+  $\sigma'_{st}$を再計算するには，すべての$d'_{st}>d'_{uv}$なる
+  $(u,v)$の$\sigma'_{uv}$を先に計算しなければならない．
+\end{corollary}
+\begin{proof}
+  定理\ref{thm:update-distance-on-delete}の更新手順より，
+  $s$と$t$の最短経路数の中に$d'_{st}>d'_{uv}$なる$u$と$v$の最短経路数
+  が含まれる．よって，$\sigma'_{st}$を再計算するには，すべての
+  $d'_{st}>d'_{uv}$なる$(u,v)$の$\sigma'_{uv}$先に計算しなければならない．
+\end{proof}

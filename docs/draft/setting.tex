@@ -1,0 +1,91 @@
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{thmtools}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{color}
+\usepackage{geometry}
+\usepackage{algorithm,algpseudocode}
+\usepackage{float}
+\usepackage[
+style=ieee,backend=biber,texencoding=utf8,bibencoding=utf8,dashed=false
+]{biblatex}
+\usepackage{verbatim}
+
+% setting title
+\makeatletter
+\def\maketitle{
+  \newgeometry{margin=1in}
+  \begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    \Huge\textbf{\@title} \\
+    \vspace{2.5cm}
+    \Large{著者} \\
+    \Large{\@author} \\
+    \vfill
+    %\includegraphics[width=.4\textwidth]{gmgfinder.pdf} \\
+    \Large{\@date}
+  \end{titlepage}
+  \restoregeometry
+}
+\makeatother
+
+% setting margin
+\newgeometry{tmargin=2cm,lmargin=2cm,rmargin=2cm,bmargin=2cm}
+
+% adding new symbol (vrectangle and vrectangleblack)
+\DeclareFontEncoding{LS1}{}{}
+\DeclareFontSubstitution{LS1}{stix}{m}{n}
+\DeclareSymbolFont{symbolsstix}{LS1}{stixscr}{m}{n}
+\DeclareMathSymbol{\vrectangleblack}{\mathord}{symbolsstix}{"C5}
+\DeclareMathSymbol{\vrectangle}{\mathord}{symbolsstix}{"C6}
+
+% add math operator
+\DeclareMathOperator*{\argmin}{\arg\!\min}
+\DeclareMathOperator*{\argmax}{\arg\!\max}
+
+% theorem preference
+\declaretheoremstyle[
+  spaceabove=1ex, 
+  numbered=yes,
+  headfont=\bfseries,
+  headpunct=,
+  bodyfont=\normalfont,
+  spacebelow=1ex,
+]{mythmstyle}
+\declaretheorem[
+  parent=chapter,style=mythmstyle,qed=$\vrectangle$,title=定義,
+]{definition}
+\declaretheorem[
+  style=mythmstyle,sibling=definition,qed=$\vrectangle$,title=例,
+]{example}
+\declaretheorem[
+  style=mythmstyle,sibling=definition,title=補題,
+]{lemma}
+\declaretheorem[
+  style=mythmstyle,sibling=definition,qed=$\vrectangle$,title=補題,
+]{lemma-without-proof}
+\declaretheorem[
+  style=mythmstyle,sibling=definition,title=定理,
+]{theorem}
+\declaretheorem[
+  style=mythmstyle,sibling=definition,qed=$\vrectangle$,title=定理,
+]{theorem-without-proof}
+\declaretheorem[
+  style=mythmstyle,sibling=definition,title=系,
+]{corollary}
+\declaretheorem[
+  style=mythmstyle,sibling=definition,qed=$\vrectangle$,title=系,
+]{corollary-without-proof}
+\declaretheorem[
+  style=mythmstyle,sibling=definition,qed=$\vrectangle$,title=予想,
+]{conjecture}
+\renewcommand{\proofname}{\normalfont{[\,証明\,]}\nopunct}
+\renewcommand{\qedsymbol}{$\vrectangleblack$}
+
+% algorithm preference
+\renewcommand{\listalgorithmname}{アルゴリズムリスト}
+\renewcommand{\thealgorithm}{\arabic{chapter}.\arabic{algorithm}}
+\makeatletter
+\renewcommand{\ALG@name}{アルゴリズム}
+\@addtoreset{algorithm}{chapter}
+\makeatother

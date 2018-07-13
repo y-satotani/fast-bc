@@ -1,0 +1,111 @@
+\chapter{提案アルゴリズム}
+
+\begin{algorithm}
+  \caption{Brandesのアルゴリズム}
+  \label{algo:brandes}
+  \begin{algorithmic}[1]
+    \Require グラフ$G=(V,E)$
+    \Ensure 媒介中心性$B_1,B_2,\ldots,B_N$
+    \State $B_i\gets0\ (i=1,2,\ldots,N)$
+    \ForAll{$s\in\{1,2,\ldots,N\}$}
+    \State $\delta_s(i)\gets0\ (i=1,2,\ldots,N)$
+    \State 頂点$s$からすべての頂点への最短経路$G_s=(V,E_s)$と$d_{si},\ \sigma_{si}\ (i=1,2,\ldots,N)$を求める. 
+    \ForAll{$(i,j)\in E_s$}
+    \State \begin{equation*} \delta_s(i)\gets\delta_s(i)+\frac{\sigma_{si}}{\sigma_{sj}}(1+\delta_s(j)) \end{equation*}
+    \EndFor
+    \State $B_i\gets B_i+\delta_s(i),\ (i=1,2,\ldots,N)$
+    \EndFor
+    \State \textbf{return} $B_i\ (i=1,2,\ldots,N)$
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+  \caption{一辺挿入時の媒介中心性更新アルゴリズム}
+  \label{algo:insert}
+  \begin{algorithmic}[1]
+    \Require グラフ$G=(V,E)$，挿入辺$\{\alpha,\beta\}$，最短経路長$\{d_{pq}\}_{p,q=1}^N$，最短経路数$\{\sigma_{pq}\}_{p,q=1}^N$，ペア依存度$\delta_s(i)$
+    \Ensure 挿入後の最短経路長$\{d'_{pq}\}_{p,q=1}^N$，最短経路数$\{\sigma'_{pq}\}_{p,q=1}^N$，媒介中心性$B'_1,B'_2,\ldots,B'_N$，ペア依存度$\delta'_s(i)$
+    \ForAll{$s\in\{1,2,\ldots,N\}$}
+    \If{$d_{s\alpha}=d_{s\beta}$}
+    \State $d'_{st}\gets d_{st}\qquad\sigma'_{st}\gets\sigma_{st}\qquad\delta'_s(i)\gets\delta_s(i)\ (i=1,2,\ldots,N)$
+    \Else
+    \State\Comment 最短経路数・最短経路長の更新
+    \If{$d_{s\alpha}<d_{s\beta}$かつ$d_{st}>d_{s\alpha}+d_{\beta t}+1$}
+    \State $d'_{st}\gets d_{s\alpha}+d_{\beta t}+1\qquad\sigma'_{st}\gets \sigma_{s\alpha}\sigma_{\beta t}$
+    \ElsIf{$d_{s\alpha}<d_{s\beta}$かつ$d_{st}=d_{s\alpha}+d_{\beta t}+1$}
+    \State $d'_{st}\gets d_{st}\qquad\sigma'_{st}\gets \sigma_{st}+\sigma_{s\alpha}\sigma_{\beta t}$
+    \ElsIf{$d_{s\alpha}=d_{s\beta}$または$d_{st}<d_{s\alpha}+d_{\beta t}+1$}
+    \State $d'_{st}\gets d_{st}\qquad\sigma'_{st}\gets\sigma_{st}$
+    \EndIf
+    \State\Comment ペア依存度の更新
+    \State $\delta'_s(i)\gets0\ (i=1,2,\ldots,N)$
+    \State 頂点$s$からすべての頂点への最短経路$G_s=(V,E_s)$と$d_{si},\ \sigma_{si}\ (i=1,2,\ldots,N)$を求める. 
+    \ForAll{$(i,j)\in E_s$}
+    \State \begin{equation*} \delta'_s(i)\gets\delta'_s(i)+\frac{\sigma_{si}}{\sigma_{sj}}(1+\delta'_s(j)) \end{equation*}
+    \EndFor
+    \EndIf
+    \EndFor
+    \State $B'_i\gets\sum_{s\in\{1,2,\ldots,N\}}\delta'_s(i)$
+    \State \textbf{return} $B'_i\ (i=1,2,\ldots,N)$
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+  \caption{一辺削除時の媒介中心性更新アルゴリズム}
+  \label{algo:insert}
+  \begin{algorithmic}[1]
+    \Require グラフ$G=(V,E)$，削除辺$\{\alpha,\beta\}$，最短経路長$\{d_{pq}\}_{p,q=1}^N$，最短経路数$\{\sigma_{pq}\}_{p,q=1}^N$，ペア依存度$\delta_s(i)$
+    \Ensure 削除後の最短経路長$\{d'_{pq}\}_{p,q=1}^N$，最短経路数$\{\sigma'_{pq}\}_{p,q=1}^N$，媒介中心性$B'_1,B'_2,\ldots,B'_N$，ペア依存度$\delta'_s(i)$
+    \ForAll{$s\in\{1,2,\ldots,N\}$}
+    \If{$d_{s\alpha}=d_{s\beta}$}
+    \State $d'_{st}\gets d_{st}\qquad\sigma'_{st}\gets\sigma_{st}\qquad\delta'_s(i)\gets\delta_s(i)\ (i=1,2,\ldots,N)$
+    \Else
+    \State\Comment 最短経路数・最短経路長の更新
+    \State $P\gets()$
+    \Comment{更新の対象となる頂点組${st}$}
+    \ForAll{$t\in\{1,2,\ldots,N\}$}
+    \If{$\sigma_{st}(\alpha,\beta)=0$}
+    \State $d'_{st}=d_{st}$
+    \State $\sigma'_{st}=\sigma_{st}$
+    \ElsIf{$0<\sigma_{st}(\alpha,\beta)<\sigma_{st}$}
+    \State $d'_{st}=d_{st}$
+    \State $\sigma'_{st}=\sigma_{st}-\sigma_{st}(\alpha,\beta)$
+    \ElsIf{$\sigma_{st}(\alpha,\beta)=\sigma_{st}>0$}
+    \Comment{頂点間距離を再計算}
+    \State $d_{\min}\gets \infty$
+    \ForAll{$v\in V,\,\sigma_{sv}>\sigma_{sv}(\alpha,\beta),\,\sigma_{vt}>\sigma_{vt}(\alpha,\beta)$}
+    \State $d_{\min}\gets\min\left\{d_{\min},d_{sv}+d_{vt}\right\}$
+    \EndFor
+    \If{$d_{\min}=\infty$}
+    \State $d'_{st}\gets\infty$
+    \State $\sigma'_{st}\gets0$
+    \Else
+    \State $d'_{st}\gets d_{\min}$
+    \State \parbox[t]{\linewidth}{
+      $P\gets(\ldots,(s_i,t_i),(s,t),(s_{i+1},t_{i+1}),\ldots)$ \\
+      ただし，$d'_{s_i,t_i}\leq d'_{st}\leq d'_{s_{i+1},t_{i+1}},\ \ldots,(s_i,t_i),\ldots\in P$
+    }
+    \EndIf
+    \EndIf
+    \EndFor
+    \ForAll{$(s_i,t_i)\in P$}
+    \Comment{最短経路数を再計算}
+    \State $\sigma'\gets0$
+    \ForAll{$v\in V,\:v\neq s_i,t_i,\:d'_{s_i,t_i}=d'_{s_i,v}+d'_{v,t_i}$}
+    \State $\sigma'\gets\sigma'+\sigma'_{s_i,v}\sigma'_{v,t_i}$
+    \EndFor
+    \State $\sigma'_{s_i,t_i}\gets\sigma'/(d'_{s_i,t_i}-1)$
+    \EndFor
+    \State\Comment ペア依存度の更新
+    \State $\delta'_s(i)\gets0\ (i=1,2,\ldots,N)$
+    \State 頂点$s$からすべての頂点への最短経路$G_s=(V,E_s)$と$d_{si},\ \sigma_{si}\ (i=1,2,\ldots,N)$を求める. 
+    \ForAll{$(i,j)\in E_s$}
+    \State \begin{equation*} \delta'_s(i)\gets\delta'_s(i)+\frac{\sigma_{si}}{\sigma_{sj}}(1+\delta'_s(j)) \end{equation*}
+    \EndFor
+    \EndIf
+    \EndFor
+    \State $B'_i\gets\sum_{s\in\{1,2,\ldots,N\}}\delta'_s(i)$
+    \State \textbf{return} $B'_i\ (i=1,2,\ldots,N)$
+  \end{algorithmic}
+\end{algorithm}
+
