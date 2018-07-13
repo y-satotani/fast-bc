@@ -98,8 +98,11 @@ void make_graph(igraph_t* G, char* name, int n, int k) {
     igraph_erdos_renyi_game(G, IGRAPH_ERDOS_RENYI_GNM, n, n*k/2, 0, 0);
   else if(strcmp(name, "BA") == 0)
     igraph_barabasi_game(G, n, 1, k/2, 0, 1, 1, 0, IGRAPH_BARABASI_BAG, 0);
-  else
-    assert(0);
+  else {
+    FILE* fp = fopen(name, "r");
+    igraph_read_graph_edgelist(G, fp, 0, 0);
+    fclose(fp);
+  }
 }
 
 void choice_noadjacent_pair(igraph_t* G,
