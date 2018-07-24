@@ -57,3 +57,36 @@
 \end{figure}
 
 \section{実データに対する実験}
+
+ネットワークは2270頂点，2663辺を有する．
+ネットワークの図を図\ref{fig:net-ou1}に示す．
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=.5\textwidth]{road-ou1.pdf}
+  \caption{実験で用いるネットワーク}
+\end{figure}
+
+\begin{table}[tb]
+  \centering
+  \caption{実データに対する挿入時の実験結果}
+  \begin{tabular}{lr}
+    \hline
+    計算方法 & 平均実行時間[s] \\ \hline
+    再計算 & 0.370 \\ \hline
+    更新 & 0.748 \\ \hline\hline
+    再計算した頂点の割合 & 0.995 \\ \hline
+  \end{tabular}
+\end{table}
+
+\begin{table}[tb]
+  \centering
+  \caption{実データに対する削除時の実験結果}
+  \begin{tabular}{lr}
+    \hline
+    計算方法 & 平均実行時間[s] \\ \hline
+    再計算 & 0.379 \\ \hline
+    更新 & 34.576 \\ \hline\hline
+    再計算した頂点の割合 & 1.000 \\ \hline
+  \end{tabular}
+\end{table}

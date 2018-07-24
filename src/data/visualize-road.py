@@ -21,5 +21,5 @@ plt.xlabel('経度')
 plt.ylabel('緯度')
 plt.xlim(min([p[0] for p in pos.values()]), max(p[0] for p in pos.values()))
 plt.ylim(min([p[1] for p in pos.values()]), max(p[1] for p in pos.values()))
-plt.savefig('{}.pdf'.format('.'.join(filename.split('.')[:-1])))
+plt.savefig('{}.svg'.format('.'.join(filename.split('.')[:-1])))
 
