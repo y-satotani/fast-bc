@@ -23,34 +23,23 @@ B_i=\sum_{s\neq i}\sum_{t\neq {i,s}}\frac{\sigma_{st}(i)}{\sigma_{st}}
 
 媒介中心性の効率的計算法として最も広く用いられているのはBrandes~\cite{Brandes2001}によって提案されたアルゴリズムである．それを以下に示す．
 
-\begin{algorithm}[H]
+\begin{algorithm}
   \caption{Brandesのアルゴリズム}
-\label{algo:Brandes}
-\rm \ \\
-入力：単純無向連結グラフ$G=(V,E)$\\
-出力：$B_1,B_2,\ldots,B_N$
-{\renewcommand{\labelenumi}{\arabic{enumi}.}
-\begin{enumerate}
-\item $s\leftarrow 1$，$B_i \leftarrow 0$\ ($i=1,2,\ldots,N$)とする.
-%
-\item 頂点$s$からすべての頂点への最短経路$G_s=(V,E_s)$を幅優先探索で求め，同時に$d_{si}$, $\sigma_{si}$\ ($i=1,2,\ldots,N$)も求める. 
-%
-\item $\delta_s(i) \leftarrow 0$ ($i=1,2,\ldots,N$)とする. 
-%
-\item 次式によって$\delta_s(i)$の値を更新する．
-\begin{multline*}
-\delta_s(i)\leftarrow \sum_{j:(i,j)\in E_s} \frac{\sigma_{si}}{\sigma_{sj}}(1+\delta_s(j)), 
-\\ i=1,2,\ldots,s-1,s+1,s+2,\ldots,N.
-\end{multline*}
-%
-\item 次式によって$B_i$の値を更新する．
-\begin{equation*}
-B_i \leftarrow B_i+\delta_s(i), \quad i=1,2,\ldots,N.
-\end{equation*}
-%
-\item $s=N$ならば$B_1,B_2,\ldots,B_N$を返して終了する.そうでなければ$s\leftarrow s+1$としてステップ3に戻る. 
-\end{enumerate}
-}
+  \label{algo:Brandes}
+  \begin{algorithmic}[1]
+    \Require グラフ$G=(V,E)$
+    \Ensure 媒介中心性$B_1,B_2,\ldots,B_N$
+    \State $B_i\gets0\ (i=1,2,\ldots,N)$
+    \ForAll{$s\in\{1,2,\ldots,N\}$}
+    \State $\delta_s(i)\gets0\ (i=1,2,\ldots,N)$
+    \State 頂点$s$からすべての頂点への最短経路$G_s=(V,E_s)$と$d_{si},\ \sigma_{si}\ (i=1,2,\ldots,N)$を求める. 
+    \ForAll{$(i,j)\in E_s$}
+    \State \begin{equation*} \delta_s(i)\gets\delta_s(i)+\frac{\sigma_{si}}{\sigma_{sj}}(1+\delta_s(j)) \end{equation*}
+    \EndFor
+    \State $B_i\gets B_i+\delta_s(i),\ (i=1,2,\ldots,N)$
+    \EndFor
+    \State \textbf{return} $B_i\ (i=1,2,\ldots,N)$
+  \end{algorithmic}
 \end{algorithm}
 
 このアルゴリズムの計算量を考える．ステップ2は$\mathcal{O}(M)$の時間で実行できる．

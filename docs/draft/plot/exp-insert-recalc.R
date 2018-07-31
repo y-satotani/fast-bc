@@ -12,8 +12,8 @@ data_ratio <- read_csv('../../res/data/bc-20180419-fixed.csv') %>%
 data_fig4 <- data_ratio %>% filter(n == 100, k == 10)
 gp <- ggplot(data_fig4, aes(`update-frac`, `time-update`, colour = query)) +
   facet_wrap(~graph) + geom_point() +
-  xlab('更新頂点割合') + ylab('実行時間') +
+  xlab('更新頂点割合') + ylab('実行時間(s)') +
   scale_colour_viridis(discrete = TRUE) +
-  theme(legend.position = 'none')
+  theme(strip.background = element_rect(fill = 'white'), strip.text = element_text(colour = 'black'), legend.position = 'none')
 
-ggsave('exp-insert-recalc.pdf', gp, cairo_pdf, width = 15, height = 5, units = 'cm')
+ggsave('exp-insert-recalc.pdf', gp, cairo_pdf, width = 15, height = 6, units = 'cm')
