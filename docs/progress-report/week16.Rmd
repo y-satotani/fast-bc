@@ -1,0 +1,62 @@
+---
+title: "研究進捗報告"
+author: "里谷 佳紀"
+date: "平成30年8月21日"
+documentclass: bxjsarticle
+classoption: xelatex,ja=standard,11pt
+geometry: no
+output:
+  pdf_document:
+    latex_engine: xelatex
+    template: mytemplate.tex
+    number_sections: yes
+    fig_caption: yes
+    includes:
+      in_header: header.sty
+  github_document:
+    html_preview: no
+---
+
+```{r setup, include = FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(viridis)
+theme_set(theme_light(base_size = 11, base_family = 'IPAexGothic'))
+if(knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex') {
+  devname <- 'cairo_pdf'
+  devargs <- c()
+} else {
+  devname <- 'png'
+  devargs <- c('type' = 'cairo-png')
+}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.height = 2.3, fig.width = 6, fig.align = 'center',
+  dev = devname, dev.args = devargs, dpi = 150
+)
+```
+
+```{r readin, include = FALSE}
+data <- read_csv('../res/data/oubc-20180713.csv') %>%
+  gather(key = 'calc-type', value = 'time', `time-update`, `time-noupdate`) %>%
+  group_by(query, `calc-type`) %>%
+  summarise(time = mean(time)) %>%
+  ungroup()
+```
+
+# 研究全体の目的
+グラフと全頂点間距離と最短経路の数およびペア依存度が与えられたとき，グラフの辺が削除されたとする． 
+このときの全頂点間距離と最短経路の数とペア依存度を高速に更新する方法を開発する． 
+また，実験と理論の両方から既存の方法と比較することで，新方法の有用性を検証する．
+
+# 前回打ち合わせ時に定めた短期目標
+1. Tencon 2018用のスライド作成
+2. 媒介中心性更新の文書化
+3. 媒介中心性更新の関連論文読み
+
+# 本日までの進捗状況
+1. 背景と方法の英訳が完了した．全体の6割程度の分量である．
+2. 進捗なし．
+3. QUBEの論文を読んだ．Brandesの方法より時間がかかることは無いようである．
