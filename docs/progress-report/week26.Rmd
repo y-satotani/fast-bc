@@ -1,0 +1,95 @@
+---
+title: "研究進捗報告"
+author: "里谷 佳紀"
+date: "平成30年11月22日"
+documentclass: bxjsarticle
+classoption: xelatex,ja=standard,11pt
+geometry: no
+output:
+  pdf_document:
+    latex_engine: xelatex
+    template: mytemplate.tex
+    number_sections: yes
+    fig_caption: yes
+    includes:
+      in_header: header.sty
+  github_document:
+    html_preview: no
+---
+
+```{r setup, include = FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(viridis)
+theme_set(theme_light(base_size = 11, base_family = 'IPAexGothic'))
+knitr::opts_knit$get('rmarkdown.pandoc.to')
+if(knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex') {
+  devname <- 'cairo_pdf'
+  devargs <- c()
+} else {
+  devname <- 'png'
+  devargs <- c('type' = 'cairo-png')
+}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.height = 3, fig.width = 6, fig.align = 'center',
+  dev = devname, dev.args = devargs, dpi = 150
+)
+```
+
+```{r readin, include = FALSE}
+data_time <- read_csv('../res/data/result-20181117.csv') %>%
+  group_by(topology, n, k, query) %>%
+  filter(topology %in% c('barabasi-albert', 'erdos-renyi')) %>%
+  summarise(
+    `proposed-max` = max(`time-proposed`),
+    `proposed-mean` = mean(`time-proposed`),
+    `brandes-mean` = mean(`time-brandes`),
+    `brandes-max` = max(`time-brandes`)
+  ) %>%
+  ungroup() %>%
+  gather(
+    key = 'method', value = 'time',
+    `proposed-max`, `proposed-mean`, `brandes-mean`, `brandes-max`
+  )
+```
+
+# 研究全体の目的
+グラフと全頂点間距離と最短経路の数およびペア依存度が与えられたとき，グラフの辺が削除されたとする．
+このときの全頂点間距離と最短経路の数とペア依存度を高速に更新する方法を開発する．
+また，実験と理論の両方から既存の方法と比較することで，新方法の有用性を検証する．
+
+# 前回打ち合わせ時に定めた短期目標
+1. 媒介中心性を更新するアルゴリズムの設計
+2. 最短経路更新に関する論文の解説の準備
+
+# 本日までの進捗状況
+1. 挿入・削除両方のアルゴリズムの設計が完了した．実験の結果を以下に示す．媒介中心性の誤差はたかだか$10^{-12}$である．
+2. 未着手
+
+# 一辺削除時の全頂点の媒介中心性の更新の実験
+一辺挿入および削除時の全頂点の媒介中心性の更新に関する実験を行った．
+
+## 一辺挿入時の実験結果
+
+一辺挿入操作に対して，次数を4に固定し頂点数を変化させたときの実行時間を示す．
+図は2個のグラフで構成され，それぞれBarabási–Albertモデル，Erdős–Rényiモデルで行った結果であることを意味する．4本の線はそれぞれBrandesのアルゴリズムの実行時間の最大値および平均値，提案手法の実行時間の最大値および平均値を表す．
+```{r fig1}
+data_fig1 <- data_time %>% filter(k == 4, query == 'insert')
+ggplot(data_fig1, aes(n, time, colour = method, shape = method, linetype = method)) +
+  facet_wrap(~topology) + geom_line() + geom_point() +
+  xlab('頂点数') + ylab('実行時間(s)') +
+  scale_colour_viridis(discrete = TRUE)
+```
+
+## 一辺削除時の実験結果
+挿入時の実験と同じ設定で削除操作に対する実行時間を示す．
+```{r fig2}
+data_fig1 <- data_time %>% filter(k == 4, query == 'delete')
+ggplot(data_fig1, aes(n, time, colour = method, shape = method, linetype = method)) +
+  facet_wrap(~topology) + geom_line() + geom_point() +
+  xlab('頂点数') + ylab('実行時間(s)') +
+  scale_colour_viridis(discrete = TRUE)
+```
