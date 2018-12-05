@@ -1,0 +1,184 @@
+\chapter{最短経路の長さと個数の証明}
+最短経路の長さと個数について，いくつかの補題を示す．
+
+\begin{lemma}[Brandes~\cite{Brandes2001}]
+$G=(V,E)$の異なる2頂点$s,t \in V$に対して，$s$から$t$への最短経路$G_{st}=(V_{st},E_{st})$が$i \in V$を含む，すなわち$i \in V_{st}$であるための必要十分条件は
+\begin{equation}
+  d_{st}=d_{si}+d_{it}
+  \label{eqn:inclusion0}
+\end{equation}
+が成り立つことである．
+\label{lemma:1}
+\end{lemma}
+\begin{proof}
+はじめに$i=s$の場合を考える．このとき明らかに$i \in V_{st}$であり，かつ$d_{si}+d_{it}=d_{ss}+d_{st}=d_{st}$より\eqref{eqn:inclusion0}もつねに成り立つ．$i=t$の場合も同様である．そこで以下では$i \not\in \{s,t\}$と仮定する．$G_{st}$が頂点$i$を含むならば，$G_{st}$の中に$s \rightarrow \cdots \rightarrow i \rightarrow \cdots \rightarrow t$の順に頂点を通る有向道が存在する．この有向道の長さは$d_{si}+d_{it}$で与えられるので\eqref{eqn:inclusion0}が成り立つ．次に\eqref{eqn:inclusion0}が成り立つと仮定する．頂点$s$を出発して$s$から$i$への最短経路の一つを通って$i$に行き，次に$i$から$t$への最短経路の一つを通って$t$に行く有向道を考える．この有向道は$s$から$t$への最短経路の一つである．なぜなら，その長さは$d_{si}+d_{it}$で与えられ，\eqref{eqn:inclusion0}より$s$から$t$への最短経路長$d_{st}$に等しいからである．したがって$i \in V_{st}$が成り立つ．
+\end{proof}
+
+\begin{lemma}
+$G=(V,E)$の異なる2頂点$s,t\in V$と辺$\{i,j\} \in E$を考える．$s$から$t$への最短経路$G_{st}=(V_{st},E_{st})$が有向辺$(i,j)$を含む，すなわち$(i,j) \in E_{st}$が成り立つための必要十分条件は
+\begin{equation}
+d_{st}=d_{si}+d_{jt}+1
+\label{eqn:inclusion}
+\end{equation}
+が成り立つことである．
+\label{lemma:2}
+\end{lemma}
+\begin{proof}
+はじめに$i=s$, $j=t$の場合を考える．このとき明らかに$G_{st}$は
+有向辺$(i,j)$を含み，かつ$d_{si}+d_{jt}+1=d_{ss}+d_{tt}+1=1=d_{st}$
+より\eqref{eqn:inclusion}も成り立つ．次に$i=s$, $j \neq t$の場合を
+考える．このとき$(i,j)\in E_{st}$であるための必要十分条件は$G_{st}$が
+$j$を含むことである．これは補題~\ref{lemma:1}より
+$d_{st}=d_{sj}+d_{jt}$と等価であり，さらに右辺$d_{sj}+d_{jt}$は
+\eqref{eqn:inclusion}の右辺と等しい．$i\neq s$, $j=t$の場合も同様である．
+そこで以下では$s,t,i,j$がすべて異なると仮定する．
+$G_{st}$が有向辺$(i,j)$を含むならば，$G_{st}$の中に
+$s \rightarrow \cdots \rightarrow i \rightarrow j \rightarrow \cdots \rightarrow t$
+の順に頂点を通る有向道が存在する．
+この有向道の長さは$d_{si}+1+d_{jt}$で与えられるので\eqref{eqn:inclusion}が
+成り立つ．次に\eqref{eqn:inclusion}が成り立つと仮定する．頂点
+$s$を出発して$s$から$i$への最短経路の一つを通って$i$に行き，次に
+辺$\{i,j\}$を通って$j$に行き，最後に$j$から$t$への最短経路の一つを
+通って$t$に行く有向道が存在する．この有向道は$s$から$t$への最短経路の一つで
+ある．なぜなら，その長さは$d_{si}+1+d_{jt}$で与えられ，
+\eqref{eqn:inclusion}より$s$から$t$への最短経路長$d_{st}$に
+等しいからである．したがって，$(i,j) \in E_{st}$が成り立つ．
+\end{proof}
+
+\begin{lemma}[Brandes\cite{Brandes2001}]
+$G=(V,E)$の異なる2頂点$s,t \in V$に対して，
+$s$から$t$への最短経路の中で$i$を通るものの個数$\sigma_{st}(i)$は
+次式で与えられる．
+\begin{equation}
+\sigma_{st}(i)=
+\left\{
+\begin{array}{ll}
+\sigma_{si} \sigma_{it}, & d_{st}=d_{si}+d_{it}\,\mbox{のとき} \\
+0, & \mbox{それ以外のとき}
+\end{array}
+\right.
+\label{eqn:sigma_sti}
+\end{equation}
+\label{lemma:3}
+\end{lemma}
+
+\begin{lemma}
+$G=(V,E)$の異なる2頂点$s,t \in V$に対して，
+$s$から$t$への最短経路の中で有向辺$(i,j)$を通るものの個数を
+$\sigma_{st}(i,j)$とおくと，それは次式で与えられる．
+\begin{equation*}
+\sigma_{st}(i,j)=
+\left\{
+\begin{array}{ll}
+\sigma_{si} \sigma_{jt}, & d_{st}=d_{si}+d_{jt}+1\,\mbox{のとき} \\
+0, & \mbox{それ以外のとき}
+\end{array}
+\right.
+%\label{eqn:sigma_stij}
+\end{equation*}
+\label{lemma:4}
+\end{lemma}
+
+次の補題は，ある二頂点間の最短経路の長さと，その経路に含まれる短い最短経路の長さに関するものである．
+\begin{lemma}
+  \label{lemma:distance-of-path}
+  $G=(V,E)$の異なる二頂点$s,t\in V$について，次が成り立つ．
+  \begin{equation*}
+    d_{st}=\min\{d_{si}+d_{it}|i\in V\}
+  \end{equation*}
+\end{lemma}
+\begin{proof}
+  TBA
+\end{proof}
+
+次の補題は，ある二頂点間の最短経路の個数と，その経路に含まれる
+短い最短経路の個数との関係を示す．
+\begin{lemma}
+  \label{lemma:number-of-paths}
+  $G=(V,E)$の異なる二頂点$s,t\in V$について，$v$を$d_{st}=d_{sv}+d_{vt}$
+  である頂点(ただし$v\neq s,t$)とすると，次が成り立つ．
+  \begin{equation}
+    \label{eq:number-of-paths}
+    \sigma_{st}=\frac{\sum_{v}\sigma_{sv}\sigma_{vt}}{d_{st}-1}
+  \end{equation}
+\end{lemma}
+\begin{proof}
+  $s$と$t$の間の一般的な経路を図\ref{fig:proof-number-of-paths}に示す．
+  \begin{figure}
+    \centering
+    \def\svgwidth{.5\columnwidth}
+    \input{proof-number-of-paths.pdf_tex}
+    \caption{$s$と$t$の一般的な最短経路}
+    \label{fig:proof-number-of-paths}
+  \end{figure}
+  $s$からの距離が一定の頂点を並べて，一つの層とする．$d_{sv}=k$なる頂点
+  $v$の集合を，第$k$層と定義し，$L_k$と表す．
+  $L_k$に属する頂点の数を$n_k$，$L_k$に属する$l$番目の頂点を$v_{kl}$と表す．
+  ここで，第$k$層に属する頂点$v$は，隣接する層(第$k-1$層と第$k+1$層)
+  以外の層に属する頂点$w$と隣接しないことに注意する．
+  もしそのような頂点が存在すると，最短経路長が変化する．
+  式\eqref{eq:number-of-paths}の両辺に$d_{st}-1$を掛けて，
+  次の式\eqref{eq:number-of-paths1}を得る．
+  \begin{equation}
+    \sigma_{st}(d_{st}-1)=\sum_{v}\sigma_{sv}\sigma_{vt}
+    \label{eq:number-of-paths1}
+  \end{equation}
+  式\eqref{eq:number-of-paths1}の右辺を，
+  図\ref{fig:proof-number-of-paths}にならって表すと，
+  \begin{equation}
+    \sum_{v}\sigma_{sv}\sigma_{vt}=
+    \sum_{k=1}^m\sum_{l=1}^{n_k}\sigma_{sv_{kl}}\sigma_{v_{kl}t}
+    \label{eq:number-of-paths2}
+  \end{equation}
+  が得られる．ここで，二つの頂点$v$と$w$について，次の隣接を表す記号$a$を導入する．
+  \begin{align*}
+    a_{vw}=
+    \begin{cases}
+      1 & vとwが隣接しているとき \\
+      0 & vとwが隣接していないとき
+    \end{cases}
+  \end{align*}
+  各々の$\sigma_{sv_{kl}}\sigma_{v_{kl}t}$について議論する．
+  $a$の定義を用いて式を変形すると，
+  \begin{align}
+    &\sigma_{sv_{kl}}\sigma_{v_{kl}t}\nonumber\\
+    =&\left(\sum_{v'\in L_{k-1}}\sigma_{sv'}a_{v'v_{kl}}\right)
+    \left(\sum_{v'\in L_{k+1}}\sigma_{v_{kl}v'}a_{v't}\right)
+    \nonumber\\
+    =&\left(\sum_{v''\in L_{k-2}}\sum_{v'\in L_{k-1}}
+    \sigma_{sv''}a_{v''v'}a_{v'v_{kl}}\right)
+    \left(\sum_{v'\in L_{k+1}}\sum_{v''\in L_{k+2}}
+    a_{v_{kl}v'}a_{v'v''}\sigma_{v''t}\right)
+    \nonumber\\
+    &\vdots\nonumber\\
+    =&\left(\sum_{(v_1,\ldots,v_{k-1})\in L_1\times\cdots\times L_{k-1}}
+    a_{sv_1}\cdots a_{v_{k-1}v_{kl}}\right)
+    \left(\sum_{(v_{k+1},\ldots,v_m)\in L_{k+1}\times\cdots\times L_m}
+    a_{v_{kl}v_{k+1}}\cdots a_{v_mv_t}\right)\nonumber\\
+    =&\sum_{(v_1,\ldots,v_{k-1},v_{k+1},\ldots,v_m)\in L_1\times\cdots\times L_{k-1}\times L_{k+1}\times\cdots\times L_m}
+    a_{sv_1}\cdots a_{v_{k-1}v_{kl}}a_{v_{kl}v_{k+1}}\cdots a_{v_mt}
+    \label{eq:number-of-paths3}
+  \end{align}
+  が得られる．式\eqref{eq:number-of-paths3}を式\eqref{eq:number-of-paths2}に
+  代入すると，
+  \begin{align}
+    &\sum_{k=1}^m\sum_{l=1}^{n_k}\sigma_{sv_{kl}}\sigma_{v_{kl}t}\nonumber\\
+    =&\sum_{k=1}^m\sum_{l=1}^{n_k}\sum_{
+      (v_1,\ldots,v_{k-1},v_{k+1},\ldots,v_m)\in
+      L_1\times\cdots\times L_{k-1}\times L_{k+1}\times\cdots\times L_m
+    }a_{sv_1}\cdots a_{v_{k-1}v_{kl}}a_{v_{kl}v_{k+1}}\cdots a_{v_mt}\nonumber\\
+    =&\sum_{k=1}^m\sum_{(v_1,\ldots,v_m)\in L_1\times\cdots\times L_m}
+    a_{sv_1}\cdots a_{v_mt}\nonumber\\
+    =&m\left(\sum_{(v_1,\ldots,v_m)\in L_1\times\cdots\times L_m}
+    a_{sv_1}\cdots a_{v_mt}\right)
+    \label{eq:number-of-paths4}
+  \end{align}
+  と変形できる．式\eqref{eq:number-of-paths4}の総和の対象が$1$となるのは，
+  $a_{sv_1},\ldots,a_{v_mt}$のすべてが$1$のとき，
+  すなわち，$s$と$v_1$,$v_1$と$v_2$,$\ldots$,$v_m$と$t$がすべて隣接している
+  とき，すなわち，$s$と$t$の最短経路となっているときである．
+  従って，総和の値は$s$と$t$の最短経路の数と一致し，
+  式\eqref{eq:number-of-paths4}は$\sigma_{st}(d_{st}-1)$と等しい．
+  従って，補題が成り立つ．
+\end{proof}
+

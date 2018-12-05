@@ -1,0 +1,220 @@
+\chapter{一辺削除時の媒介中心性の変化量}
+\label{chap:update-bc-on-delete}
+本章では，$G=(V,E)$に辺$e=\{\alpha,\beta\}\in E$を削除して得られるグラフを
+$G'=(V,E')$とする．$G'$における頂点$s$から頂点$t\,(\neq s)$への最短経路を有向グラフ
+$G'_{st}=(V'_{st},E'_{st})$で表し，頂点$s$から他のすべての頂点への最短経
+路を有向グラフ$G'_s=(V,E'_s)$で表す．また，$G'$における頂点$s$から
+頂点$t\,(\neq s)$への最短経路の個数と長さをそれぞれ$\sigma'_{st}$, 
+$d'_{st}$で表し，$\sigma'_{st}$個の最短経路のうち頂点$i$を通るもの
+の個数を$\sigma'_{st}(i)$で表し，$\sigma'_{st}$個の最短経路のうち有効辺$(\alpha,\beta)$を通るものの個数を$\sigma'_{st}(\alpha,\beta)$で表す．
+
+まず，更新時の距離に関するいくつかの補題を示す．
+\begin{lemma}
+  \label{lemma:existence-of-vertex}
+  $G'$において，異なる二頂点$s,t\in V'$が同じ連結成分に含まれるとき，$\sigma_{si}>\sigma_{si}(\alpha,\beta)$かつ$\sigma_{it}>\sigma_{it}(\alpha,\beta)$なる$i\in V_{st}'$が存在する．
+\end{lemma}
+\begin{proof}
+  背理法で証明する．$\sigma_{si}>\sigma_{si}(\alpha,\beta)$かつ$\sigma_{it}>\sigma_{it}(\alpha,\beta)$である$i\in V_{st}'$が存在しない，すなわち，すべての$i\in V_{st}'$について$\sigma_{si}=\sigma_{si}(\alpha,\beta)$または$\sigma_{it}=\sigma_{it}(\alpha,\beta)$ならば，$G$において，$s$と$t$のすべての最短経路に$(\alpha,\beta)$を含む．すると，$G'$において，$s$と$t$が異なる連結成分に含まれることとなり，仮定と矛盾する．
+\end{proof}
+
+\begin{lemma}
+  \label{lemma:update-distance-on-delete}
+  頂点$s$と$t$が同じ連結成分に含まれるとき，次が成り立つ．
+  \begin{equation}
+    d'_{st}=\min\{d_{si}+d_{it}|i\in V,\sigma_{si}>\sigma_{si}(\alpha,\beta),\sigma_{it}>\sigma_{it}(\alpha,\beta)\}
+    \label{eq:update-distance-on-delete}
+  \end{equation}
+\end{lemma}
+\begin{proof}
+  補題\ref{lemma:distance-of-path}より，
+  \begin{equation}
+    d'_{st}=\min\{d'_{si}+d'_{it}|i\in V'\}
+    \label{eq:distance-of-path-after-delete}
+  \end{equation}
+  が成り立つ．ここで，
+  \begin{equation*}
+    d'_{si}+d'_{it}=
+    \begin{cases}
+      d_{si}+d_{it} & \sigma_{si}>\sigma_{si}(\alpha,\beta)\textrm{かつ}\sigma_{it}>\sigma_{it}(\alpha,\beta)のとき \\
+      d'_{si}+d_{it} & \sigma_{si}=\sigma_{si}(\alpha,\beta)\textrm{かつ}\sigma_{it}>\sigma_{it}(\alpha,\beta)のとき \\
+      d_{si}+d'_{it} & \sigma_{si}>\sigma_{si}(\alpha,\beta)\textrm{かつ}\sigma_{it}=\sigma_{it}(\alpha,\beta)のとき
+    \end{cases}
+  \end{equation*}
+  であることと，$d'_{ij}\geq d_{ij}$であることと補題\ref{lemma:existence-of-vertex}から，式\eqref{eq:distance-of-path-after-delete}は，式\eqref{eq:update-distance-on-delete}に変形できる．
+\end{proof}
+
+次の二つの定理は，一辺削除後の最短経路長と最短経路数の変化量に関するものである．
+\begin{theorem}
+  \label{thm:update-distance-on-delete}
+  $d_{s\alpha}\leq d_{s\beta}$のとき，$d'_{st}$について，次が成り立つ．
+  \begin{equation*}
+    d'_{st}=
+    \begin{cases}
+      d_{st} & \sigma_{st}(\alpha,\beta)<\sigma_{st} のとき \\
+      \min\{d_{sv}+d_{vt}\,|\,v\in V,\,\sigma_{sv}>\sigma_{sv}(\alpha,\beta),\,\sigma_{vt}>\sigma_{vt}(\alpha,\beta) & \sigma_{st}(\alpha,\beta)=\sigma_{st} のとき
+    \end{cases}
+  \end{equation*}
+\end{theorem}
+\begin{proof}
+  $\sigma_{st}(\alpha,\beta)<\sigma_{st}$ならば，長さが$d_{st}$である$s$と$t$の最短経路が存在するので，$d'_{st}=d_{st}$である．  $\sigma_{st}(\alpha,\beta)=\sigma_{st}$ならば，$s$と$t$のすべての最短経路が$(\alpha,\beta)$を含むので，補題\ref{lemma:update-distance-on-delete}を用いて再計算する．
+\end{proof}
+\begin{theorem}
+  \label{thm:update-pathnum-on-delete}
+  $d_{s\alpha}\leq d_{s\beta}$のとき，$\sigma'_{st}$について，次が成り立つ．
+  \begin{equation*}
+    \sigma'_{st}=
+    \begin{cases}
+      \sigma_{st} & \sigma_{st}(\alpha,\beta)=0 のとき \\
+      \sigma_{st}-\sigma_{s\alpha}\sigma_{\beta t} & 0<\sigma_{st}(\alpha,\beta)<\sigma_{st} のとき \\
+      \frac{\sum_v(\sigma'_{sv}\sigma'_{vt})}{d'_{st}-1}\:(v\in V,\,v\neq s,t,\,d'_{st}=d'_{sv}+d'_{vt}) & \sigma_{st}(\alpha,\beta)=\sigma_{st} のとき
+    \end{cases}
+  \end{equation*}
+\end{theorem}
+\begin{proof}
+  $\sigma_{st}(\alpha,\beta)=0$のとき，$(\alpha,\beta)\notin E'_{st}$なので，$\sigma'_{st}=\sigma_{st}$が成り立つ．
+  $0<\sigma_{st}(\alpha,\beta)<\sigma_{st}$のとき，削除により$\sigma_{s\alpha}\sigma_{\beta t}$個の最短経路がなくなるため，$\sigma'_{st}=\sigma_{st}-\sigma_{s\alpha}\sigma_{\beta t}$が成り立つ．
+  $\sigma_{st}=\sigma_{st}(\alpha,\beta)$のとき，$s$と$t$のすべての最短経路が$(\alpha,\beta)$を含むため，補題\ref{lemma:number-of-paths}により再計算する．
+\end{proof}
+
+定理\ref{thm:update-distance-on-delete}と定理\ref{thm:update-pathnum-on-delete}より，一辺削除時の頂点間距離の更新の方法が分かる．
+この方法に基づく一辺削除時の媒介中心性を更新するアルゴリズムをアルゴリズム\ref{algo:update-bc-on-delete}に示す．
+
+\begin{algorithm}[H]
+  \caption{一辺削除時の一頂点に対するペア依存度を更新するアルゴリズム}
+  \label{algo:update-pd-on-delete}
+  \begin{algorithmic}[1]
+    \Require 辺削除後のグラフ$G=(V,E)$，削除辺$\{v,w\}$，更新対象の頂点$z$，辺削除前の最短経路長$d_{xz},\,(x\in V)$と最短経路数$\sigma_{xz},\,(x\in V)$とペア依存度$\delta_z(x),\,(x\in V)$
+    \Ensure 辺削除後の最短経路長$d'_{xz},\,(x\in V)$と最短経路数$\sigma'_{xz},\,(x\in V)$とペア依存度$\delta'_z(x),\,(x\in V)$
+    \State $d'_{xz}\gets d_{xz}$，$\sigma'_{xz}\gets\sigma_{xz}$，$\delta'_z(x)\gets\delta_z(x)$
+    \State $\mathrm{PathAffected}\gets\varnothing$
+    \State $\mathrm{DepAffected}\gets\varnothing$
+    \State\Comment 最短経路長の更新
+    \State $\mathrm{WorkSet}\gets\{(v,w)\}$
+    \State $\mathrm{VisitedVertices}\gets\{v\}$
+    \While{$\mathrm{WorkSet}\neq\varnothing$}
+    \State $\mathrm{WorkSet}$から有向辺$(x,u)$を取り出す
+    \If{$l_{xu}+d'_{uz}<d'_{xz}$}
+    \State $d'_{xz}=l_{xu}+d'_{uz}$
+    \State $\mathrm{PathAffected}\gets\mathrm{PathAffected}\cup\{x\}$
+    \ForAll{$y\in\mathcal{N}_G(x)$ s.t. $y\notin\mathrm{PathAffected}\land SP(y,x,v)$}
+    \State $\mathrm{WorkSet}\gets\mathrm{WorkSet}\cup\{(y,x)\}$
+    \State $\mathrm{VisitedVertices}\gets\mathrm{VisitedVertices}\cup\{y\}$
+    \EndFor
+    \ForAll{$y\in\mathcal{N}_G(x)$ s.t. $(d_{xz}=l_{xy}+d_{yz})\land(d_{xz}\neq\infty)$}
+    \State $\mathrm{DepAffected}\gets\mathrm{DepAffected}\cup\{y\}$
+    \EndFor
+    \EndIf
+    \EndWhile
+    \State\Comment 最短経路数の更新
+    \State $\mathrm{WorkSet}\gets\{(d'_{vw}, (v, w))\}$
+    \State $\mathrm{VisitedVertices}\gets\{v\}$
+    \While{$\mathrm{WorkSet}\neq\varnothing$}
+    \State $\mathrm{WorkSet}$から有向辺$(x,u)$を取り出す
+    \State $\sigma_{\mathrm{old}}\gets\sigma'_{xz}$
+    \State $\sigma\gets\sum_{y\in \mathcal(N)_G(x)\mathrm{s.t.}SP(x,y,z)}\sigma'_{yz}$
+    \State $\sigma_{xz}\gets\sigma$
+    \If{$x\in\mathrm{PathAffected}\lor x\neq z\land\sigma_{\mathrm{old}}\neq\sigma$}
+    \State $\sigma'_{xz}\gets\sigma$
+    \State $\mathrm{PathAffected}\gets\mathrm{PathAffected}\cup\{x\}$
+    \State $\mathrm{DepAffected}\gets\mathrm{DepAffected}\cup\{x\}$
+    \ForAll{$y\in\mathcal{N}_G(x)$ s.t. $SP(y,x,v)\land y\notin\mathrm{VisitedVertices}$}
+    \State 距離が昇順になるように$\mathrm{WorkSet}$に$(d'_{yz},(y,x))$を追加
+    \State $\mathrm{VisitedVertices}\gets\mathrm{VisitedVertices}\cup\{y\}$
+    \EndFor
+    \EndIf
+    \EndWhile
+    \State\Comment ペア依存度の更新
+    \State $\mathrm{VisitedVertices}\gets\mathrm{AffectedDependencies}$
+    \State $\mathrm{WorkSet}\gets((d'_{xz},x)|x\in\mathrm{AffectedDependencies},x\mathrm{は}d'_{xz}\mathrm{の昇順に並べられている})$
+    \While{$\mathrm{WorkSet}\neq\varnothing$}
+    \State $\mathrm{WorkSet}$から頂点$x$を取り出す
+    \If{$x\neq z$}
+    \State $\delta'_z(x)\gets\sum_{y\in\mathcal{N}_G(x)\mathrm{s.t.}SP(y,x,z)}\frac{\sigma'_{xz}}{\sigma'_{yz}}(1+\delta'_z(y)$
+    \ForAll{$y\in\mathcal{N}_G(x)\mathrm{s.t.}SP(x,y,z)$}
+    \State 距離が昇順になるように$\mathrm{WorkSet}$に$(d'_{yz},y)$を追加
+    \State $\mathrm{VisitedVertices}\gets\mathrm{VisitedVertices}\cup\{y\}$
+    \EndFor
+    \EndIf
+    \EndWhile
+    \State \textbf{return} $\mathrm{PathAffected}$
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+  \caption{一辺削除時の媒介中心性更新アルゴリズム}
+  \label{algo:update-bc-on-delete}
+  \begin{algorithmic}[1]
+    \Require グラフ$G=(V,E)$，削除辺$\{v,w\}$とその長さ$c$，辺削除前の最短経路長$d_{xz},\,(x\in V)$と最短経路数$\sigma_{xz},\,(x\in V)$とペア依存度$\delta_z(x),\,(x\in V)$
+    \Ensure 辺削除後の最短経路長$d'_{xz},\,(x\in V)$と最短経路数$\sigma'_{xz},\,(x\in V)$とペア依存度$\delta'_z(x),\,(x\in V)$
+    \State グラフ$G$に$l_{vw}=c$として辺$\{v,w\}$を追加
+    \State $\mathrm{AffectedSinks}\gets\textproc{DeleteUpdate}(G,(w,v),v,d,\sigma,\delta)$
+    \State $\mathrm{AffectedSources}\gets\textproc{DeleteUpdate}(G,(v,w),w,d,\sigma,\delta)$
+    \ForAll{$z\in\mathrm{AffectedSinks}$}
+    \State $\textproc{DeleteUpdate}(G,(v,w),z,d,\sigma,\delta)$
+    \EndFor
+    \ForAll{$z\in\mathrm{AffectedSources}$}
+    \State $\textproc{DeleteUpdate}(G,(w,v),z,d,\sigma,\delta)$
+    \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}[H]
+  \caption{一辺削除時の媒介中心性更新アルゴリズム}
+  \label{algo:update-bc-on-delete-old}
+  \begin{algorithmic}[1]
+    \Require グラフ$G=(V,E)$，削除辺$\{\alpha,\beta\}$，最短経路長$\{d_{pq}\}_{p,q=1}^N$，最短経路数$\{\sigma_{pq}\}_{p,q=1}^N$，ペア依存度$\delta_s(i)$
+    \Ensure 削除後の最短経路長$\{d'_{pq}\}_{p,q=1}^N$，最短経路数$\{\sigma'_{pq}\}_{p,q=1}^N$，媒介中心性$B'_1,B'_2,\ldots,B'_N$，ペア依存度$\delta'_s(i)$
+    \ForAll{$s\in\{1,2,\ldots,N\}$}
+    \If{$d_{s\alpha}=d_{s\beta}$}
+    \State $d'_{st}\gets d_{st}\qquad\sigma'_{st}\gets\sigma_{st}\qquad\delta'_s(i)\gets\delta_s(i)\ (i=1,2,\ldots,N)$
+    \Else
+    \State\Comment 最短経路数・最短経路長の更新
+    \State $P\gets()$
+    \Comment{更新の対象となる頂点組${st}$}
+    \ForAll{$t\in\{1,2,\ldots,N\}$}
+    \If{$\sigma_{st}(\alpha,\beta)=0$}
+    \State $d'_{st}=d_{st}$
+    \State $\sigma'_{st}=\sigma_{st}$
+    \ElsIf{$0<\sigma_{st}(\alpha,\beta)<\sigma_{st}$}
+    \State $d'_{st}=d_{st}$
+    \State $\sigma'_{st}=\sigma_{st}-\sigma_{st}(\alpha,\beta)$
+    \ElsIf{$\sigma_{st}(\alpha,\beta)=\sigma_{st}>0$}
+    \Comment{頂点間距離を再計算}
+    \State $d_{\min}\gets \infty$
+    \ForAll{$v\in V,\,\sigma_{sv}>\sigma_{sv}(\alpha,\beta),\,\sigma_{vt}>\sigma_{vt}(\alpha,\beta)$}
+    \State $d_{\min}\gets\min\left\{d_{\min},d_{sv}+d_{vt}\right\}$
+    \EndFor
+    \If{$d_{\min}=\infty$}
+    \State $d'_{st}\gets\infty$
+    \State $\sigma'_{st}\gets0$
+    \Else
+    \State $d'_{st}\gets d_{\min}$
+    \State \parbox[t]{\linewidth}{
+      $P\gets(\ldots,(s_i,t_i),(s,t),(s_{i+1},t_{i+1}),\ldots)$ \\
+      ただし，$d'_{s_i,t_i}\leq d'_{st}\leq d'_{s_{i+1},t_{i+1}},\ \ldots,(s_i,t_i),\ldots\in P$
+    }
+    \EndIf
+    \EndIf
+    \EndFor
+    \ForAll{$(s_i,t_i)\in P$}
+    \Comment{最短経路数を再計算}
+    \State $\sigma'\gets0$
+    \ForAll{$v\in V,\:v\neq s_i,t_i,\:d'_{s_i,t_i}=d'_{s_i,v}+d'_{v,t_i}$}
+    \State $\sigma'\gets\sigma'+\sigma'_{s_i,v}\sigma'_{v,t_i}$
+    \EndFor
+    \State $\sigma'_{s_i,t_i}\gets\sigma'/(d'_{s_i,t_i}-1)$
+    \EndFor
+    \State\Comment ペア依存度の更新
+    \State $\delta'_s(i)\gets0\ (i=1,2,\ldots,N)$
+    \State 頂点$s$からすべての頂点への最短経路$G_s=(V,E_s)$と$d_{si},\ \sigma_{si}\ (i=1,2,\ldots,N)$を求める. 
+    \ForAll{$(i,j)\in E_s$}
+    \State \begin{equation*} \delta'_s(i)\gets\delta'_s(i)+\frac{\sigma_{si}}{\sigma_{sj}}(1+\delta'_s(j)) \end{equation*}
+    \EndFor
+    \EndIf
+    \EndFor
+    \State $B'_i\gets\sum_{s\in\{1,2,\ldots,N\}}\delta'_s(i)$
+    \State \textbf{return} $B'_i\ (i=1,2,\ldots,N)$
+  \end{algorithmic}
+\end{algorithm}
+
