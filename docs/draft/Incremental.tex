@@ -5,289 +5,22 @@ $G'=(V,E')$とする．$G'$における頂点$s$から頂点$t\,(\neq s)$への�
 $G'_{st}=(V'_{st},E'_{st})$で表し，頂点$s$から他のすべての頂点への最短経
 路を有向グラフ$G'_s=(V,E'_s)$で表す．また，$G'$における頂点$s$から
 頂点$t\,(\neq s)$への最短経路の個数と長さをそれぞれ$\sigma'_{st}$, 
-$d'_{st}$で表し，$\sigma'_{st}$個の最短経路のうち頂点$i$を通るもの
-の個数を$\sigma'_{st}(i)$で表す．
+$d'_{st}$で表す．
 
 \section{一辺挿入時の最短経路長の変化量}
 \label{sect:update-dist-on-insert}
 
-\section{一辺挿入時の最短経路数の変化量}
-\label{sect:update-sigma-on-insert}
-
-\section{一辺挿入時のペア依存度の変化量}
-\label{sect:update-deps-on-insert}
-
-以下では$G_{st}$, $d_{st}$, $\sigma_{st}$と
-$G'_{st}$, $d'_{st}$, $\sigma'_{st}$, $\sigma'_{st}(i)$の関係について考察する．
-ただし，一般性を失うことなく
-\begin{equation}
-d_{s\alpha} \leq d_{s\beta}
-\label{eqn:assum}
-\end{equation}
-と仮定し，便宜上
-$V_{ss}=V'_{ss}=\{s\}$, $E_{ss}=E'_{ss}=\emptyset$, $d'_{ss}=0$, 
-$\sigma'_{ss}=0$とおく．
-
-\begin{lemma}
-$t=\alpha$ならば$G'_{st}=G_{st}$, $d'_{st}=d_{st}$, 
-$\sigma'_{st}=\sigma_{st}$である．
-\label{lemma:5}
-\end{lemma}
-\begin{proof}
-$G'_{st} \neq G_{st}$となるのは$d_{s\beta}+1 \leq d_{st}(=d_{s\alpha})$が
-成り立つときに限られる．これは\eqref{eqn:assum}と矛盾するので
-$G'_{st}=G_{st}$である．このとき明らかに$d'_{st}=d_{st}$, 
-$\sigma'_{st}=\sigma_{st}$が成り立つ．
-\end{proof}
-
-\begin{lemma}
-$t=\beta$ならば以下が成り立つ．
-\begin{enumerate}
-\item $d_{s\alpha}+1<d_{st}$ならば$G'_{st}$は$G_{s\alpha}$と有向辺$(\alpha,t)$からなり，$d'_{st}=d_{s\alpha}+1$, $\sigma'_{st}=\sigma_{s\alpha}$である．
-\item $d_{s\alpha}+1=d_{st}$ならば$G'_{st}$は$G_{st}$と$G_{s\alpha}$と有向辺$(\alpha,t)$からなり，$d'_{st}=d_{st}$, $\sigma'_{st}=\sigma_{st}+\sigma_{s\alpha}$である．
-\item $d_{s\alpha}=d_{st}$ならば$G'_{st}=G_{st}$, $d'_{st}=d_{st}$, $\sigma'_{st}=\sigma_{st}$である．
-\end{enumerate}
-\label{lemma:6}
-\end{lemma}
-\begin{proof}
-$t=\beta$ならば$d_{s\alpha}>d_{st}(=d_{s\beta})$が成り立つことはない．
-式\eqref{eqn:assum}と矛盾するからである．
-はじめに1番目の主張を証明する．$d_{s\alpha}+1<d_{st}$と仮定する．
-$G'$において$s$から辺$\{\alpha,t\}$を通って$t$に行く最短経路の長さは$d_{s\alpha}+1$で与えられ，$s$から辺$\{\alpha,t\}$を通らずに$t$に行く最短経路の長さは$G$における$s$から$t$への最短経路の長さ$d_{st}$に等しい．このことと仮定$d_{s\alpha}+1<d_{st}$より，$G'$における$s$から$t$へのすべての最短経路は辺$\{\alpha,t\}$を通る．すなわち$G'_{st}$は$G_{s\alpha}$と有向辺$(\alpha,t)$からなる．また，補題\ref{lemma:1}より$d'_{st}=d_{s\alpha}+d_{\alpha t}=d_{s\alpha}+1$であり，補題\ref{lemma:3}より$\sigma'_{st}=\sigma_{s\alpha}\sigma_{\alpha t}=\sigma_{s\alpha}$である．
-%
-次に2番目の主張を証明する．$d_{s\alpha}+1=d_{st}$と仮定する．このとき$\alpha \not\in V_{st}$である．なぜなら，仮に$\alpha \in V_{st}$とすると，補題\ref{lemma:1}より$d_{st}=d_{s\alpha}+d_{\alpha t}$が成り立ち，$\{\alpha,t\} \not\in E$より$d_{\alpha t} \geq 2$ が成り立つので，$d_{s\alpha}+1=d_{st}$と矛盾するからである．$G'$において$s$から$\alpha$を
-通って$t$に行く最短経路の長さは$d_{s\alpha}+1$で与えられ，$s$から$\alpha$
-を通らずに$t$に行く最短経路の長さは$d_{st}$で与えられる．仮定$d_{s\alpha}+1=d_{st}$
-よりこれらは等しいので，$G'$における$s$から$t$への最短経路は
-$G_{st}$と$G_{s\alpha}$と有向辺$(\alpha,t)$からなる．このとき$d'_{st}=d_{st}$, $\sigma'_{st}=\sigma_{st}+\sigma_{s\alpha}$である．
-%
-最後に3番目の主張を証明する．$d_{s\alpha}=d_{st}$と仮定する．
-このとき$s$から辺$\{\alpha,t\}$を通って
-$t$に行く最短経路の長さ$d_{s\alpha}+1$が$d_{st}$より大きいことから，$s$から
-$t$への最短経路の中に$\{\alpha,t\}$を通るものはない．したがって，$G'_{st}=G_{st}$
-であり，これより明らかに$d'_{st}=d_{st}$, $\sigma'_{st}=\sigma_{st}$である．
-\end{proof}
-
-\begin{lemma}
-$t \neq \alpha, \beta$かつ$\min\{d_{s\alpha}+d_{\beta t}, d_{s\beta}+d_{\alpha t}\}+1
-\leq d_{st}$ならば$d_{s\alpha}<d_{s\beta}$かつ$d_{s\alpha}+d_{\beta t} < d_{s\beta}+d_{\alpha t}$である．
-\label{lemma:7}
-\end{lemma}
-\begin{proof}
-背理法で証明する．はじめに$d_{s\alpha}=d_{s\beta}$と仮定する．また，一般性を
-失うことなく$d_{\beta t} \leq d_{\alpha t}$とする．このとき
-\[
- d_{s\beta}+d_{\beta t}+1=d_{s\alpha}+d_{\beta t}+1 \leq d_{st}
-\]
-が成り立つが，これは$s$を出発して$\beta$を通って$t$に行く最短経路の長さ
-$d_{s\beta}+d_{\beta t}$が$d_{st}$より短いことを意味するので矛盾である．
-したがって$d_{s\alpha}<d_{s\beta}$でなければならない．次に
-$d_{s\alpha}+d_{\beta t} > d_{s\beta}+d_{\alpha t}$と仮定する．
-このとき$d_{s\alpha}<d_{s\beta}$より
-\[
- d_{s\alpha}+d_{\alpha t}+1 < d_{s\beta}+d_{\alpha t}+1 \leq d_{st}
-\]
-が得られる．これは$s$を出発して$\alpha$を通って$t$に行く最短経路の長さ
-$d_{s\alpha}+d_{\alpha t}$が$d_{st}$より
-小さいことを意味するので矛盾である．最後に
-$d_{s\alpha}+d_{\beta t} = d_{s\beta}+d_{\alpha t}$と仮定すると
-\begin{align}
-d_{s\alpha}+d_{\beta t}+1 &\leq d_{st} \\
-d_{s\beta }+d_{\alpha t}+1 &\leq d_{st}
-\end{align}
-が成り立つ．これらの辺々を加えると
-\[
- (d_{s\alpha}+d_{\alpha t})+(d_{s\beta}+d_{\beta t})+2 \leq 2d_{st}
-\]
-となるので，$d_{s\alpha}+d_{\alpha t}$と$d_{s\beta}+d_{\beta t}$の少なくとも
-一つは$d_{st}-1$以下である．ところがこれは$s$から$t$への経路の中で距離が
-$d_{st}$より小さいものが存在することを意味するので矛盾である．
-\end{proof}
-%
-
-補題\ref{lemma:7}より次の補題が得られる．
-
-\begin{lemma}
-$t \neq \alpha, \beta$ならば以下が成り立つ．
-\begin{enumerate}
-\item $\min\{d_{s\alpha}+d_{\beta t}, d_{s\beta}+d_{\alpha t}\}+1<d_{st}$
-ならば$G'_{st}$は$G_{s\alpha}$と有向辺$(\alpha,\beta)$と$G_{\beta t}$からなり，$d'_{st}=d_{s\alpha}+1+d_{\beta t}$, $\sigma'_{st}=\sigma_{s\alpha}\sigma_{\beta t}$である．
-\item $\min\{d_{s\alpha}+d_{\beta t}, d_{s\beta}+d_{\alpha t}\}+1=d_{st}$
-ならば$G'_{st}$は$G_{st}$と$G_{s\alpha}$と有向辺$(\alpha,\beta)$と$G_{\beta t}$からなり，$d'_{st}=d_{st}$, $\sigma'_{st}=\sigma_{st}+\sigma_{s\alpha}\sigma_{\beta t}$である．
-\item $\min\{d_{s\alpha}+d_{\beta t}, d_{s\beta}+d_{\alpha t}\}+1>d_{st}$ならば$G'_{st}=G_{st}$, $d'_{st}=d_{st}$, $\sigma'_{st}=\sigma_{st}$である．
-\end{enumerate}
-\label{lemma:8}
-\end{lemma}
-\begin{proof}
-まず1番目の主張を証明する．
-$\min\{d_{s\alpha}+d_{\beta t}, d_{s\beta}+d_{\alpha t}\}+1<d_{st}$
-ならば補題\ref{lemma:7}より$d_{s\alpha}+d_{\beta t}<d_{s\beta}+d_{\alpha t}$が成り立つので，$G'$において$s$から辺$\{\alpha,\beta\}$を通って$t$に行くすべての最短経路は辺$\{\alpha,\beta\}$を$\alpha \rightarrow \beta$の向きに通る．
-また，それらの長さは$d_{s\alpha}+1+d_{\beta t}$で与えられる．一方，
-$s$から辺$\{\alpha,\beta\}$を通らずに$t$に行く最短経路の長さは$G$に
-おける$s$から$t$への最短経路の長さ$d_{st}$に等しい．
-このことと$d_{s\alpha}+1+d_{\beta t}<d_{st}$より，$G'$における$s$から$t$への
-すべての最短経路は辺$\{\alpha,\beta\}$を$\alpha \rightarrow \beta$の向きに通る．したがって，$G'_{st}$は$G_{s\alpha}$と有向辺$(\alpha,\beta)$と$G_{\beta t}$からなる．また，補題~\ref{lemma:2}より$d'_{st}=d_{s\alpha}+d_{\beta t}+1$であり，補題~\ref{lemma:4}より$\sigma'_{st}=\sigma_{s\alpha}\sigma_{\beta t}$である．
-%
-次に2番目の主張を証明する．
-$\min\{d_{s\alpha}+d_{\beta t}, d_{s\beta}+d_{\alpha t}\}+1=d_{st}$ならば
-補題~\ref{lemma:7}より$d_{s\alpha}+d_{\beta t}<d_{s\beta}+d_{\alpha t}$が成り立つので，$G'$における$s$から$t$への最短経路は，
-辺$\{\alpha,\beta\}$を$\alpha \rightarrow \beta$の向きに通るものと
-辺$\{\alpha,\beta\}$を通らないものに分類される．したがって
-$G'$における$s$から$t$への最短経路の集合は$G_{st}$と$G_{s\alpha}$と有向辺$(\alpha,\beta)$と$G_{\beta t}$からなる．また，このとき$d'_{st}=d_{st}$, $\sigma'_{st}=\sigma_{st}+\sigma_{s\alpha}\sigma_{\beta t}$である．
-
-最後に3番目の主張を証明する．
-$\min\{d_{s\alpha}+d_{\beta t}, d_{s\beta}+d_{\alpha t}\}+1>d_{st}$ならば
-$G'$における$s$から$t$への最短経路$G'_{st}$は$G_{st}$に等しいので，
-$d'_{st}=d_{st}$, $\sigma'_{st}=\sigma_{st}$である．
-\end{proof}
-
-補題~\ref{lemma:8}では$\min\{d_{s\alpha}+d_{\beta t}, d_{s\beta}+d_{\alpha t}\}+1$
-と$d_{st}$の大小関係によって場合分けが行われている．次の補題は，それが別の等価な
-条件によって判定できることを示している．
-
-\begin{lemma}
-$t \neq \alpha, \beta$ならば以下が成り立つ．
-\begin{enumerate}
-\item $\min\{d_{s\alpha}+d_{\beta t}, d_{s\beta}+d_{\alpha t}\}+1<d_{st}$で
-あるための必要十分条件は$d_{s\alpha} < d_{s\beta}$と
-$d_{s\alpha}+d_{\beta t}+1<d_{st}$がともに成り立つことである．
-\item $\min\{d_{s\alpha}+d_{\beta t}, d_{s\beta}+d_{\alpha t}\}+1=d_{st}$
-であるための必要十分条件は$d_{s\alpha} < d_{s\beta}$と 
-$d_{s\alpha}+d_{\beta t}+1=d_{st}$がともに成り立つことである．
-\item $\min\{d_{s\alpha}+d_{\beta t}, d_{s\beta}+d_{\alpha t}\}+1>d_{st}$
-であるための必要十分条件は$d_{s\alpha}=d_{s\beta}$と$d_{s\alpha}+d_{\beta t}+1>d_{st}$の少なくとも一つが成り立つことである．
-\end{enumerate}
-\label{lemma:8b}
-\end{lemma}
-\begin{proof}
-まず1番目の主張を証明する．
-$\min\{d_{s\alpha}+d_{\beta s}, d_{s\beta}+d_{\alpha t}\}+1<d_{st}$ならば補題\ref{lemma:7}より$d_{s\alpha}<d_{s\beta}$と
-$d_{s\alpha}+d_{\beta t}<d_{s\beta}+d_{\alpha t}$が成り立ち，さらに後者より
-\[
-d_{s\alpha}+d_{\beta t}+1=
- \min\{d_{s\alpha}+d_{\beta s}, d_{s\beta}+d_{\alpha t}\}+1<d_{st}
-\]
-が成り立つ．逆に$d_{s\alpha}+d_{\beta t}+1<d_{st}$ならば
-\[
- \min\{d_{s\alpha}+d_{\beta s}, d_{s\beta}+d_{\alpha t}\}+1 \leq 
-d_{s\alpha}+d_{\beta s}+1<d_{st}
-\]
-が成り立つ．次に2番目の主張を証明する．
-$\min\{d_{s\alpha}+d_{\beta s}, d_{s\beta}+d_{\alpha t}\}+1=d_{st}$ならば補題\ref{lemma:7}より$d_{s\alpha}<d_{s\beta}$と
-$d_{s\alpha}+d_{\beta t}<d_{s\beta}+d_{\alpha t}$が成り立ち，さらに後者より
-\[
-d_{s\alpha}+d_{\beta t}+1=
- \min\{d_{s\alpha}+d_{\beta s}, d_{s\beta}+d_{\alpha t}\}+1=d_{st}
-\]
-が成り立つ．逆に$d_{s\alpha}<d_{s\beta}$かつ$d_{s\alpha}+d_{\beta t}+1=d_{st}$ならば
-\[
-d_{s\beta}+d_{\alpha t}>d_{s\alpha}+d_{\alpha t} \geq d_{st}
-=d_{s\alpha}+d_{\beta t}+1
-\]
-より
-\[
- d_{s\alpha}+d_{\beta t} < d_{s\beta}+d_{\alpha t}
-\]
-が得られ，さらにこれより
-\[
-\min\{d_{s\alpha}+d_{\beta s}, d_{s\beta}+d_{\alpha t}\}+1=
-d_{s\alpha}+d_{\beta s}+1=d_{st}
-\]
-が成り立つ．最後に3番目の主張を証明する．
-$\min\{d_{s\alpha}+d_{\beta s}, d_{s\beta}+d_{\alpha t}\}+1>d_{st}$ならば
-\[
- d_{s\alpha}+d_{\beta s}+1 \geq 
-\min\{d_{s\alpha}+d_{\beta s}, d_{s\beta}+d_{\alpha t}\}+1>d_{st}
-\]
-が成り立つ．十分性については対偶を考えればよい．すなわち，
-$\min\{d_{s\alpha}+d_{\beta s}, d_{s\beta}+d_{\alpha t}\}+1 \leq d_{st}$
-ならば$d_{s\alpha}<d_{s\beta}$と$d_{s\alpha}+d_{\beta t}+1\leq d_{st}$の
-両方が成り立つことを示せばよい．これは1番目と2番目の主張で既に示されている．
-\end{proof}
-
-補題~\ref{lemma:8}と補題~\ref{lemma:8b}より次の補題が得られる．
-\begin{lemma}
-$t \neq \alpha, \beta$ならば以下が成り立つ．
-\begin{enumerate}
-\item $d_{s\alpha}<d_{s\beta}$かつ$d_{s\alpha}+d_{\beta t}+1<d_{st}$
-ならば$G'_{st}$は$G_{s\alpha}$と有向辺$(\alpha,\beta)$と$G_{\beta t}$からなり，$d'_{st}=d_{s\alpha}+1+d_{\beta t}$, $\sigma'_{st}=\sigma_{s\alpha}\sigma_{\beta t}$である．
-\item $d_{s\alpha}<d_{s\beta}$かつ$d_{s\alpha}+d_{\beta t}+1=d_{st}$
-ならば$G'_{st}$は$G_{st}$と$G_{s\alpha}$と有向辺$(\alpha,\beta)$と$G_{\beta t}$からなり，$d'_{st}=d_{st}$, $\sigma'_{st}=\sigma_{st}+\sigma_{s\alpha}\sigma_{\beta t}$である．
-\item $d_{s\alpha}=d_{s\beta}$または$d_{s\alpha}+d_{\beta t}+1>d_{st}$ならば$G'_{st}=G_{st}$, $d'_{st}=d_{st}$, $\sigma'_{st}=\sigma_{st}$である．
-\end{enumerate}
-\label{lemma:9}
-\end{lemma}
-
-さらに，補題\ref{lemma:5}, \ref{lemma:6}, \ref{lemma:9}は次のように
-一つにまとめられる．
-
-\begin{theorem}
-仮定\eqref{eqn:assum}の下で以下が成り立つ．
-\begin{enumerate}
-\item $d_{s\alpha}<d_{s\beta}$かつ$d_{s\alpha}+d_{\beta t}+1<d_{st}$
-ならば$G'_{st}$は$G_{s\alpha}$と有向辺$(\alpha,\beta)$と$G_{\beta t}$からなり，$d'_{st}=d_{s\alpha}+1+d_{\beta t}$, $\sigma'_{st}=\sigma_{s\alpha}\sigma_{\beta t}$である．
-\item $d_{s\alpha}<d_{s\beta}$かつ$d_{s\alpha}+d_{\beta t}+1=d_{st}$
-ならば$G'_{st}$は$G_{st}$と$G_{s\alpha}$と有向辺$(\alpha,\beta)$と$G_{\beta t}$からなり，$d'_{st}=d_{st}$, $\sigma'_{st}=\sigma_{st}+\sigma_{s\alpha}\sigma_{\beta t}$である．
-\item $d_{s\alpha}=d_{s\beta}$または$d_{s\alpha}+d_{\beta t}+1>d_{st}$ならば$G'_{st}=G_{st}$, $d'_{st}=d_{st}$, $\sigma'_{st}=\sigma_{st}$である．
-\end{enumerate}
-\label{theorem:1}
-\end{theorem}
-
-同様にして$\sigma'_{st}(i)$に関する次の結果が得られる．証明は紙数の都合上省略する．
-\begin{theorem}
-仮定\eqref{eqn:assum}の下で以下が成り立つ．
-\begin{enumerate}
-\item $d_{s\alpha}<d_{s\beta}$かつ$d_{s\alpha}+d_{\beta t}+1<d_{st}$ならば
-$\sigma'_{st}(i)$は次式で与えられる．
-\[
- \sigma'_{st}(i)=\left\{
-\begin{array}{ll}
-\sigma_{si}\sigma_{i\alpha}\sigma_{\beta t}, & i \in V_{s\alpha}\,\mbox{のとき} \\
-\sigma_{s\alpha}\sigma_{\beta i}\sigma_{it}, & i \in V_{\beta t}\,\mbox{のとき} \\
-0, & i \not\in V_{s\alpha} \cup V_{\beta t}\,\mbox{のとき}
-\end{array}
-\right.
-\]
-%
-\item $d_{s\alpha}<d_{s\beta}$かつ$d_{s\alpha}+d_{\beta t}+1=d_{st}$ならば
-$\sigma'_{st}(i)$は次式で与えられる．
-\[
- \sigma'_{st}(i)=\left\{
-\begin{array}{ll}
-\sigma_{st}(i)+\sigma_{si}\sigma_{i\alpha}\sigma_{\beta t}, & i \in V_{s\alpha}\,\mbox{のとき} \\
-\sigma_{st}(i)+\sigma_{s\alpha}\sigma_{\beta i}\sigma_{it}, & i \in V_{\beta t}\,\mbox{のとき} \\
-\sigma_{st}(i), & i \not\in V_{s\alpha} \cup V_{\beta t}\,\mbox{のとき}
-\end{array}
-\right.
-\]
-%
-\item $d_{s\alpha}=d_{s\beta}$または$d_{s\alpha}+d_{\beta t}+1>d_{st}$ならば
-$\sigma'_{st}(i)=\sigma_{st}(i)$である．
-\end{enumerate}
-\label{theorem:2}
-\end{theorem}
-
-定理~\ref{theorem:2}において$\sigma'_{st}(i)$を求めるには
-$\sigma_{st}(i)$の値や頂点$i$が$V_{s\alpha}$や$V_{\beta t}$に属するか
-否かの判定が必要である．前者は\eqref{eqn:sigma_sti}
-で与えられるので，$G$のすべての頂点間の最短経路の個数と長さから$\sigma'_{st}(i)$
-を求めることができる．後者についても，$i \in V_{s\alpha}$, $i \in V_{\beta t}$で
-あるための必要十分条件がそれぞれ$d_{si}+d_{i\alpha}=d_{s\alpha}$, 
-$d_{\beta i}+d_{it}=d_{it}$
-であるから，$G$のすべての頂点間の最短経路の長さを用いて判定することができる．
-
-以上の議論を用いて，一辺挿入時の媒介中心性を更新するアルゴリズムをアルゴリズム\ref{algo:update-bc-on-insert}に示す．
-
 \begin{algorithm}[H]
-  \caption{一辺挿入時の一頂点に対するペア依存度を更新するアルゴリズム}
-  \label{algo:update-pd-on-insert}
+  \caption{一辺挿入時の一頂点への最短経路長を更新するアルゴリズム}
+  \label{algo:update-dist-on-insert}
   \begin{algorithmic}[1]
-    \Require 辺挿入後のグラフ$G=(V,E)$，挿入辺$\{v,w\}$，更新対象の頂点$z$，辺挿入前の最短経路長$d_{xz},\,(x\in V)$と最短経路数$\sigma_{xz},\,(x\in V)$とペア依存度$\delta_z(x),\,(x\in V)$
-    \Ensure 辺挿入後の最短経路長$d'_{xz},\,(x\in V)$と最短経路数$\sigma'_{xz},\,(x\in V)$とペア依存度$\delta'_z(x),\,(x\in V)$
-    \State $d'_{xz}\gets d_{xz}$，$\sigma'_{xz}\gets\sigma_{xz}$，$\delta'_z(x)\gets\delta_z(x)$
-    \State $\mathrm{PathAffected}\gets\varnothing$
+    \Require 更新対象の頂点$z$，辺挿入前の最短経路長$d_{xz},\,(x\in V)$
+    \Ensure 辺挿入後の最短経路長$d'_{xz},\,(x\in V)$
+    \Procedure{InsertUpdateDist}{$G,(v,w),z$}
+    \State $d'_{xz}\gets d_{xz}$
+    \State $SP(a,b,c)\triangleq(d'_{ac}=l_{ab}+d'_{bc})\land(d'_{ac}\neq\infty)$
+    \State $\mathrm{DistAffected}\gets\varnothing$
     \State $\mathrm{DepAffected}\gets\varnothing$
-    \State\Comment 最短経路長の更新
     \State $\mathrm{WorkSet}\gets\{(v,w)\}$
     \State $\mathrm{VisitedVertices}\gets\{v\}$
     \While{$\mathrm{WorkSet}\neq\varnothing$}
@@ -304,7 +37,25 @@ $d_{\beta i}+d_{it}=d_{it}$
     \EndFor
     \EndIf
     \EndWhile
-    \State\Comment 最短経路数の更新
+    \State \textbf{return} $\mathrm{DistAffected},\mathrm{DepAffected}$
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+\section{一辺挿入時の最短経路数の変化量}
+\label{sect:update-sigma-on-insert}
+
+\begin{algorithm}[H]
+  \caption{一辺挿入時の一頂点への最短経路数を更新するアルゴリズム}
+  \label{algo:update-sigma-on-insert}
+  \begin{algorithmic}[1]
+    \Require 更新対象の頂点$z$，辺挿入前の最短経路数$\sigma_{xz},\,(x\in V)$
+    \Ensure 辺挿入後の最短経路数$\sigma'_{xz},\,(x\in V)$
+    \Procedure{InsertUpdateSigma}{$G,(v,w),z,\mathrm{DistAffected}$}
+    \State $SP(a,b,c)\triangleq(d'_{ac}=l_{ab}+d'_{bc})\land(d'_{ac}\neq\infty)$
+    \State $\sigma'_{xz}\gets\sigma_{xz}$
+    \State $\mathrm{PathAffected}\gets\mathrm{DistAffected}$
+    \State $\mathrm{DepAffected}\gets\varnothing$
     \State $\mathrm{WorkSet}\gets\{(d'_{vw}, (v, w))\}$
     \State $\mathrm{VisitedVertices}\gets\{v\}$
     \While{$\mathrm{WorkSet}\neq\varnothing$}
@@ -322,8 +73,24 @@ $d_{\beta i}+d_{it}=d_{it}$
     \EndFor
     \EndIf
     \EndWhile
-    \State\Comment ペア依存度の更新
-    \State $\mathrm{VisitedVertices}\gets\mathrm{AffectedDependencies}$
+    \State \textbf{return} $\mathrm{PathAffected}$, $\mathrm{DepAffected}$
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+\section{一辺挿入時のペア依存度の変化量}
+\label{sect:update-pd-on-insert}
+
+\begin{algorithm}[H]
+  \caption{一辺挿入時の一頂点に対するペア依存度を更新するアルゴリズム}
+  \label{algo:update-pd-on-insert}
+  \begin{algorithmic}[1]
+    \Require 更新対象の頂点$z$，辺挿入前のペア依存度$\delta_z(x),\,(x\in V)$
+    \Ensure 辺挿入後のペア依存度$\delta'_z(x),\,(x\in V)$
+    \Procedure{InsertUpdatePD}{$G,(v,w),z,\mathrm{DepAffected}$}
+    \State $SP(a,b,c)\triangleq(d'_{ac}=l_{ab}+d'_{bc})\land(d'_{ac}\neq\infty)$
+    \State $\delta'_z(x)\gets\delta_z(x)$
+    \State $\mathrm{VisitedVertices}\gets\mathrm{DepAffected}$
     \State $\mathrm{WorkSet}\gets((d'_{xz},x)|x\in\mathrm{AffectedDependencies},x\mathrm{は}d'_{xz}\mathrm{の昇順に並べられている})$
     \While{$\mathrm{WorkSet}\neq\varnothing$}
     \State $\mathrm{WorkSet}$から頂点$x$を取り出す
@@ -335,7 +102,7 @@ $d_{\beta i}+d_{it}=d_{it}$
     \EndFor
     \EndIf
     \EndWhile
-    \State \textbf{return} $\mathrm{PathAffected}$
+    \EndProcedure
   \end{algorithmic}
 \end{algorithm}
 
@@ -343,8 +110,15 @@ $d_{\beta i}+d_{it}=d_{it}$
   \caption{一辺挿入時の媒介中心性更新アルゴリズム}
   \label{algo:update-bc-on-insert}
   \begin{algorithmic}[1]
-    \Require グラフ$G=(V,E)$，挿入辺$\{v,w\}$とその長さ$c$，辺挿入前の最短経路長$d_{xz},\,(x\in V)$と最短経路数$\sigma_{xz},\,(x\in V)$とペア依存度$\delta_z(x),\,(x\in V)$
-    \Ensure 辺挿入後の最短経路長$d'_{xz},\,(x\in V)$と最短経路数$\sigma'_{xz},\,(x\in V)$とペア依存度$\delta'_z(x),\,(x\in V)$
+    \Require グラフ$G=(V,E)$，挿入辺$\{v,w\}$とその長さ$c$
+    \Ensure 辺挿入後の媒介中心性$B'(x),\,(x\in V)$
+    \Procedure{InsertUpdate}{$G,(v,w),z$}
+    \State $\mathrm{DistAffected},\mathrm{DepAffectedD}\gets\textproc{InsertUpdateDist}(G,(w,v),z)$
+    \State $\mathrm{PathAffected},\mathrm{DepAffectedS}\gets\textproc{InsertUpdateSigma}(G,(w,v),z,\mathrm{DistAffected})$
+    \State $\mathrm{DepAffected}\gets\mathrm{DepAffectedD}\cup\mathrm{DepAffectedS}$
+    \State $\textproc{InsertUpdatePD}(G,(w,v),z,\mathrm{DepAffected})$
+    \State \textbf{return} $\mathrm{PathAffected}$
+    \EndProcedure
     \State グラフ$G$に$l_{vw}=c$として辺$\{v,w\}$を追加
     \State $\mathrm{AffectedSinks}\gets\textproc{InsertUpdate}(G,(w,v),v,d,\sigma,\delta)$
     \State $\mathrm{AffectedSources}\gets\textproc{InsertUpdate}(G,(v,w),w,d,\sigma,\delta)$
