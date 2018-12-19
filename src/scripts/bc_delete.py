@@ -1,28 +1,29 @@
 from math import inf, isinf
 import bisect
 
-def delete_update(G, e, z, dist, sigma, deps, weight=None):
+def delete_update_dist(G, e, z, trio, weight=None):
     v, w = e
-    dist_old = dict((x, dist[x, z]) for x in G.nodes)
+    dist, sigma, deps = trio
     length = lambda a, b: 1 if weight is None else G.edges[a, b][weight]
     SP = lambda a, b, c:\
          dist[a, c] == length(a, b) + dist[b, c] and\
          dist[a, c] != inf
-    SP_old = lambda a, b, c:\
-             c == z and\
-             dist_old[a] == length(a, b) + dist_old[b] and\
-             dist_old[a] != inf
 
+    # TODO: remove useless variable
+    do_sigma = True
     affected_vertices = set()
 
     # Phase 1: Identify affected vertices then determine new distances to z
-    work_set = set() if any(SP(v, x, z) for x in G.neighbors(v)) else {v}
+    if any(SP(v, x, z) for x in G.neighbors(v)):
+        return affected_vertices, do_sigma
+
+    work_set = {v}
     while work_set:
         u = work_set.pop()
         affected_vertices.add(u)
         for x in filter(lambda x: SP(x, u, z), G.neighbors(u)):
-            if all(lambda y: not SP(x, y, z) or y in affected_vertices
-                   for y in G.neighbors(x)):
+            if all(lambda y: y in affected_vertices
+                   for y in G.neighbors(x) if SP(x, y, z)):
                 work_set.add(x)
 
     priority_queue = []
@@ -46,40 +47,86 @@ def delete_update(G, e, z, dist, sigma, deps, weight=None):
                 del priority_queue[idx]
             bisect.insort(priority_queue, (dist[c, z], c))
 
+    return affected_vertices, do_sigma
+
+def delete_update_sigma(G, e, z, trio, affected_dist, do_sigma, weight=None):
+    v, w = e
+    dist, sigma, deps = trio
+    length = lambda a, b: 1 if weight is None else G.edges[a, b][weight]
+    SP = lambda a, b, c:\
+         dist[a, c] == length(a, b) + dist[b, c] and\
+         dist[a, c] != inf
+
     # Phase 2: Identify affected vertices then determine new sigma to z
-    work_set = set() if dist_old[v] == dist_old[w] else {v}
+    if not do_sigma:
+        return affected_dist
+
+    affected_vertices = affected_dist
+    priority_queue = sorted([(dist[a, z], a) for a in affected_dist])
+    work_set = {v}
     while work_set:
         u = work_set.pop()
-        affected_vertices.add(u)
+        if u not in affected_dist:
+            affected_vertices.add(u)
+            bisect.insort(priority_queue, (dist[u, z], u))
         for x in filter(lambda x: SP(x, u, z), G.neighbors(u)):
-            if any(lambda y: not SP(x, y, z) or y in affected_vertices
-                   for y in G.neighbors(x)):
+            if any(lambda y: y in affected_vertices
+                   for y in G.neighbors(x) if SP(x, y, z)):
                 work_set.add(x)
 
-    priority_queue = sorted([(dist[x, z], x) for x in affected_vertices])
     for _, a in priority_queue:
-        sigma_az = sum(
+        sigma[a, z] = sum(
             sigma[b, z] for b in G.neighbors(a) if SP(a, b, z)
         )
-        sigma[a, z] = sigma_az
+
+    return affected_vertices
+
+def delete_update_delta(G, e, z, trio, affected_vertices, weight=None):
+    v, w = e
+    dist, sigma, deps = trio
+    length = lambda a, b: 1 if weight is None else G.edges[a, b][weight]
+    SP = lambda a, b, c:\
+         dist[a, c] == length(a, b) + dist[b, c] and\
+         dist[a, c] != inf
 
     # Phase 3: Update pairwise dependencies
-    if dist_old[v] != dist_old[w]:
-        bisect.insort(priority_queue, (dist[w, z], w))
-    visited_vertices = set(x for _, x in priority_queue)
     nupdate = 0
+    if len(affected_vertices) == 0:
+        return nupdate
+
+    priority_queue = []
+    for a in affected_vertices:
+        bisect.insort(priority_queue, (dist[a, z], a))
+    if not (dist[w, z], w) in priority_queue:
+        bisect.insort(priority_queue, (dist[w, z], w))
+    visited_vertices = affected_vertices.copy()
+
     while len(priority_queue) > 0:
         _, x = priority_queue.pop()
+        if x == z:
+            break
+        far = filter(lambda y: SP(y, x, z), G.neighbors(x))
+        near = filter(lambda y: SP(x, y, z), G.neighbors(x))
+        a = deps[z, x]
+        deps[z, x] = sum(
+            sigma[x, z] / sigma[y, z] * (1 + deps[z, y]) for y in far)
         nupdate += 1
-        far = list(filter(lambda y: SP(y, x, z), G.neighbors(x)))
-        near = list(filter(lambda y: SP(x, y, z), G.neighbors(x)))
-        delta = sum(sigma[x, z] / sigma[y, z] * (1 + deps[z, y]) for y in far)
-        deps[z, x] = delta if z != x else 0
         for y in near:
             if not y in visited_vertices:
                 bisect.insort(priority_queue, (dist[y, z], y))
                 visited_vertices.add(y)
 
+    return nupdate
+
+def delete_update(G, e, z, dist, sigma, deps, weight=None):
+    affected_vertices, do_sigma\
+        = delete_update_dist(G, e, z, (dist, sigma, deps), weight)
+    affected_vertices\
+        = delete_update_sigma(G, e, z, (dist, sigma, deps),
+                              affected_vertices, do_sigma, weight)
+    nupdate\
+        = delete_update_delta(G, e, z, (dist, sigma, deps),
+                              affected_vertices, weight)
     return affected_vertices, nupdate
 
 def delete_edge(G, e, dist, sigma, deps, weight=None):
@@ -95,9 +142,11 @@ def delete_edge(G, e, dist, sigma, deps, weight=None):
     sum_nupdate += nupdate
 
     for x in affected_sinks:
+        if x == w: continue
         delete_update(G, (v, w), x, dist, sigma, deps, weight)
         sum_nupdate += nupdate
     for x in affected_sources:
+        if x == v: continue
         delete_update(G, (w, v), x, dist, sigma, deps, weight)
         sum_nupdate += nupdate
     return sum_nupdate
