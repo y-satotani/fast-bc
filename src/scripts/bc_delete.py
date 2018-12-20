@@ -9,8 +9,7 @@ def delete_update_dist(G, e, z, trio, weight=None):
          dist[a, c] == length(a, b) + dist[b, c] and\
          dist[a, c] != inf
 
-    # TODO: remove useless variable
-    do_sigma = True
+    do_sigma = dist[v, z] != dist[w, z]
     affected_vertices = set()
 
     # Phase 1: Identify affected vertices then determine new distances to z
