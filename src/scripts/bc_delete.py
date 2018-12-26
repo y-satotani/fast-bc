@@ -93,10 +93,9 @@ def delete_update_delta(G, e, z, trio, affected_vertices, weight=None):
     if len(affected_vertices) == 0:
         return nupdate
 
-    priority_queue = []
-    for a in affected_vertices:
-        bisect.insort(priority_queue, (dist[a, z], a))
-    if not (dist[w, z], w) in priority_queue:
+    priority_queue = sorted([(dist[a, z], a) for a in affected_vertices])
+    #if not (dist[w, z], w) in priority_queue:
+    if w not in affected_vertices:
         bisect.insort(priority_queue, (dist[w, z], w))
     visited_vertices = affected_vertices.copy()
 
