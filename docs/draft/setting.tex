@@ -6,8 +6,15 @@
 \usepackage{algorithm,algpseudocode}
 \usepackage{float}
 \usepackage[
-style=ieee,backend=biber,texencoding=utf8,bibencoding=utf8,dashed=false
+  style=ieee,backend=biber,
+  texencoding=utf8,bibencoding=utf8,
+  dashed=false,
+  isbn=false,url=false,doi=false,eprint=false,
 ]{biblatex}
+\renewbibmacro{in:}{}
+\DeclareFieldFormat{journaltitle}{#1}
+\DeclareFieldFormat{booktitle}{#1}
+%\renewrobustcmd*{\bibinitdelim}{}
 \usepackage{verbatim}
 
 % setting title

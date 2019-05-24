@@ -1,133 +1,86 @@
-\chapter{一辺挿入時の媒介中心性の変化量}
+\chapter{一辺挿入時の媒介中心性更新法}
 \label{chap:update-bc-on-insert}
-本章では，$G=(V,E)$に辺$e=\{\alpha,\beta\} \not\in E$を挿入して得られるグラフを
-$G'=(V,E')$とする．$G'$における頂点$s$から頂点$t\,(\neq s)$への最短経路を有向グラフ
-$G'_{st}=(V'_{st},E'_{st})$で表し，頂点$s$から他のすべての頂点への最短経
-路を有向グラフ$G'_s=(V,E'_s)$で表す．また，$G'$における頂点$s$から
-頂点$t\,(\neq s)$への最短経路の個数と長さをそれぞれ$\sigma'_{st}$, 
-$d'_{st}$で表す．
+本章では，$G=(V,E)$に辺$e=\{v,w\} \not\in E$を挿入して得られるグラフを
+$G'=(V,E')$とする．$G'$における頂点$s$から頂点$t\,(\neq s)$への最短経路を有向グラフ$G'_{st}=(V'_{st},E'_{st})$で表し，すべての頂点から頂点$s$への最短経路を有向グラフ$G'_s=(V,E'_s)$で表す．また，$G'$における頂点$s$から頂点$t\,(\neq s)$への最短経路の個数と長さをそれぞれ$\sigma'_{st}$, $d'_{st}$で表す．
 
-\section{一辺挿入時の最短経路長の変化量}
+\section{最短経路長の更新}
 \label{sect:update-dist-on-insert}
 
-\begin{algorithm}[H]
-  \caption{一辺挿入時の一頂点への最短経路長を更新するアルゴリズム}
-  \label{algo:update-dist-on-insert}
-  \begin{algorithmic}[1]
-    \Require 更新対象の頂点$z$，辺挿入前の最短経路長$d_{xz},\,(x\in V)$
-    \Ensure 辺挿入後の最短経路長$d'_{xz},\,(x\in V)$
-    \Procedure{InsertUpdateDist}{$G,(v,w),z$}
-    \State $d'_{xz}\gets d_{xz}$
-    \State $SP(a,b,c)\triangleq(d'_{ac}=l_{ab}+d'_{bc})\land(d'_{ac}\neq\infty)$
-    \State $\mathrm{DistAffected}\gets\varnothing$
-    \State $\mathrm{DepAffected}\gets\varnothing$
-    \State $\mathrm{WorkSet}\gets\{(v,w)\}$
-    \State $\mathrm{VisitedVertices}\gets\{v\}$
-    \While{$\mathrm{WorkSet}\neq\varnothing$}
-    \State $\mathrm{WorkSet}$から有向辺$(x,u)$を取り出す
-    \If{$l_{xu}+d'_{uz}<d'_{xz}$}
-    \State $d'_{xz}=l_{xu}+d'_{uz}$
-    \State $\mathrm{PathAffected}\gets\mathrm{PathAffected}\cup\{x\}$
-    \ForAll{$y\in\mathcal{N}_G(x)$ s.t. $y\notin\mathrm{PathAffected}\land SP(y,x,v)$}
-    \State $\mathrm{WorkSet}\gets\mathrm{WorkSet}\cup\{(y,x)\}$
-    \State $\mathrm{VisitedVertices}\gets\mathrm{VisitedVertices}\cup\{y\}$
-    \EndFor
-    \ForAll{$y\in\mathcal{N}_G(x)$ s.t. $(d_{xz}=l_{xy}+d_{yz})\land(d_{xz}\neq\infty)$}
-    \State $\mathrm{DepAffected}\gets\mathrm{DepAffected}\cup\{y\}$
-    \EndFor
-    \EndIf
-    \EndWhile
-    \State \textbf{return} $\mathrm{DistAffected},\mathrm{DepAffected}$
-    \EndProcedure
-  \end{algorithmic}
-\end{algorithm}
+挿入後の頂点$z$への最短経路長$d'_{xz}$を求めるアルゴリズムはRamalingamとRepsによって与えられている．以下，そのアルゴリズムについて説明する．
 
-\section{一辺挿入時の最短経路数の変化量}
-\label{sect:update-sigma-on-insert}
+\begin{lemma-without-proof}
+  頂点$v$が$d'_{xz}<d_{xz}$を満たすための必要十分条件は以下である．
+  \begin{equation*}
+    d_{vz}>l_{vw}+d_{wz}
+  \end{equation*}
+\end{lemma-without-proof}
 
-\begin{algorithm}[H]
-  \caption{一辺挿入時の一頂点への最短経路数を更新するアルゴリズム}
-  \label{algo:update-sigma-on-insert}
-  \begin{algorithmic}[1]
-    \Require 更新対象の頂点$z$，辺挿入前の最短経路数$\sigma_{xz},\,(x\in V)$
-    \Ensure 辺挿入後の最短経路数$\sigma'_{xz},\,(x\in V)$
-    \Procedure{InsertUpdateSigma}{$G,(v,w),z,\mathrm{DistAffected}$}
-    \State $SP(a,b,c)\triangleq(d'_{ac}=l_{ab}+d'_{bc})\land(d'_{ac}\neq\infty)$
-    \State $\sigma'_{xz}\gets\sigma_{xz}$
-    \State $\mathrm{PathAffected}\gets\mathrm{DistAffected}$
-    \State $\mathrm{DepAffected}\gets\varnothing$
-    \State $\mathrm{WorkSet}\gets\{(d'_{vw}, (v, w))\}$
-    \State $\mathrm{VisitedVertices}\gets\{v\}$
-    \While{$\mathrm{WorkSet}\neq\varnothing$}
-    \State $\mathrm{WorkSet}$から有向辺$(x,u)$を取り出す
-    \State $\sigma_{\mathrm{old}}\gets\sigma'_{xz}$
-    \State $\sigma\gets\sum_{y\in \mathcal(N)_G(x)\mathrm{s.t.}SP(x,y,z)}\sigma'_{yz}$
-    \State $\sigma_{xz}\gets\sigma$
-    \If{$x\in\mathrm{PathAffected}\lor x\neq z\land\sigma_{\mathrm{old}}\neq\sigma$}
-    \State $\sigma'_{xz}\gets\sigma$
-    \State $\mathrm{PathAffected}\gets\mathrm{PathAffected}\cup\{x\}$
-    \State $\mathrm{DepAffected}\gets\mathrm{DepAffected}\cup\{x\}$
-    \ForAll{$y\in\mathcal{N}_G(x)$ s.t. $SP(y,x,v)\land y\notin\mathrm{VisitedVertices}$}
-    \State 距離が昇順になるように$\mathrm{WorkSet}$に$(d'_{yz},(y,x))$を追加
-    \State $\mathrm{VisitedVertices}\gets\mathrm{VisitedVertices}\cup\{y\}$
-    \EndFor
-    \EndIf
-    \EndWhile
-    \State \textbf{return} $\mathrm{PathAffected}$, $\mathrm{DepAffected}$
-    \EndProcedure
-  \end{algorithmic}
-\end{algorithm}
+\begin{lemma-without-proof}
+  頂点$x\in G,x\neq v$が$d'_{xz}<d_{xz}$を満たすための必要十分条件は以下である．
+  \begin{equation*}
+    \exists y\in\mathcal{N}_G(x),yが変化する\land d_{xz}>l_{xy}+d_{yz}
+  \end{equation*}
+\end{lemma-without-proof}
 
-\section{一辺挿入時のペア依存度の変化量}
-\label{sect:update-pd-on-insert}
+これらの頂点は，最短経路長の観点から削除の影響を受ける．
 
-\begin{algorithm}[H]
-  \caption{一辺挿入時の一頂点に対するペア依存度を更新するアルゴリズム}
-  \label{algo:update-pd-on-insert}
-  \begin{algorithmic}[1]
-    \Require 更新対象の頂点$z$，辺挿入前のペア依存度$\delta_z(x),\,(x\in V)$
-    \Ensure 辺挿入後のペア依存度$\delta'_z(x),\,(x\in V)$
-    \Procedure{InsertUpdatePD}{$G,(v,w),z,\mathrm{DepAffected}$}
-    \State $SP(a,b,c)\triangleq(d'_{ac}=l_{ab}+d'_{bc})\land(d'_{ac}\neq\infty)$
-    \State $\delta'_z(x)\gets\delta_z(x)$
-    \State $\mathrm{VisitedVertices}\gets\mathrm{DepAffected}$
-    \State $\mathrm{WorkSet}\gets((d'_{xz},x)|x\in\mathrm{AffectedDependencies},x\mathrm{は}d'_{xz}\mathrm{の昇順に並べられている})$
-    \While{$\mathrm{WorkSet}\neq\varnothing$}
-    \State $\mathrm{WorkSet}$から頂点$x$を取り出す
-    \If{$x\neq z$}
-    \State $\delta'_z(x)\gets\sum_{y\in\mathcal{N}_G(x)\mathrm{s.t.}SP(y,x,z)}\frac{\sigma'_{xz}}{\sigma'_{yz}}(1+\delta'_z(y)$
-    \ForAll{$y\in\mathcal{N}_G(x)\mathrm{s.t.}SP(x,y,z)$}
-    \State 距離が昇順になるように$\mathrm{WorkSet}$に$(d'_{yz},y)$を追加
-    \State $\mathrm{VisitedVertices}\gets\mathrm{VisitedVertices}\cup\{y\}$
-    \EndFor
-    \EndIf
-    \EndWhile
-    \EndProcedure
-  \end{algorithmic}
-\end{algorithm}
+\begin{figure}[tb]
+  \centering
+  \def\svgwidth{.35\linewidth}
+  \input{incremental-dist-idea-1.pdf_tex}
+  \caption{$z$への最短経路長が変化する頂点を求める例．数字は$z$への最短経路長を表す}
+  \label{fig:incremental-dist-idea-1}
+\end{figure}
 
-\begin{algorithm}[H]
-  \caption{一辺挿入時の媒介中心性更新アルゴリズム}
-  \label{algo:update-bc-on-insert}
-  \begin{algorithmic}[1]
-    \Require グラフ$G=(V,E)$，挿入辺$\{v,w\}$とその長さ$c$
-    \Ensure 辺挿入後の媒介中心性$B'(x),\,(x\in V)$
-    \Procedure{InsertUpdate}{$G,(v,w),z$}
-    \State $\mathrm{DistAffected},\mathrm{DepAffectedD}\gets\textproc{InsertUpdateDist}(G,(w,v),z)$
-    \State $\mathrm{PathAffected},\mathrm{DepAffectedS}\gets\textproc{InsertUpdateSigma}(G,(w,v),z,\mathrm{DistAffected})$
-    \State $\mathrm{DepAffected}\gets\mathrm{DepAffectedD}\cup\mathrm{DepAffectedS}$
-    \State $\textproc{InsertUpdatePD}(G,(w,v),z,\mathrm{DepAffected})$
-    \State \textbf{return} $\mathrm{PathAffected}$
-    \EndProcedure
-    \State グラフ$G$に$l_{vw}=c$として辺$\{v,w\}$を追加
-    \State $\mathrm{AffectedSinks}\gets\textproc{InsertUpdate}(G,(w,v),v,d,\sigma,\delta)$
-    \State $\mathrm{AffectedSources}\gets\textproc{InsertUpdate}(G,(v,w),w,d,\sigma,\delta)$
-    \ForAll{$z\in\mathrm{AffectedSinks}$}
-    \State $\textproc{InsertUpdate}(G,(v,w),z,d,\sigma,\delta)$
-    \EndFor
-    \ForAll{$z\in\mathrm{AffectedSources}$}
-    \State $\textproc{InsertUpdate}(G,(w,v),z,d,\sigma,\delta)$
-    \EndFor
-  \end{algorithmic}
-\end{algorithm}
+\begin{figure}[tb]
+  \centering
+  \def\svgwidth{.35\linewidth}
+  \input{incremental-dist-idea-2.pdf_tex}
+  \caption{$z$への最短経路長が変化する頂点を求める例．数字は$z$への最短経路長を表す}
+  \label{fig:incremental-dist-idea-2}
+\end{figure}
+
+頂点$x\in G$が変化することが分かった時，次の式を用いて挿入後の距離$d'_{xz}$をもとめる．
+
+\begin{corollary-without-proof}
+  \begin{equation*}
+    d'_{xz}=l_{xy}+d'_{yz} (y\mathrm{は条件の}y.)
+  \end{equation*}
+\end{corollary-without-proof}
+
+さらに，$xy\ldots z\in E_z,y\in\mathcal{N}_G(x)$は$E'_z$に含まれないので，$y$をペア依存度$\delta_z(y)$が更新するリストに追加する．
+
+\section{最短経路数の更新}
+\label{sect:update-sigma-on-delete}
+
+挿入後の$z$への最短経路数$\sigma'_{xz}$を求めるアルゴリズムを与える．以下，そのアルゴリズムを説明する．
+
+頂点$v$が$\sigma'_{xz}\neq\sigma_{xz}$を満たすための必要十分条件は以下である．
+\begin{equation*}
+  d_{vz}\geq l_{vw}+d_{wz}
+\end{equation*}
+
+頂点$x\in G,x\neq v$が$\sigma'_{xz}\neq\sigma_{xz}$を満たすための必要十分条件は以下である．
+\begin{equation*}
+  \exists y\in\mathcal{N}_G(x),yが変化する\land d_{xz}\geq l_{xy}+d_{yz}
+\end{equation*}
+
+これらの頂点は，最短経路長の観点から削除の影響を受ける．
+
+頂点$x\in G$が，変化することが分かった時，次の式を用いて挿入後の最短経路数$\sigma'_{xz}$をもとめる．式より，$d'_{xz}$の昇順で計算する．
+
+\begin{equation*}
+  \sigma'_{xz}=\sum_{(x,y)\in E'}\sigma'_{yz}
+\end{equation*}
+
+さらに，$\sigma_{xz}$が変化したので，$x$をペア依存度$\delta_z(y)$が更新するリストに追加する．
+
+\section{ペア依存度の更新}
+\label{sect:update-delta-on-delete}
+
+挿入後のペア依存度$\delta'_z(x)$をBrandesのアルゴリズムによって求める．具体的には，\ref{sect:update-dist-on-insert}と\ref{sect:update-sigma-on-insert}で求めた影響を受ける頂点から，$d'_{xz}$の降順となるように次式を計算しながら走査する．
+\[ \delta'_{z}(x)\gets\sum_{(y,x)\in E_z}\frac{\sigma'_{xz}}{\sigma'_{yz}}(1+\delta'_z(y)) \]
+
+\section{媒介中心性の更新}
+媒介中心性を更新する前に，すべての頂点に対するペア依存度を更新する必要がある．すべての頂点に対するペア依存度を更新した後，各頂点$x$について，$B'_x=\sum_{z\neq x}\delta'_{z}(x)$として辺削除後の媒介中心性を求める．
 
