@@ -1,2 +1,2 @@
-# fast-bc
-Faster BC algorithm on removing edge
+# dynamic-betweenness
+An algorithm for fully-dynamic betweenness centrality
