@@ -6,7 +6,7 @@ import numpy as np
 import networkx as nx
 
 from bc_helper import\
-    argumented_all_shortest_path_length, pairwise_dependencies
+    augmented_all_shortest_path_length, pairwise_dependencies
 from bc_insert import insert_edge
 from bc_delete import delete_edge
 
@@ -37,25 +37,25 @@ def main():
     query = sys.argv[5]
     assert(query in ('insert', 'delete'))
     if query == 'insert':
-        e = random.choice([
+        v, w = random.choice([
             (v, w)
             for v in G.nodes for w in G.nodes
             if not G.has_edge(v, w) and v != w
         ])
         c = random.randint(1, 5)
     elif query == 'delete':
-        e = random.choice(list(G.edges))
+        v, w = random.choice(list(G.edges))
 
     # calculate APSP with sigma of original graph
-    dist, sigma = argumented_all_shortest_path_length(G, weight)
+    dist, sigma = augmented_all_shortest_path_length(G, weight)
     deps = pairwise_dependencies(G, weight)
 
     # update process
     time_start = time.time()
     if query == 'insert':
-        nupdate = insert_edge(G, e, dist, sigma, deps, weight, c)
+        insert_edge(G, v, w, c, dist, sigma, deps, weight)
     elif query == 'delete':
-        nupdate = delete_edge(G, e, dist, sigma, deps, weight)
+        delete_edge(G, v, w, dist, sigma, deps, weight)
     bc = dict((x, sum(deps[z, x] for z in G.nodes) / 2) for x in G.nodes)
     time_end = time.time()
     time_proposed = time_end - time_start
@@ -67,10 +67,10 @@ def main():
     time_end = time.time()
     time_brandes = time_end - time_start
 
-    print('{},{},{},{},{},{},{},{},{}'.format(
+    print('{},{},{},{},{},{},{},{}'.format(
         topology, n, k, seed, query,
         max(abs(bc[x] - bc_true[x]) for x in G.nodes),
-        nupdate/(n*(n-1)), time_proposed, time_brandes))
+        time_proposed, time_brandes))
 
 if __name__ == '__main__':
     main()

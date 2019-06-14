@@ -5,7 +5,17 @@ import networkx as nx
 from networkx.algorithms.centrality.betweenness\
     import _single_source_dijkstra_path_basic
 
-def argumented_all_shortest_path_length(G, weight='length'):
+def update_key(queue, u, v):
+    # update element of priority queue which has u
+    us = [t for t in queue if t[1] == u]
+    assert(len(us) < 2)
+    if not us:
+        queue.append((v, u))
+    elif us[0][0] > v:
+        queue.remove(us[0])
+        queue.append((v, u))
+
+def augmented_all_shortest_path_length(G, weight='length'):
     dist = defaultdict(lambda: inf)
     sigma = defaultdict(lambda: 0)
     for v in G.nodes:
