@@ -1,6 +1,6 @@
 CC := gcc
-IDIR := /usr/include/igraph
-LDIR := /usr/lib/x86_64-linux-gnu/
+IDIR := /usr/local/include/igraph
+LDIR := /usr/local/lib/
 LIBS := -lm -ligraph
 CFLAGS := -fpic -g -O3 -march=native -Wall \
           $(addprefix -I,$(IDIR)) $(addprefix -L,$(LDIR))
