@@ -3,7 +3,10 @@
 #define _BETWEENNESS_H_
 
 #include <igraph.h>
+#include <igraph_types_internal.h>
 
-void pairwise_dependency(igraph_matrix_t* Delta, igraph_t* G, const char* weight);
+void pairwise_dependency(igraph_t*        G,
+                         igraph_matrix_t* Delta,
+                         const char*      weight);
 
 #endif // _BETWEENNESS_H_
