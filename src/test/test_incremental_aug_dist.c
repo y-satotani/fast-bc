@@ -88,6 +88,7 @@ int main(int argc, char* argv[]) {
   igraph_matrix_destroy(&D);
   igraph_matrix_int_destroy(&Sigma);
   igraph_matrix_destroy(&Delta);
+  igraph_matrix_destroy(&Deltatrue);
   igraph_vector_destroy(&Btrue);
   igraph_destroy(&G);
 
