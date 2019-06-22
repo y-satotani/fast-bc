@@ -16,6 +16,7 @@ void aug_dist(igraph_t*            G,
 
   igraph_matrix_init(D, n, n);
   igraph_matrix_int_init(Sigma, n, n);
+  igraph_matrix_fill(D, IGRAPH_INFINITY);
 
   for(igraph_integer_t source = 0; source < n; source++) {
     igraph_2wheap_push_with_index(&queue, source, 0);
@@ -34,7 +35,7 @@ void aug_dist(igraph_t*            G,
         igraph_real_t d_v = MATRIX(*D, source, v);
         igraph_real_t d_vp = d_u + EAN(G, weight, eid);
 
-        if(d_v == 0. && v != source) {
+        if(d_v == IGRAPH_INFINITY && v != source) {
           // first visit
           MATRIX(*D, source, v) = d_vp;
           MATRIX(*Sigma, source, v) = MATRIX(*Sigma, source, u);

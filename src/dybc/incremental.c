@@ -45,7 +45,8 @@ void incremental_part(igraph_t*            G,
                       igraph_matrix_int_t* Sigma,
                       igraph_matrix_t*     Delta,
                       const char*          weight) {
-  if(igraph_cmp_epsilon(MATRIX(*D, v, z), c + MATRIX(*D, w, z)) < 0)
+  if(igraph_cmp_epsilon(MATRIX(*D, v, z), c + MATRIX(*D, w, z)) < 0
+     || MATRIX(*Sigma, w, z) == 0)
     return;
   igraph_vector_t dp_z;
   igraph_2wheap_t queue;
