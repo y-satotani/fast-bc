@@ -1,0 +1,210 @@
+\chapter{例}
+
+\bgroup
+\setlength{\fboxrule}{0pt}
+\setlength{\fboxsep}{10pt}
+
+\section{挿入例}
+
+\begin{tabular}{cp{8cm}}
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{incremental-path-0.pdf_tex}
+  }}
+  &
+  もともとのグラフ
+  \\
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{incremental-path-1.pdf_tex}
+  }}
+  &
+  $(E,H)$を挿入，$l_{EH}=2$
+  \\
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{incremental-path-2.pdf_tex}
+  }}
+  &
+  $d_{EH}=5$なので，$d_{EH}>l_{EH}+d'_{HH}$.
+  よって，$d'_{EH}\gets l_{EH}+d'_{HH}=2$.
+  さらに，$(E,F)\in E_H$なので，$(E,F)$をキューに追加する．
+  \\
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{incremental-path-3.pdf_tex}
+  }}
+  &
+  $d_{FH}=4$なので，$d_{FH}>l_{FE}+d'_{EH}$.よって，
+  $d'_{FH}\gets l_{FE}+d'_{EH}=3$.
+
+  さらに，$(F,E)\in \bar{E_H}$つまり，$(E,F)in E_H$なので，
+  $\delta_H(E)$が変化するフラグを設定する．
+
+  さらに，$(F,G)\in\bar{E_H}$かつ$d'_{GH}<l_{FG}+d'_{FH}$なので，
+  $(F,G)\notin \bar{E'_H}$.よって，
+  $\delta_H(G)$が変化するフラグを設定する．
+
+  さらに，$(C,F)\in\bar{E_H}$かつ，$d_{CH}\gt l_{CF}+d'_{FH}$なので，
+  $(C,F)$をキューに追加する．
+\end{tabular}
+\newpage
+\begin{tabular}{cp{8cm}}
+  \\
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{incremental-path-4.pdf_tex}
+  }}
+  &
+  $d_{CH}=6$.
+  $d_{CH}\gt l_{CF}+d'_{FH}$んおで，$d_{CH}\gets l_{CF}+d'_{FH}=5$.
+
+  また，$(C,B)\in\bar{E_H}$かつ，$d_{BH}<l_{BC}+d'_{CH}$なので，
+  $(C,B)\notin\bar{E'_H}$.よって，
+  $\delta_H(B)$を，ペア依存度が変化するフラグを設定する．
+
+  さらに，$(D,C)\in\bar{E_H}$かつ$d_{DH}\gt l_{DC}+d'_{CH}$なので，
+  $(D,C)$をキューに追加する．
+  \\
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{incremental-path-5.pdf_tex}
+  }}
+  &
+  $d_{DH}=9$.
+  $d_{DH}>l_{DC}+d'_{CH}$なので，$d'_{DH}\gets l_{DC}+d'_{CH}=8$.
+
+  また，$(A,D)\in\bar{E_H}$なので，$(A,D)$をキューに追加する．
+  \\
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{incremental-path-6.pdf_tex}
+  }}
+  &
+  \\
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{incremental-path-7.pdf_tex}
+  }}
+  &
+\end{tabular}
+
+\newpage
+
+\section{削除例}
+
+\begin{tabular}{cp{8cm}}
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{decremental-path-0.pdf_tex}
+  }}
+  &
+  もともとのグラフ
+  \\
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{decremental-path-1.pdf_tex}
+  }}
+  &
+  $(E,H)$を削除．
+  \\
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{decremental-path-2.pdf_tex}
+  }}
+  &
+  $d_{EH}=l_{EH}+d_{HH}$なので，$E$を距離更新リストに追加する．
+  \\
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{decremental-path-3.pdf_tex}
+  }}
+  &
+  $d_{FH}=l_{FE}+d_{EH}$なので，$F$を距離更新リストに追加する．
+
+  同様に，$C,D,A$も距離更新リストに追加する．
+\end{tabular}
+\newpage
+\begin{tabular}{cp{8cm}}
+  \\
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{decremental-path-4.pdf_tex}
+  }}
+  &
+  $C,F$について，その近傍に距離更新リストに無い頂点が存在するので，
+  それぞれ，
+  $(C,l_{CB}+d_{BH}),(F,l_{FG}+d_{GH})$
+  を更新キューに追加する．
+
+  更新キュー：$((F,4),(C,6))$.
+  \\
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{decremental-path-5.pdf_tex}
+  }}
+  &
+  キューから，$(F,4)$を取り出す．
+
+  $d'_{FH}\gets 4$と更新．
+  また，$\sigma'_{FH}\gets\sigma'_{GH}=1$と更新．
+
+  $F$の近傍のうち，更新リストに含まれているものについて，
+  $(E,l_{EF}+d'_{FH})$を距離更新キューに追加する．
+
+  そして，$F$を距離更新リストから削除する．
+
+  更新キュー：$((E,5),(C,6))$.
+  \\
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{decremental-path-6.pdf_tex}
+  }}
+  &
+  キューから$(E,5)$を取り出す．
+
+  $d'_{EH}\gets 5$と更新する．
+  また，$\sigma'_{EH}\gets\sigma'_{FH}=1$と更新する．
+
+  $E$を，$\delta$更新リストに追加する．
+
+  そして，$E$を距離更新リストから削除する．
+
+  距離更新キュー：$((C,6))$
+  \\
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{decremental-path-7.pdf_tex}
+  }}
+  &
+  キューから$(C,6)$を取り出す．
+
+  $d'_{CH}\gets 6$と更新する．
+  また，$\sigma'_{CH}\gets\sigma'_{BH}+\sigma'_{FH}=2$と更新する．
+
+  $C$の近傍のうち，更新リストに含まれているものについて，
+  $(D,l_{DC}+d'_{CH})$を距離更新キューに追加する．
+
+  $C$を，$\delta$更新リストに追加する．
+
+  そして，$C$を距離更新リストから削除する．
+
+  距離更新キュー：$((D,9))$
+\end{tabular}
+\newpage
+\begin{tabular}{cp{8cm}}
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{decremental-path-8.pdf_tex}
+  }}
+  &
+  これらを，距離更新キューが空になるまで繰り返す．
+  \\
+  \raisebox{-.8\totalheight}{\fbox{
+    \def\svgwidth{.35\linewidth}
+    \input{decremental-path-9.pdf_tex}
+  }}
+  &
+\end{tabular}
+
+\egroup
