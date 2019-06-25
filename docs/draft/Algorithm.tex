@@ -1,254 +1,213 @@
 \chapter{更新アルゴリズム}
-\label{chap:algorithm-on-insert}
+\label{chap:app-algorithm}
+
+\section{Brandesのアルゴリズム}
+\label{sect:app-brandes-algorithm}
+\begin{algorithm}[H]
+  \caption{Brandesのアルゴリズム}
+  \label{algo:brandes-algorithm}
+  \begin{multicols}{2}
+    \begin{algorithmic}[1]
+      \Procedure{Brandes}{$G$}
+      \State $B_x\gets 0,\:\forall x\in V$
+      \ForAll{$s\in V$}
+      \State $S\gets()$ \Comment スタック
+      \State $P_w\gets (),\:\forall w\in V$ \Comment リスト
+      \State $\sigma_t\gets 0,\:\forall t\in V;\:\sigma_s\gets 1$
+      \State $d_t\gets -1,\:\forall t\in V;\:d_s\gets 0$
+      \State $Q\gets ()$ \Comment 順位キュー
+      \State $\mathrm{push}(Q, s)$
+      \While{$\lvert Q\rvert>0$}
+      \State $v\gets\mathrm{pop}(Q)$
+      \State $\mathrm{push}(S, v)$
+      \ForAll{$w\in\mathcal{N}_G(v)$}
+      \If{$d_w<0\lor d_v+l_{vw}<d_w$}
+      \State $d_w\gets d_v+l_{vw}$
+      \State $\sigma_w\gets\sigma_v$
+      \State $P_w\gets(v)$
+      \State $\mathrm{updatekey}(Q, w, d_w)$
+      \EndIf
+      \If{$d_w=d_v+l_{vw}$}
+      \State $\sigma_w\gets\sigma_w+\sigma_v$
+      \State $\mathrm{append}(P_w, v)$
+      \EndIf
+      \EndFor
+      \EndWhile
+      \State $\delta_v\gets 0,\:v\in V$
+      \While{$\lvert S\rvert>0$}
+      \State $w\gets\mathrm{pop}(S)$
+      \ForAll{$v\in P_w$}
+      \State $\delta_v\gets\delta_v+\frac{\sigma_v}{\sigma_w}(1+\delta_w)$
+      \EndFor
+      \If{$w\neq s$}
+      \State $B_w\gets B_w+\delta_w$
+      \EndIf
+      \EndWhile
+      \EndFor
+      \EndProcedure
+    \end{algorithmic}
+  \end{multicols}
+\end{algorithm}
 
 \section{一辺挿入時の更新アルゴリズム}
-\label{sect:update-dist-on-insert}
-
+\label{sect:app-incremental-algorithm}
 \begin{algorithm}[H]
-  \caption{一辺挿入時の一頂点への最短経路長を更新するアルゴリズム}
-  \label{algo:update-dist-on-insert}
-  \begin{algorithmic}[1]
-    \Require 更新対象の頂点$z$，辺挿入前の最短経路長$d_{xz},\,(x\in V)$
-    \Ensure 辺挿入後の最短経路長$d'_{xz},\,(x\in V)$
-    \Procedure{InsertUpdateDist}{$G,(v,w),z$}
-    \State $d'_{xz}\gets d_{xz}$
-    \State $SP(a,b,c)\triangleq(d'_{ac}=l_{ab}+d'_{bc})\land(d'_{ac}\neq\infty)$
-    \State $\mathrm{DistAffected}\gets\varnothing$
-    \State $\mathrm{DepAffected}\gets\varnothing$
-    \State $\mathrm{WorkSet}\gets\{(v,w)\}$
-    \State $\mathrm{VisitedVertices}\gets\{v\}$
-    \While{$\mathrm{WorkSet}\neq\varnothing$}
-    \State $\mathrm{WorkSet}$から有向辺$(x,u)$を取り出す
-    \If{$l_{xu}+d'_{uz}<d'_{xz}$}
-    \State $d'_{xz}=l_{xu}+d'_{uz}$
-    \State $\mathrm{DistAffected}\gets\mathrm{DistAffected}\cup\{x\}$
-    \ForAll{$y\in\mathcal{N}_G(x)$ s.t. $y\notin\mathrm{DistAffected}\land SP(y,x,v)$}
-    \State $\mathrm{WorkSet}\gets\mathrm{WorkSet}\cup\{(y,x)\}$
-    \State $\mathrm{VisitedVertices}\gets\mathrm{VisitedVertices}\cup\{y\}$
-    \EndFor
-    \ForAll{$y\in\mathcal{N}_G(x)$ s.t. $(d_{xz}=l_{xy}+d_{yz})\land(d_{xz}\neq\infty)$}
-    \State $\mathrm{DepAffected}\gets\mathrm{DepAffected}\cup\{y\}$
-    \EndFor
-    \EndIf
-    \EndWhile
-    \State \textbf{return} $\mathrm{DistAffected},\mathrm{DepAffected}$
-    \EndProcedure
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \caption{一辺挿入時の一頂点への最短経路数を更新するアルゴリズム}
-  \label{algo:update-sigma-on-insert}
-  \begin{algorithmic}[1]
-    \Require 更新対象の頂点$z$，辺挿入前の最短経路数$\sigma_{xz},\,(x\in V)$
-    \Ensure 辺挿入後の最短経路数$\sigma'_{xz},\,(x\in V)$
-    \Procedure{InsertUpdateSigma}{$G,(v,w),z,\mathrm{DistAffected}$}
-    \State $SP(a,b,c)\triangleq(d'_{ac}=l_{ab}+d'_{bc})\land(d'_{ac}\neq\infty)$
-    \State $\sigma'_{xz}\gets\sigma_{xz}$
-    \State $\mathrm{PathAffected}\gets\mathrm{DistAffected}$
-    \State $\mathrm{DepAffected}\gets\varnothing$
-    \State $\mathrm{WorkSet}\gets\{(d'_{vw}, (v, w))\}$
-    \State $\mathrm{VisitedVertices}\gets\{v\}$
-    \While{$\mathrm{WorkSet}\neq\varnothing$}
-    \State $\mathrm{WorkSet}$から有向辺$(x,u)$を取り出す
-    \State $\sigma_{\mathrm{old}}\gets\sigma'_{xz}$
-    \State $\sigma\gets\sum_{y\in \mathcal(N)_G(x)\mathrm{s.t.}SP(x,y,z)}\sigma'_{yz}$
-    \State $\sigma_{xz}\gets\sigma$
-    \If{$x\in\mathrm{PathAffected}\lor x\neq z\land\sigma_{\mathrm{old}}\neq\sigma$}
-    \State $\sigma'_{xz}\gets\sigma$
-    \State $\mathrm{PathAffected}\gets\mathrm{PathAffected}\cup\{x\}$
-    \State $\mathrm{DepAffected}\gets\mathrm{DepAffected}\cup\{x\}$
-    \ForAll{$y\in\mathcal{N}_G(x)$ s.t. $SP(y,x,v)\land y\notin\mathrm{VisitedVertices}$}
-    \State 距離が昇順になるように$\mathrm{WorkSet}$に$(d'_{yz},(y,x))$を追加
-    \State $\mathrm{VisitedVertices}\gets\mathrm{VisitedVertices}\cup\{y\}$
-    \EndFor
-    \EndIf
-    \EndWhile
-    \State \textbf{return} $\mathrm{PathAffected}$, $\mathrm{DepAffected}$
-    \EndProcedure
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \caption{一辺挿入時の一頂点に対するペア依存度を更新するアルゴリズム}
-  \label{algo:update-pd-on-insert}
-  \begin{algorithmic}[1]
-    \Require 更新対象の頂点$z$，辺挿入前のペア依存度$\delta_z(x),\,(x\in V)$
-    \Ensure 辺挿入後のペア依存度$\delta'_z(x),\,(x\in V)$
-    \Procedure{InsertUpdatePD}{$G,(v,w),z,\mathrm{DepAffected}$}
-    \State $SP(a,b,c)\triangleq(d'_{ac}=l_{ab}+d'_{bc})\land(d'_{ac}\neq\infty)$
-    \State $\delta'_z(x)\gets\delta_z(x)$
-    \State $\mathrm{VisitedVertices}\gets\mathrm{DepAffected}$
-    \State $\mathrm{WorkSet}\gets((d'_{xz},x)|x\in\mathrm{AffectedDependencies},x\mathrm{は}d'_{xz}\mathrm{の昇順に並べられている})$
-    \While{$\mathrm{WorkSet}\neq\varnothing$}
-    \State $\mathrm{WorkSet}$から頂点$x$を取り出す
-    \If{$x\neq z$}
-    \State $\delta'_z(x)\gets\sum_{y\in\mathcal{N}_G(x)\mathrm{s.t.}SP(y,x,z)}\frac{\sigma'_{xz}}{\sigma'_{yz}}(1+\delta'_z(y)$
-    \ForAll{$y\in\mathcal{N}_G(x)\mathrm{s.t.}SP(x,y,z)$}
-    \State 距離が昇順になるように$\mathrm{WorkSet}$に$(d'_{yz},y)$を追加
-    \State $\mathrm{VisitedVertices}\gets\mathrm{VisitedVertices}\cup\{y\}$
-    \EndFor
-    \EndIf
-    \EndWhile
-    \EndProcedure
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \caption{一辺挿入時の媒介中心性更新アルゴリズム}
-  \label{algo:update-bc-on-insert}
-  \begin{algorithmic}[1]
-    \Require グラフ$G=(V,E)$，挿入辺$\{v,w\}$とその長さ$c$
-    \Ensure 辺挿入後の媒介中心性$B'(x),\,(x\in V)$
-    \Procedure{InsertUpdate}{$G,(v,w),z$}
-    \State $\mathrm{DistAffected},\mathrm{DepAffectedD}\gets\textproc{InsertUpdateDist}(G,(w,v),z)$
-    \State $\mathrm{PathAffected},\mathrm{DepAffectedS}\gets\textproc{InsertUpdateSigma}(G,(w,v),z,\mathrm{DistAffected})$
-    \State $\mathrm{DepAffected}\gets\mathrm{DepAffectedD}\cup\mathrm{DepAffectedS}$
-    \State $\textproc{InsertUpdatePD}(G,(w,v),z,\mathrm{DepAffected})$
-    \State \textbf{return} $\mathrm{PathAffected}$
-    \EndProcedure
-    \State グラフ$G$に$l_{vw}=c$として辺$\{v,w\}$を追加
-    \State $\mathrm{AffectedSinks}\gets\textproc{InsertUpdate}(G,(w,v),v,d,\sigma,\delta)$
-    \State $\mathrm{AffectedSources}\gets\textproc{InsertUpdate}(G,(v,w),w,d,\sigma,\delta)$
-    \ForAll{$z\in\mathrm{AffectedSinks}$}
-    \State $\textproc{InsertUpdate}(G,(v,w),z,d,\sigma,\delta)$
-    \EndFor
-    \ForAll{$z\in\mathrm{AffectedSources}$}
-    \State $\textproc{InsertUpdate}(G,(w,v),z,d,\sigma,\delta)$
-    \EndFor
-  \end{algorithmic}
+  \caption{一辺挿入時のペア依存度を更新するアルゴリズム}
+  \label{algo:incremental-algorithm}
+  \begin{multicols}{2}
+    \begin{algorithmic}[1]
+      \Procedure{Incremental}{$G,(v,w),c$}
+      \State $d'_{xz}\gets d_{xz},\quad\sigma'_{xz}\gets \sigma_{xz},\quad$
+      $\delta'_z(x)\gets \delta_z(x)\quad \forall x,z\in V(G)$
+      \State $G'\gets(V(G),E(G)\cup\{(v,w)\}),\quad l_{vw}\gets c$
+      \ForAll{$z\in V(G)$}
+      \If{$l_{vz}>l_{wz}$}
+      \State $\textsc{IncrementalPart}(G',(v,w),z)$
+      \Else
+      \State $\textsc{IncrementalPart}(G',(w,v),z)$
+      \EndIf
+      \EndFor
+      \EndProcedure
+      \Procedure{IncrementalPart}{$G',(v,w),z$}
+      \If{$d_{wz}=\infty\lor d_{vz}<l_{vw}+d_{wz}$}
+      \State \textbf{return}
+      \EndIf
+      \State $Q\gets((v,l_{vw}+d_{wz}))$
+      \Comment 各要素の第二要素をキーとする順位キュー
+      \State $\delta S\gets\{\}$
+      \Comment $\delta_z(x)$を更新する頂点集合
+      \While{$\lvert Q\rvert>0$}
+      \State $x,\hat{d}_{xz}\gets\mathrm{popmin}(Q)$
+      \State $d'_{xz}\gets\hat{d}_{xz},\quad\sigma'_{xz}\gets 0$
+      \ForAll{$y\in\mathcal{N}_{G'}(x)$}
+      \If{$d'_{yz}\geq l_{yx}+d'_{xz}$}
+      \State $\mathrm{updatekey}(Q,y,l_{yx}+d_{xz})$
+      \EndIf
+      \If{$d'_{xz}=l_{xy}+d'_{yz}$}
+      \State $\sigma'_{xz}\gets\sigma'_{xz}+\sigma'_{yz}$
+      \EndIf
+      \If{$(d_{xz}=l_{xy}+d_{yz}\land\lnot(y=w\land x=v))$
+        $\veebar(d'_{xz}=l_{xy}+d'_{yz})$}
+      \State $S\gets S\cup\{y\}$
+      \EndIf
+      \EndFor
+      \If{$\sigma'_{xz}\neq\sigma_{xz}$}
+      \State $S\gets S\cup\{x\}$
+      \EndIf
+      \EndWhile
+      \State $R\gets((x,d'_{xz})\vert x\in S)$
+      \Comment 各要素の第二要素をキーとする順位キュー
+      \While{$\lvert R\rvert>0$}
+      \State $x,\_\gets\mathrm{popmax}(R)$
+      \State $\delta'_z(x)\gets 0$
+      \If{$x=z$}
+      \State \textbf{continue}
+      \EndIf
+      \ForAll{$y\in\mathcal{N}_G(x)$}
+      \If{$d'_{yz}=l_{yx}+d'_{xz}$}
+      \State $\delta'_z(x)\gets\delta'_z(x)$
+      $+\frac{\sigma'_{xz}}{\sigma'_{yz}}(1+\delta'_z(y)$
+      \ElsIf{$d_{zx}=l_{xy}+d_{yz}$}
+      \State $\mathrm{updatekey}(R, y, d'_{yz})$
+      \EndIf
+      \EndFor
+      \EndWhile
+      \EndProcedure
+    \end{algorithmic}
+  \end{multicols}
 \end{algorithm}
 
 \section{一辺削除時の更新アルゴリズム}
-\label{sect:algorithm-on-delete}
-
+\label{sect:app-decremental-algorithm}
 \begin{algorithm}[H]
-  \caption{一辺削除時の一頂点への最短経路長を更新するアルゴリズム}
-  \label{algo:update-dist-on-delete}
-  \begin{algorithmic}[1]
-    \Require 更新対象の頂点$z$，辺削除前の最短経路長$d_{xz},\,(x\in V)$
-    \Ensure 辺削除後の最短経路長$d'_{xz},\,(x\in V)$
-    \Procedure{DeleteUpdateDist}{$G,(v,w),z$}
-    \State $d'_{xz}\gets d_{xz}$
-    \State $SP(a,b,c)\triangleq(d'_{ac}=l_{ab}+d'_{bc})\land(d'_{ac}\neq\infty)$
-    \State $\mathrm{DistAffected}\gets\varnothing$
-    \If{$\exists x\in\mathcal{N}_G(v), SP(v,x,z)$}
-    \State $\mathrm{WorkSet}\gets\varnothing$
-    \Else
-    \State $\mathrm{WorkSet}\gets\{v\}$
-    \EndIf
-    \While{$\mathrm{WorkSet}\neq\varnothing$}
-    \State $\mathrm{WorkSet}$から頂点$u$を取り出す
-    \State $\mathrm{DistAffected}\gets\mathrm{DistAffected}\cup\{u\}$
-    \ForAll{$x\in\mathcal{N}_G(u)$ s.t. $SP(x,u,z)$}
-    \If{$\forall y\in\mathcal{N}_G(x), \neg SP(x,y,z)\lor y\in\mathrm{DistAffected}$}
-    \State $\mathrm{WorkSet}\gets\mathrm{WorkSet}\cup\{x\}$
-    \EndIf
-    \EndFor
-    \EndWhile
-    \State $\mathrm{PriorityQueue}\gets\varnothing$
-    \ForAll{$a\in\mathrm{DistAffected}$}
-    \State $d'_{az}=\min(\{l_{ab}+d'_{bz}|b\in\mathcal{N}_G(a),b\notin\mathrm{DistAffected}\}\cup\{\infty\})$
-    \If{$d'_{az}\neq\infty$}
-    \State $d'_{az}$をキーとして$a$を$\mathrm{PriorityQueue}$に追加
-    \EndIf
-    \EndFor
-    \While{$\mathrm{PriorityQueue}\neq\varnothing$}
-    \State $\mathrm{PriorityQueue}$から最小キーの頂点$a$を取り出す
-    \ForAll{$c\in\mathcal{N}_G(a)$ s.t. $l_{ca}+d'_{az}<d_{cz}$}
-    \State $d'_{cz}=l_{ca}+d'_{az}$
-    \State $\mathrm{PriorityQueue}$の$c$のキーを$d'_{cz}$に更新
-    \EndFor
-    \EndWhile
-    \State \textbf{return} $\mathrm{DistAffected}$
-    \EndProcedure
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \caption{一辺削除時の一頂点への最短経路数を更新するアルゴリズム}
-  \label{algo:update-sigma-on-delete}
-  \begin{algorithmic}[1]
-    \Require 更新対象の頂点$z$，辺削除前の最短経路数$\sigma_{xz},\,(x\in V)$，
-    最短経路長が変化した頂点の集合$\mathrm{DistAffected}$
-    \Ensure 辺削除後の最短経路数$\sigma'_{xz},\,(x\in V)$
-    \Procedure{DeleteUpdateSigma}{$G,(v,w),z,\mathrm{DistAffected}$}
-    \State $SP(a,b,c)\triangleq(d'_{ac}=l_{ab}+d'_{bc})\land(d'_{ac}\neq\infty)$
-    \State $\sigma'_{xz}\gets\sigma_{xz}$
-    \State $\mathrm{PathAffected}\gets\mathrm{DistAffected}$
-    \If{$d_{vz}=d_{wz}$}
-    \State $\mathrm{WorkSet}\gets\varnothing$
-    \Else
-    \State $\mathrm{WorkSet}\gets\{v\}$
-    \EndIf
-    \While{$\mathrm{WorkSet}\neq\varnothing$}
-    \State $\mathrm{WorkSet}$から頂点$u$を取り出す
-    \State $\mathrm{PathAffected}\gets\mathrm{PathAffected}\cup\{u\}$
-    \ForAll{$x\in\mathcal{N}_G(u)$ s.t. $SP(x,u,z)$}
-    \If{$\exists y\in\mathcal{N}_G(x), \neg SP(x,y,z)\lor y\in\mathrm{PathAffected}$}
-    \State $\mathrm{WorkSet}$に$d'_{xz}$をキーとして$x$を追加
-    \EndIf
-    \EndFor
-    \EndWhile
-    \ForAll{$a\in\mathrm{WorkSet}$\ (ただし，順番はキー($d_{az}$)の昇順)}
-    \State $\sigma'_{az}\gets\sum_{b\in\mathcal{N}_G(a)\mathrm{s.t.}SP(a,b,z)}\sigma'_{bz}$
-    \EndFor
-    \State \textbf{return} $\mathrm{PathAffected}$
-    \EndProcedure
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \caption{一辺削除時の一頂点に対するペア依存度を更新するアルゴリズム}
-  \label{algo:update-pd-on-delete}
-  \begin{algorithmic}[1]
-    \Require 更新対象の頂点$z$，辺削除前のペア依存度$\delta_z(x),\,(x\in V)$，
-    最短経路長または最短経路数が変化した頂点の集合$\mathrm{PathAffected}$
-    \Ensure 辺削除後のペア依存度$\delta'_z(x),\,(x\in V)$
-    \Procedure{DeleteUpdatePD}{$G,(v,w),z,\mathrm{PathAffected}$}
-    \State $\delta'_z(x)\gets\delta_z(x)$
-    \State $SP(a,b,c)\triangleq(d'_{ac}=l_{ab}+d'_{bc})\land(d'_{ac}\neq\infty)$
-    \State $\mathrm{PriorityQueue}\gets\{(d'_{xz},x)|x\in\mathrm{PathAffected}\}$
-    \If{$d_{vz}\neq d_{wz}$}
-    \State $d'_{wz}$をキーとして$\mathrm{PirorityQueue}$に$w$を追加
-    \EndIf
-    \State $\mathrm{VisitedVertices}\gets\{x|x\in\mathrm{PriorityQueue}\}$
-    \While{$\mathrm{PriorityQueue}\neq\varnothing$}
-    \State $\mathrm{PriorityQueue}$から最大キー($d'_{xz}$)の頂点$x$を取り出す
-    \If{$x\neq z$}
-    \State $\delta_z(x)=\sum_{y\in\mathcal{N}_G(x)\mathrm{s.t.}SP(y,x,z)}\frac{\sigma'_{xz}}{\sigma'_{yz}}(1+\delta_z(y))$
-    \ForAll{$y\in\mathcal{N}_G(x)\mathrm{s.t.}SP(x,y,z)\land y\notin\mathrm{VisitedVertices}$}
-    \State $\mathrm{PriorityQueue}$に$d'_{yz}$をキーとして$y$を追加
-    \State $\mathrm{VisitedVertices}\gets\mathrm{VisitedVertices}\cup\{y\}$
-    \EndFor
-    \EndIf
-    \EndWhile
-    \State \textbf{return} $\mathrm{PathAffected}$
-    \EndProcedure
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[H]
-  \caption{一辺削除時の媒介中心性更新アルゴリズム}
-  \label{algo:update-bc-on-delete}
-  \begin{algorithmic}[1]
-    \Require グラフ$G=(V,E)$，削除辺$\{v,w\}$
-    \Ensure 辺削除後の媒介中心性$B'(x),\,(x\in V)$
-    \Procedure{DeleteUpdate}{$G,(v,w),z$}
-    \State $\mathrm{DistAffected}\gets\textproc{DeleteUpdateDist}(G,(w,v),z)$
-    \State $\mathrm{PathAffected}\gets\textproc{DeleteUpdateSigma}(G,(w,v),z,\mathrm{DistAffected})$
-    \State $\textproc{DeleteUpdatePD}(G,(w,v),z,\mathrm{PathAffected})$
-    \State \textbf{return} $\mathrm{PathAffected}$
-    \EndProcedure
-    \State グラフ$G$から辺$\{v,w\}$を削除
-    \State $\mathrm{AffectedSinks}\gets\textproc{DeleteUpdate}(G,(w,v),v)$
-    \State $\mathrm{AffectedSources}\gets\textproc{DeleteUpdate}(G,(v,w),w)$
-    \ForAll{$z\in\mathrm{AffectedSinks}$}
-    \State $\textproc{DeleteUpdate}(G,(v,w),z)$
-    \EndFor
-    \ForAll{$z\in\mathrm{AffectedSources}$}
-    \State $\textproc{DeleteUpdate}(G,(w,v),z)$
-    \EndFor
-    \State $B'(z)\gets\sum_{x\in V}\delta'_z(x),\,\forall z\in V$
-  \end{algorithmic}
+  \caption{一辺挿入時のペア依存度を更新するアルゴリズム}
+  \label{algo:decremental-algorithm}
+  \begin{multicols}{2}
+    \begin{algorithmic}[1]
+      \Procedure{Decremental}{$G,(v,w),c$}
+      \State $d'_{xz}\gets d_{xz},\quad\sigma'_{xz}\gets \sigma_{xz},\quad$
+      $\delta'_z(x)\gets \delta_z(x)\quad \forall x,z\in V(G)$
+      \State $G'\gets(V(G),E(G)\cup\{(v,w)\}),\quad l_{vw}\gets c$
+      \ForAll{$z\in V(G)$}
+      \If{$l_{vz}>l_{wz}$}
+      \State $\textsc{DecrementalPart}(G',(v,w),z)$
+      \Else
+      \State $\textsc{DecrementalPart}(G',(w,v),z)$
+      \EndIf
+      \EndFor
+      \EndProcedure
+      \Procedure{DecrementalPart}{$G',(v,w),z$}
+      \If{$d_{wz}=\infty\lor d_{vz}<l_{vw}+d_{wz}$}
+      \State \textbf{return}
+      \EndIf
+      \State $\mathrm{WorkSet}\gets\{v\}$
+      \State $\mathrm{Affected}\gets\{v\}$
+      \While{$\lvert\mathrm{WorkSet}\rvert>0$}
+      \State $x\gets\mathrm{pop}(\mathrm{WorkSet})$
+      \ForAll{$y\in\mathcal{N}_{G'}(x)$}
+      \If{$d_{yz}=l_{yx}+d_{xz}\land y\notin\mathrm{Affected}$}
+      \State $\mathrm{Affected}\gets\mathrm{Affected}\cup\{y\},\quad$
+      $\mathrm{WorkSet}\gets\mathrm{WorkSet}\cup\{y\}$
+      \EndIf
+      \EndFor
+      \EndWhile
+      \State $Q\gets()$
+      \Comment 各要素の第二要素をキーとする順位キュー
+      \ForAll{$x\in\mathrm{Affected}$}
+      \State $\hat{d}_{xz}\gets\min($
+      $\{l_{xy}+d_{yz}\vert$
+      $y\in\mathcal{N}_{G'}(x),\:y\notin\mathrm{Affected}\}$
+      $\cup\{\infty\})$
+      \If{$\hat{d}_{xz}=\infty$}
+      \State $d'_{xz}\gets\infty,\quad\sigma'_{xz}\gets 0$
+      \Else
+      \State $\mathrm{updatekey}(Q, x, \hat{d}_{xz})$
+      \EndIf
+      \EndFor
+      \State $S\gets\{w\}$
+      \Comment $\delta_z(x)$を更新する頂点集合
+      \While{$\lvert Q\rvert>0$}
+      \State $x,\hat{d}_{xz}\gets\mathrm{popmin}(Q)$
+      \State $\mathrm{Affected}\gets\mathrm{Affected}\setminus\{x\}$
+      \State $d'_{xz}\gets\hat{d}_{xz},\quad\sigma'_{xz}\gets 0$
+      \ForAll{$y\in\mathrm{Affected}$}
+      \If{$d'_{yz}\geq l_{yx}+d'_{xz}$}
+      \State $\mathrm{updatekey}(Q,y,l_{yx}+d_{xz})$
+      \EndIf
+      \If{$d'_{xz}=l_{xy}+d'_{yz}$}
+      \State $\sigma'_{xz}\gets\sigma'_{xz}+\sigma'_{yz}$
+      \EndIf
+      \If{$d_{xz}=l_{xy}+d_{yz}\veebar d'_{xz}=l_{xy}+d'_{yz}$}
+      \State $S\gets S\cup\{y\}$
+      \EndIf
+      \If{$d_{yz}=l_{yx}+d_{xz}\veebar d'_{yz}=l_{yx}+d'_{xz}$}
+      \State $S\gets S\cup\{x\}$
+      \EndIf
+      \EndFor
+      \If{$\sigma'_{xz}\neq\sigma_{xz}$}
+      \State $S\gets S\cup\{x\}$
+      \EndIf
+      \EndWhile
+      \State $S\gets S\cup\mathrm{Affected}$
+      \State $\mathrm{Affected}\gets\varnothing$
+      \State $R\gets((x,d'_{xz})\vert x\in S)$
+      \Comment 各要素の第二要素をキーとする順位キュー
+      \While{$\lvert R\rvert>0$}
+      \State $x,\_\gets\mathrm{popmax}(R)$
+      \State $\delta'_z(x)\gets 0$
+      \If{$x=z$}
+      \State \textbf{continue}
+      \EndIf
+      \ForAll{$y\in\mathcal{N}_G(x)$}
+      \If{$d'_{yz}=l_{yx}+d'_{xz}$}
+      \State $\delta'_z(x)\gets\delta'_z(x)$
+      $+\frac{\sigma'_{xz}}{\sigma'_{yz}}(1+\delta'_z(y)$
+      \ElsIf{$d_{zx}=l_{xy}+d_{yz}$}
+      \State $\mathrm{updatekey}(R, y, d'_{yz})$
+      \EndIf
+      \EndFor
+      \EndWhile
+      \EndProcedure
+    \end{algorithmic}
+  \end{multicols}
 \end{algorithm}
