@@ -7,110 +7,72 @@ $G'_{st}=(V'_{st},E'_{st})$で表し，すべての頂点から頂点$s$への�
 頂点$t\,(\neq s)$への最短経路の個数と長さをそれぞれ$\sigma'_{st}$, 
 $d'_{st}$で表す．
 
-
-\section{最短経路長の更新}
-\label{sect:update-dist-on-insert}
-
-削除後の頂点$z$への最短経路長$d'_{xz}$を求めるアルゴリズムはRamalingamとRepsによって与えられている．以下，そのアルゴリズムについて説明する．
-
-\subsection{最短経路長が変化する頂点の導出}
+\section{最短経路長または最短経路数が変化する頂点の導出}
 
 \begin{lemma}
-  頂点$x\in G$が，$d_{xz}<d'_{xz}$を満たすための必要十分条件は次のいずれかである．
+  \textcolor{red}{TODO}
+  頂点$x\in G$が，$d_{xz}<d'_{xz}$または...を満たすための必要十分条件は次のいずれかである．
   \begin{enumerate}
   \item $v$
   \item $y\in\mathcal{N}_G'(x)$のうち，$(x,y)\in E_z$を満たすものについて，そのすべてが影響を受けるような頂点$x$
   \end{enumerate}
 \end{lemma}
 \begin{proof}
-例えば，図\ref{fig:decremental-dist-idea-1}において，$x_1$の近傍のうち，$z$への最短経路を通っているのは$v$で，$v$は影響を受ける．そのため，$x_1$は削除の影響を受ける．一方，$y$の近傍のうち，$z$への最短経路を通っているのは2個あるが，そのうちひとつは影響を受けないので，$y$は削除の影響を受けない．
+例えば，図\ref{fig:TODO}において，$x_1$の近傍のうち，$z$への最短経路を通っているのは$v$で，$v$は影響を受ける．そのため，$x_1$は削除の影響を受ける．一方，$y$の近傍のうち，$z$への最短経路を通っているのは2個あるが，そのうちひとつは影響を受けないので，$y$は削除の影響を受けない．
 \end{proof}
 
-\subsection{最短経路長の計算}
+\section{最短経路長および最短経路数の更新}
 
 \begin{lemma}
   影響を受けることが分かった頂点$x$について，影響を受けない，または，最短経路長が確定した頂点$y$が近傍にあるなら，$d'_{xz}\gets l_{xy}+d'_{yz}$として，$x$の最短経路長$d'_{xz}$を確定させる．
 \end{lemma}
 
-例えば，図\ref{fig:decremental-dist-idea-3}において，$v$と$x_1$は，近傍に影響を受けない頂点$y$をもつため，直ちに最短経路長を確定することができる．$x_2$と$x_3$は$x_1$が確定した後に最短経路長を確定することができる．
-
-\section{最短経路数の更新}
-\label{sect:update-sigma-on-delete}
-
-削除後の$z$への最短経路数$\sigma'_{xz}$を求めるアルゴリズムを与える．以下，そのアルゴリズムを説明する．
-
-\subsection{最短経路数が変化する頂点の導出}
-これらの頂点は，最短経路数の観点から削除の影響を受ける．
-
-\begin{itemize}
-\item 最短経路長の観点から削除の影響を受ける頂点
-\item $y\in\mathcal{N}_G'(x)$のうち，$(x,y)\in E_z$を満たすものについて，最短経路数の観点から影響を受けるものが存在するような頂点$x$
-\end{itemize}
-
-例えば，図\ref{fig:decremental-sigma-idea-1}において，$y$の近傍のうち，$z$への最短経路を通っているのは2個あり，その中で$v$は影響を受けるので，$y$は最短経路数の観点から削除の影響を受ける．
-
-\subsection{最短経路数の計算}
-影響を受けることが分かった頂点$x$について，次式で削除後の最短経路数$\sigma'_{xz}$を確定させる．
-\[ \sigma'_{xz}\gets\sum_{(x,y)\in E_z}\sigma'_{yz}. \]
-計算式の都合上，$d'_{xz}$の昇順で$\sigma'_{xz}$を確定させる．
+例えば，図\ref{fig:TODO}において，$v$と$x_1$は，近傍に影響を受けない頂点$y$をもつため，直ちに最短経路長を確定することができる．$x_2$と$x_3$は$x_1$が確定した後に最短経路長を確定することができる．
 
 \section{ペア依存度の更新}
 \label{sect:update-delta-on-delete}
 
-削除後のペア依存度$\delta'_z(x)$をBrandesのアルゴリズムによって求める．具体的には，\ref{sect:update-dist-on-delete}と\ref{sect:update-sigma-on-delete}で求めた影響を受ける頂点から，$d'_{xz}$の降順となるように次式を計算しながら走査する．
+削除後のペア依存度$\delta'_z(x)$をBrandesのアルゴリズムによって求める．
+具体的には，\ref{sect:update-augdist-on-delete}で求めた影響を受ける頂点から，
+$d'_{xz}$の降順となるように次式を計算しながら走査する．
 \[ \delta'_{z}(x)\gets\sum_{(y,x)\in E_z}\frac{\sigma'_{xz}}{\sigma'_{yz}}(1+\delta'_z(y)) \]
 
-\section{媒介中心性の更新}
-媒介中心性を更新する前に，すべての頂点に対するペア依存度を更新する必要がある．すべての頂点に対するペア依存度を更新した後，各頂点$x$について，$B'_x=\sum_{z\neq x}\delta'_{z}(x)$として辺削除後の媒介中心性を求める．
-
 \section{計算量の解析}
-\section{概要}
 
-提案した辺削除時の媒介中心性更新アルゴリズムの最悪計算量を解析する．
+\begin{lemma}
+  提案した辺削除時の媒介中心性更新アルゴリズムの最悪計算量は，
+  \[ \mathcal{O}(EV+V^2\log V) \]
+  である．ただし，頂点数を$V$,辺数を$E$とする，
+\end{lemma}
+\begin{proof}
+  提案したアルゴリズムは，次の4つの工程で構成される．
+  \begin{enumerate}
+  \item 最短経路長の更新
+  \item 最短経路数の更新
+  \item ペア依存度の更新
+  \item 媒介中心性の更新
+  \end{enumerate}
 
-\section{結果}
-提案した辺削除時の媒介中心性更新アルゴリズムの最悪計算量は，
-\[ \mathcal{O}(EV+V^2\log V) \]
-である．ただし，頂点数を$V$,辺数を$E$とする，
+  以下，それぞれの工程の最悪計算量を解析する．頂点数を$V$,辺数を$E$とする．
 
-\section{解析}
+  最悪の場合は，Dijkstraのアルゴリズムを$V$回繰り返すことになので，計算量は
+  $\mathcal{O}(VE+V^2\log V)$である．
 
-提案したアルゴリズムは，次の4つの工程で構成される．
+  同様，最悪の場合は，Dijkstraのアルゴリズムを$V$回繰り返すことになので，計算量は
+  $\mathcal{O}(VE+V^2\log V)$である．
 
-\begin{enumerate}
-\item 最短経路長の更新
-\item 最短経路数の更新
-\item ペア依存度の更新
-\item 媒介中心性の更新
-\end{enumerate}
+  最悪の場合は，すべての頂点組のペア依存度を更新するので，
+  Brandesのアルゴリズムの計算量と一致する．つまり，
+  $\mathcal{O}(VE+V^2\log V)$．
 
-以下，それぞれの工程の最悪計算量を解析する．頂点数を$V$,辺数を$E$とする．
+  データ構造の都合で，頂点数$\times$頂点数の2次元配列の要素をひとつの軸に沿って
+  足し合わせる．そのため，計算量は$\mathcal{O}(V^2)$である．
 
-\subsection{最短経路長の更新}
-\label{subsect:phase1}
-最悪の場合は，Dijkstraのアルゴリズムを$V$回繰り返すことになので，計算量は
-$\mathcal{O}(VE+V^2\log V)$である．
+  したがって，全体の最悪計算量は，
+  \[ \mathcal{O}(VE+V^2\log V+V^2)=\mathcal{O}(VE+V^2\log V) \]
+  である．
+\end{proof}
 
-\subsection{最短経路数の更新}
-\label{subsect:phase2}
-\ref{subsect:phase1}と同様，最悪の場合は，Dijkstraのアルゴリズムを$V$回繰り返すことになので，計算量は
-$\mathcal{O}(VE+V^2\log V)$である．
-
-\subsection{ペア依存度の更新}
-\label{subsect:phase3}
-最悪の場合は，すべての頂点組のペア依存度を更新するので，Brandesのアルゴリズムの計算量と一致する．つまり，
-$\mathcal{O}(VE+V^2\log V)$．
-
-\subsection{媒介中心性の更新}
-\label{subsect:phase4}
-データ構造の都合で，頂点数$\times$頂点数の2次元配列の要素をひとつの軸に沿って足し合わせる．そのため，計算量は$\mathcal{O}(V^2)$である．
-
-\subsection{全体の計算量}
-\ref{subsect:phase1},\ref{subsect:phase2},\ref{subsect:phase3},\ref{subsect:phase4}の結果を足し合わせると，全体の最悪計算量は，
-\[ \mathcal{O}(VE+V^2\log V+V^2)=\mathcal{O}(VE+V^2\log V) \]
-である．
-
-\subsection{考察}
 実験結果から，提案手法の実行時間はBrandesのアルゴリズムの定数倍に近いことが分かる．
 このことは，両アルゴリズムの計算量は一致するが，提案手法の方は計算量を足し合わせているので，その分計算時間が余計にかかっていることを示唆する．よって，解析の結果と矛盾しない．
 

@@ -7,7 +7,7 @@
 辺集合が非順序対の集合であるとき，グラフは無向と呼ばれる．
 逆に，辺集合が順序対の集合であるとき，グラフは有向と呼ばれる．
 
-また，無向グラフの各辺$\{v,w\}\in E$および有向グラフの各辺$(v,w)\in E$には正の重み$l_{vw}い>0$を与えている．
+また，無向グラフの各辺$\{v,w\}\in E$および有向グラフの各辺$(v,w)\in E$には正の重み$l_{vw}>0$を与えている．
 
 隣接する，接続している
 $G$の頂点$v$の近傍$\mathcal{N}_G(v)$
@@ -26,8 +26,6 @@ $G$の異なる2頂点$s,t$を両端とする有向道の中で，有向道に�
 また，$s$から$t$への最短経路の中で頂点$v$を通るものの個数を$\sigma_{st}(v)$で表す．
 頂点$s$から他の頂点へのすべての最短経路で構成される有向グラフを$G_s=(V_s,E_s)$で表す．
 同様に，頂点$s$から頂点$t$へのすべての最短経路で構成される有向グラフを$G_{st}=(V_{st},E_{st})$で表す．
-
-最短経路を計算するアルゴリズムの説明
 
 \section{最短経路長および最短経路数の性質}
 
@@ -49,7 +47,7 @@ $G$の異なる2頂点$s,t$を両端とする有向道の中で，有向道に�
 \begin{lemma}
   $G=(V,E)$の異なる2頂点$s,t\in V$と辺$\{i,j\} \in E$を考える．$s$から$t$への最短経路$G_{st}=(V_{st},E_{st})$が有向辺$(i,j)$を含む，すなわち$(i,j) \in E_{st}$が成り立つための必要十分条件は
   \begin{equation}
-    d_{st}=d_{si}+d_{jt}+1
+    d_{st}=d_{si}+l_{ij}+d_{jt}
     \label{eqn:inclusion}
   \end{equation}
   が成り立つことである．
@@ -57,7 +55,7 @@ $G$の異なる2頂点$s,t$を両端とする有向道の中で，有向道に�
 \end{lemma}
 \begin{proof}
   はじめに$i=s$, $j=t$の場合を考える．このとき明らかに$G_{st}$は
-  有向辺$(i,j)$を含み，かつ$d_{si}+d_{jt}+1=d_{ss}+d_{tt}+1=1=d_{st}$
+  有向辺$(i,j)$を含み，かつ$d_{si}+l_{ij}+d_{jt}=d_{ss}+l_{st}+d_{tt}=l_{st}=d_{st}$
   より\eqref{eqn:inclusion}も成り立つ．次に$i=s$, $j \neq t$の場合を
   考える．このとき$(i,j)\in E_{st}$であるための必要十分条件は$G_{st}$が
   $j$を含むことである．これは補題~\ref{lemma:1}より
@@ -67,12 +65,12 @@ $G$の異なる2頂点$s,t$を両端とする有向道の中で，有向道に�
   $G_{st}$が有向辺$(i,j)$を含むならば，$G_{st}$の中に
   $s \rightarrow \cdots \rightarrow i \rightarrow j \rightarrow \cdots \rightarrow t$
   の順に頂点を通る有向道が存在する．
-  この有向道の長さは$d_{si}+1+d_{jt}$で与えられるので\eqref{eqn:inclusion}が
+  この有向道の長さは$d_{si}+l_{ij}+d_{jt}$で与えられるので\eqref{eqn:inclusion}が
   成り立つ．次に\eqref{eqn:inclusion}が成り立つと仮定する．頂点
   $s$を出発して$s$から$i$への最短経路の一つを通って$i$に行き，次に
   辺$\{i,j\}$を通って$j$に行き，最後に$j$から$t$への最短経路の一つを
   通って$t$に行く有向道が存在する．この有向道は$s$から$t$への最短経路の一つで
-  ある．なぜなら，その長さは$d_{si}+1+d_{jt}$で与えられ，
+  ある．なぜなら，その長さは$d_{si}+l_{ij}+d_{jt}$で与えられ，
   \eqref{eqn:inclusion}より$s$から$t$への最短経路長$d_{st}$に
   等しいからである．したがって，$(i,j) \in E_{st}$が成り立つ．
 \end{proof}
@@ -102,7 +100,7 @@ $G$の異なる2頂点$s,t$を両端とする有向道の中で，有向道に�
     \sigma_{st}(i,j)=
     \left\{
     \begin{array}{ll}
-      \sigma_{si} \sigma_{jt}, & d_{st}=d_{si}+d_{jt}+1\,\mbox{のとき} \\
+      \sigma_{si} \sigma_{jt}, & d_{st}=d_{si}+l_{ij}+d_{jt}\,\mbox{のとき} \\
       0, & \mbox{それ以外のとき}
     \end{array}
     \right.
@@ -205,26 +203,6 @@ $G$の異なる2頂点$s,t$を両端とする有向道の中で，有向道に�
   従って，補題が成り立つ．
 \end{proof}
 
-\begin{lemma}
-  \label{lemma:condition-of-invariability-of-shortest-path}
-  $E_{yx}=E'_{yx}$であることの必要十分条件は，$d_{yx}=d'_{yx}$かつ$\sigma_{yx}=\sigma'_{yx}$である．
-\end{lemma}
-\begin{proof}
-  $E_{yx}=E'_{yx}$なら$d_{yx}=d'_{yx}$かつ$\sigma_{yx}=\sigma'_{yx}$であることは自明である．
-
-  逆は，図\ref{fig:proof-invariability-of-paths}のような$E_{yx}$を，$d_{yx}=d'_{yx}$かつ$\sigma_{yx}=\sigma'_{yx}$を満たすように，$E_{yx}\neq E'_{yx}$とするには，少なくとも一辺の削除と一辺の挿入が必要である．
-  挿入時，レイヤーの距離より長い辺を挿入すると$E_{yx}=E'_{yx}$である．また，レイヤーの距離が等しくなるように結ぶと，$\sigma_{yx}\neq\sigma'_{yx}$となる．また，レイヤーの距離より短い辺を挿入すると$d_{yx}\neq d'_{yx}$になる．また，削除時，$e\notin E_{yx}$である辺を削除すると，$E_{yx}=E'_{yx}$である．また，$e\in E_{yx}$である辺を削除すると，$d_{yx}\neq d'_{yx}$または$\sigma_{yx}\neq\sigma'_{yx}$となる．
-  したがってそのような操作は不可能で，逆も成り立つ．
-
-  \begin{figure}
-    \centering
-    \def\svgwidth{.5\columnwidth}
-    \input{proof-invariability-of-paths.pdf_tex}
-    \caption{$s$と$t$の一般的な最短経路}
-    \label{fig:proof-invariability-of-paths}
-  \end{figure}
-\end{proof}
-
 \section{媒介中心性とペア依存度}
 頂点$i$の媒介中心性$B_i$は
 \begin{equation}
@@ -252,34 +230,38 @@ Brandesのアルゴリズムは次のペア依存度を用いて効率的に媒�
 \end{equation*}
 Brandesのアルゴリズムはこの性質を応用して媒介中心性を高速に計算している．
 
-\begin{algorithm}
-  \caption{Brandesのアルゴリズム}
-  \label{algo:Brandes}
-  \begin{algorithmic}[1]
-    \Require グラフ$G=(V,E)$
-    \Ensure 媒介中心性$B_1,B_2,\ldots,B_N$
-    \State $B_i\gets0\ (i=1,2,\ldots,N)$
-    \ForAll{$s\in\{1,2,\ldots,N\}$}
-    \State $\delta_s(i)\gets0\ (i=1,2,\ldots,N)$
-    \State 頂点$s$からすべての頂点への最短経路$G_s=(V,E_s)$と$d_{si},\ \sigma_{si}\ (i=1,2,\ldots,N)$を求める. 
-    \ForAll{$(i,j)\in E_s$}
-    \State \begin{equation*} \delta_s(i)\gets\delta_s(i)+\frac{\sigma_{si}}{\sigma_{sj}}(1+\delta_s(j)) \end{equation*}
-    \EndFor
-    \State $B_i\gets B_i+\delta_s(i),\ (i=1,2,\ldots,N)$
-    \EndFor
-    \State \textbf{return} $B_i\ (i=1,2,\ldots,N)$
-  \end{algorithmic}
-\end{algorithm}
-
 このアルゴリズムの計算量を考える．ステップ2は$\mathcal{O}(M)$の時間で実行できる．
 ステップ4についても，$G$のすべての頂点を$s$からの最短経路の逆向きに一度だけ辿ることにより$\{\delta_s(i)\}_{i=1}^N$の値を更新できるため，$\mathcal{O}(M)$の時間で実行できる~\cite{Brandes2001}．
-したがって，アルゴリズム~\ref{algo:Brandes}の全体の計算量は$\mathcal{O}(NM)$であり，それは$\mathcal{O}(N^3)$よりも小さい．特にグラフが疎であるとき，すなわち$M \ll N^2$が成り立つとき前者は後者に比べて非常に小さな値となる．
+したがって，アルゴリズム~\ref{algo:brandes}の全体の計算量は$\mathcal{O}(NM)$であり，それは$\mathcal{O}(N^3)$よりも小さい．特にグラフが疎であるとき，すなわち$M \ll N^2$が成り立つとき前者は後者に比べて非常に小さな値となる．
 
 
-\section{ペア依存度の変化に関する条件}
-ここでは，一辺が挿入または削除されたあとのペア依存度が変化する条件について述べる．
+\section{最短経路とペア依存度の変化に関する条件}
+
+\textcolor{red}{3章に移動する可能性あり}
+
+ここでは，一辺が挿入または削除されたあとの最短経路およびペア依存度が変化する条件について述べる．
 
 記号について，挿入または削除の操作後であることを明示するため，記号$'$をつける．例えば，操作後のグラフは$G'$と表す．
+
+\begin{lemma}
+  \label{lemma:condition-of-invariability-of-shortest-path}
+  $E_{yx}=E'_{yx}$であることの必要十分条件は，$d_{yx}=d'_{yx}$かつ$\sigma_{yx}=\sigma'_{yx}$である．
+\end{lemma}
+\begin{proof}
+  $E_{yx}=E'_{yx}$なら$d_{yx}=d'_{yx}$かつ$\sigma_{yx}=\sigma'_{yx}$であることは自明である．
+
+  逆は，図\ref{fig:proof-invariability-of-paths}のような$E_{yx}$を，$d_{yx}=d'_{yx}$かつ$\sigma_{yx}=\sigma'_{yx}$を満たすように，$E_{yx}\neq E'_{yx}$とするには，少なくとも一辺の削除と一辺の挿入が必要である．
+  挿入時，レイヤーの距離より長い辺を挿入すると$E_{yx}=E'_{yx}$である．また，レイヤーの距離が等しくなるように結ぶと，$\sigma_{yx}\neq\sigma'_{yx}$となる．また，レイヤーの距離より短い辺を挿入すると$d_{yx}\neq d'_{yx}$になる．また，削除時，$e\notin E_{yx}$である辺を削除すると，$E_{yx}=E'_{yx}$である．また，$e\in E_{yx}$である辺を削除すると，$d_{yx}\neq d'_{yx}$または$\sigma_{yx}\neq\sigma'_{yx}$となる．
+  したがってそのような操作は不可能で，逆も成り立つ．
+
+  \begin{figure}
+    \centering
+    \def\svgwidth{.5\columnwidth}
+    \input{proof-invariability-of-paths.pdf_tex}
+    \caption{$s$と$t$の一般的な最短経路}
+    \label{fig:proof-invariability-of-paths}
+  \end{figure}
+\end{proof}
 
 \begin{lemma-without-proof}
   \label{lemma:condition-of-invariability-of-pairwise-dependency}

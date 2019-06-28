@@ -1,9 +1,12 @@
 \chapter{数値実験}
 
 本章では，提案したアルゴリズムの有効性を検証するための実験を行う．次の二つの方法を比較する．
+
+\section{人工ネットワークに対する結果}
+
 \begin{enumerate}
-\item 再計算：辺が挿入または削除される度にBrandesのアルゴリズム(アルゴリズム\ref{algo:Brandes})で媒介中心性を再計算する
-\item 更新：辺が挿入された場合アルゴリズム\ref{algo:update-bc-on-insert}で媒介中心性を更新し，削除された場合アルゴリズム\ref{algo:update-bc-on-delete}で媒介中心性を更新する
+\item 再計算：辺が挿入または削除される度にBrandesのアルゴリズム(アルゴリズム\ref{algo:brandes})で媒介中心性を再計算する
+\item 更新：辺が挿入された場合アルゴリズム\ref{algo:incremental-algorithm}で媒介中心性を更新し，削除された場合アルゴリズム\ref{algo:decremental-algorithm}で媒介中心性を更新する
 \end{enumerate}
 
 この実験では，次の三種類の人工ネットワークを対象とする．
@@ -13,11 +16,7 @@
 \item RRG:ランダム正則グラフ
 \end{enumerate}
 
-\section{頂点数に対する計算時間}
-
-\section{辺数に対する計算時間}
-
-\section{以下メモです．}
+\textcolor{red}{TODO: 更新割合も計算する(cite...)}
 
 \subsection{一辺挿入時の実験結果}
 
@@ -84,6 +83,8 @@
 \end{figure}
 
 \section{実ネットワークに対する実験}
+
+\textcolor{red}{TODO: 用いるデータセットの説明}
 
 実際の道路ネットワークに対する実験を行う．実験で用いるネットワークを図\ref{fig:net-ou1}に示す．このネットワークは2270個の頂点と2663本の辺を有する．
 \begin{figure}[tb]

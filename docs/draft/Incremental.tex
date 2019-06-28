@@ -1,28 +1,23 @@
 \chapter{一辺挿入時の媒介中心性更新法}
 \label{chap:update-bc-on-insert}
 本章では，$G=(V,E)$に辺$e=\{v,w\} \not\in E$を挿入して得られるグラフを
-$G'=(V,E')$とする．$G'$における頂点$s$から頂点$t\,(\neq s)$への最短経路を有向グラフ$G'_{st}=(V'_{st},E'_{st})$で表し，すべての頂点から頂点$s$への最短経路を有向グラフ$G'_s=(V,E'_s)$で表す．また，$G'$における頂点$s$から頂点$t\,(\neq s)$への最短経路の個数と長さをそれぞれ$\sigma'_{st}$, $d'_{st}$で表す．
+$G'=(V,E')$とする．$G'$における頂点$s$から頂点$t\,(\neq s)$への最短経路を
+有向グラフ$G'_{st}=(V'_{st},E'_{st})$で表し，すべての頂点から頂点$s$への最短経路を
+有向グラフ$G'_s=(V,E'_s)$で表す．また，$G'$における頂点$s$から頂点$t\,(\neq s)$への
+最短経路の個数と長さをそれぞれ$\sigma'_{st}$, $d'_{st}$で表す．
 
-\section{最短経路長の更新}
-\label{sect:update-dist-on-insert}
+\section{最短経路長および最短経路数の更新}
+\label{sect:update-augdist-on-insert}
 
-挿入後の頂点$z$への最短経路長$d'_{xz}$を求めるアルゴリズムはRamalingamとRepsによって与えられている．以下，そのアルゴリズムについて説明する．
+挿入後の頂点$z$への最短経路長$d'_{xz}$および最短経路数$\sigma'_{xz}$を求めるアルゴリズムについて説明する．
 
 \begin{lemma-without-proof}
-  頂点$v$が$d'_{xz}<d_{xz}$を満たすための必要十分条件は以下である．
+  \textcolor{red}{TODO}
+  頂点$v$が$d'_{xz}<d_{xz}$または...を満たすための必要十分条件は以下である．
   \begin{equation*}
     d_{vz}>l_{vw}+d_{wz}
   \end{equation*}
 \end{lemma-without-proof}
-
-\begin{lemma-without-proof}
-  頂点$x\in G,x\neq v$が$d'_{xz}<d_{xz}$を満たすための必要十分条件は以下である．
-  \begin{equation*}
-    \exists y\in\mathcal{N}_G(x),yが変化する\land d_{xz}>l_{xy}+d_{yz}
-  \end{equation*}
-\end{lemma-without-proof}
-
-これらの頂点は，最短経路長の観点から削除の影響を受ける．
 
 頂点$x\in G$が変化することが分かった時，次の式を用いて挿入後の距離$d'_{xz}$をもとめる．
 
@@ -32,39 +27,11 @@ $G'=(V,E')$とする．$G'$における頂点$s$から頂点$t\,(\neq s)$への�
   \end{equation*}
 \end{corollary-without-proof}
 
-さらに，$xy\ldots z\in E_z,y\in\mathcal{N}_G(x)$は$E'_z$に含まれないので，$y$をペア依存度$\delta_z(y)$が更新するリストに追加する．
-
-\section{最短経路数の更新}
-\label{sect:update-sigma-on-delete}
-
-挿入後の$z$への最短経路数$\sigma'_{xz}$を求めるアルゴリズムを与える．以下，そのアルゴリズムを説明する．
-
-頂点$v$が$\sigma'_{xz}\neq\sigma_{xz}$を満たすための必要十分条件は以下である．
-\begin{equation*}
-  d_{vz}\geq l_{vw}+d_{wz}
-\end{equation*}
-
-頂点$x\in G,x\neq v$が$\sigma'_{xz}\neq\sigma_{xz}$を満たすための必要十分条件は以下である．
-\begin{equation*}
-  \exists y\in\mathcal{N}_G(x),yが変化する\land d_{xz}\geq l_{xy}+d_{yz}
-\end{equation*}
-
-これらの頂点は，最短経路長の観点から削除の影響を受ける．
-
-頂点$x\in G$が，変化することが分かった時，次の式を用いて挿入後の最短経路数$\sigma'_{xz}$をもとめる．式より，$d'_{xz}$の昇順で計算する．
-
-\begin{equation*}
-  \sigma'_{xz}=\sum_{(x,y)\in E'}\sigma'_{yz}
-\end{equation*}
-
-さらに，$\sigma_{xz}$が変化したので，$x$をペア依存度$\delta_z(y)$が更新するリストに追加する．
-
 \section{ペア依存度の更新}
 \label{sect:update-delta-on-delete}
 
-挿入後のペア依存度$\delta'_z(x)$をBrandesのアルゴリズムによって求める．具体的には，\ref{sect:update-dist-on-insert}と\ref{sect:update-sigma-on-insert}で求めた影響を受ける頂点から，$d'_{xz}$の降順となるように次式を計算しながら走査する．
+挿入後のペア依存度$\delta'_z(x)$をBrandesのアルゴリズムによって求める．
+具体的には，\ref{sect:update-augdist-on-insert}で求めた影響を受ける頂点から，
+$d'_{xz}$の降順となるように次式を計算しながら走査する．
+
 \[ \delta'_{z}(x)\gets\sum_{(y,x)\in E_z}\frac{\sigma'_{xz}}{\sigma'_{yz}}(1+\delta'_z(y)) \]
-
-\section{媒介中心性の更新}
-媒介中心性を更新する前に，すべての頂点に対するペア依存度を更新する必要がある．すべての頂点に対するペア依存度を更新した後，各頂点$x$について，$B'_x=\sum_{z\neq x}\delta'_{z}(x)$として辺削除後の媒介中心性を求める．
-
