@@ -205,6 +205,26 @@ $G$の異なる2頂点$s,t$を両端とする有向道の中で，有向道に�
   従って，補題が成り立つ．
 \end{proof}
 
+\begin{lemma}
+  \label{lemma:condition-of-invariability-of-shortest-path}
+  $E_{yx}=E'_{yx}$であることの必要十分条件は，$d_{yx}=d'_{yx}$かつ$\sigma_{yx}=\sigma'_{yx}$である．
+\end{lemma}
+\begin{proof}
+  $E_{yx}=E'_{yx}$なら$d_{yx}=d'_{yx}$かつ$\sigma_{yx}=\sigma'_{yx}$であることは自明である．
+
+  逆は，図\ref{fig:proof-invariability-of-paths}のような$E_{yx}$を，$d_{yx}=d'_{yx}$かつ$\sigma_{yx}=\sigma'_{yx}$を満たすように，$E_{yx}\neq E'_{yx}$とするには，少なくとも一辺の削除と一辺の挿入が必要である．
+  挿入時，レイヤーの距離より長い辺を挿入すると$E_{yx}=E'_{yx}$である．また，レイヤーの距離が等しくなるように結ぶと，$\sigma_{yx}\neq\sigma'_{yx}$となる．また，レイヤーの距離より短い辺を挿入すると$d_{yx}\neq d'_{yx}$になる．また，削除時，$e\notin E_{yx}$である辺を削除すると，$E_{yx}=E'_{yx}$である．また，$e\in E_{yx}$である辺を削除すると，$d_{yx}\neq d'_{yx}$または$\sigma_{yx}\neq\sigma'_{yx}$となる．
+  したがってそのような操作は不可能で，逆も成り立つ．
+
+  \begin{figure}
+    \centering
+    \def\svgwidth{.5\columnwidth}
+    \input{proof-invariability-of-paths.pdf_tex}
+    \caption{$s$と$t$の一般的な最短経路}
+    \label{fig:proof-invariability-of-paths}
+  \end{figure}
+\end{proof}
+
 \section{媒介中心性とペア依存度}
 頂点$i$の媒介中心性$B_i$は
 \begin{equation}
@@ -261,46 +281,6 @@ Brandesのアルゴリズムはこの性質を応用して媒介中心性を高�
 
 記号について，挿入または削除の操作後であることを明示するため，記号$'$をつける．例えば，操作後のグラフは$G'$と表す．
 
-\begin{lemma}
-  \label{lemma:transformation-of-invariability-of-pairwise-dependency}
-  頂点$s,v$の操作前のペア依存度
-  \begin{equation}
-    \label{eq:pairwise-dependency}
-    \delta_s(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_s(w))
-  \end{equation}
-  と操作後のペア依存度
-  \begin{equation}
-    \label{eq:pairwise-dependency-after-update}
-    \delta'_s(v)=\sum_{(v,w)\in E'_s}\frac{\sigma'_{sv}}{\sigma'_{sw}}(1+\delta'_s(w))
-  \end{equation}
-  に関して，これらは同値である．
-  \begin{enumerate}
-  \item $\sigma_{sv}=\sigma'_{sv}$かつ，集合$W=\{w|(v,w)\in E_s\}$と集合$W'=\{w|(v,w)\in E'_s\}$が等しく，すべての$w\in W$に対して$\sigma_{sw},\,\delta_s(w)$が操作によって変化しない
-    \label{item:explicit-invariability-of-pairwise-dependency}
-  \item $\sigma_{sv}=\sigma'_{sv}$かつ，集合$X=\{x|x\in V,d_{sx}=d_{sv}+d_{vx}\}$と集合$X'=\{x|x\in V',d'_{sx}=d'_{sv}+d'_{vx}\}$が等しく，すべての$x\in X$に対して$\sigma_{sx}$が操作によって変化しない
-    \label{item:implicit-invariability-of-pairwise-dependency}
-  \end{enumerate}
-\end{lemma}
-\begin{proof}
-  \ref{item:explicit-invariability-of-pairwise-dependency}が成り立つならば，
-  集合$W_2=\{w_2|(w,w_2)\in E_s,w\in W\}$が操作によって変化せず，
-  すべての$w_2\in W_2$に対して$\sigma_{sw_2}$と$\delta_s(w_2)$が操作によって変化しない．
-
-  すべての$w_2\in W_2$に対して$\delta_s(w_2)$が変化しないので，同様に，
-  集合$W_3=\{w_3|(w_2,w_3)\in E_s,w_2\in W_2\}$が操作によって変化せず，
-  すべての$w_3\in W_3$に対して$\sigma_{sw_3}$と$\delta_s(w_3)$が操作によって変化しない．
-
-  同じことを繰り返すと，集合$W^*=W\cup W_2\cup W_3\cup\cdots\cup W_k$が操作によって変化せず，すべての$w\in W^*$に対して$\sigma_{sw}$は操作によって変化しないことが言える．（$G_s$が有向アサイクリックグラフなので，上記の操作によって作られる$W^*$は有限集合である．また，$w\in\{w|w\in W^*,\{w'|(w,w')\in E_s\}=\varnothing\}$に対して，$\delta_s(w)=0$なので，この条件は消去できる）
-
-  再考：$v$からの位置が変わった場合が考慮されていない
-  
-  また，各$W_i$は$W_i=\{w|w\in\mathcal{N}^i_G(v),d_{sw}=d_{sv}+d_{vw}\}$と書き換えられるので，$G$は連結グラフであることから，$W^*=\cup_{i=0}W_i=\{w|w\in\cup_{i=0}\mathcal{N}^i_G(v),d_{sw}=d_{sv}+d_{vw}\}=\{w|w\in V,d_{sw}=d_{sv}+d_{vw}\}$とできる．
-
-  よって，\ref{item:explicit-invariability-of-pairwise-dependency}$\implies$\ref{item:implicit-invariability-of-pairwise-dependency}が成り立つ．
-
-  \ref{item:implicit-invariability-of-pairwise-dependency}$\implies$\ref{item:explicit-invariability-of-pairwise-dependency}も，先の手順を逆向きに適用することにより導出できる．
-\end{proof}
-
 \begin{lemma-without-proof}
   \label{lemma:condition-of-invariability-of-pairwise-dependency}
   ペア依存度
@@ -326,24 +306,43 @@ Brandesのアルゴリズムはこの性質を応用して媒介中心性を高�
   \label{fig:pd-invariability-counterexample}
 \end{figure}
 
-
 \begin{lemma}
-  \label{lemma:condition-of-invariability-of-shortest-path}
-  $E_{yx}=E'_{yx}$であることの必要十分条件は，$d_{yx}=d'_{yx}$かつ$\sigma_{yx}=\sigma'_{yx}$である．
+  \label{lemma:transformation-of-invariability-of-pairwise-dependency}
+  頂点$s,v$の操作前のペア依存度
+  \begin{equation}
+    \label{eq:pairwise-dependency}
+    \delta_s(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_s(w))
+  \end{equation}
+  と操作後のペア依存度
+  \begin{equation}
+    \label{eq:pairwise-dependency-after-update}
+    \delta'_s(v)=\sum_{(v,w)\in E'_s}\frac{\sigma'_{sv}}{\sigma'_{sw}}(1+\delta'_s(w))
+  \end{equation}
+  に関して，これらは同値である．
+  \begin{enumerate}
+  \item $\sigma_{sv}=\sigma'_{sv}$かつ，集合$W=\{(v,w)\in E_s\}$と集合$W'=\{(v,w)\in E'_s\}$が等しく，すべての$(v,w)\in W$に対して$\sigma_{sv}$と$\sigma_{sw}$,$\delta_s(w)$が操作によって変化しない
+    \label{item:explicit-invariability-of-pairwise-dependency}
+  \item $\sigma_{sv}=\sigma'_{sv}$かつ，集合$X=\{(x,y)|(x,y)\in E_s,d_{sy}=d_{sv}+d_{vx}+l_{xy}\}$と集合$X'=\{(x,y)|(x,y)\in E'_s,d'_{sy}=d'_{sv}+d'_{vx}+l_{xy}\}$が等しく，すべての$(x,y)\in X$に対して$\sigma_{sy}$が操作によって変化しない
+    \label{item:implicit-invariability-of-pairwise-dependency}
+  \end{enumerate}
 \end{lemma}
 \begin{proof}
-  $E_{yx}=E'_{yx}$なら$d_{yx}=d'_{yx}$かつ$\sigma_{yx}=\sigma'_{yx}$であることは自明である．
+  \ref{item:explicit-invariability-of-pairwise-dependency}が成り立つならば，
+  集合$W_2=\{(w,w_2)|(w,w_2)\in E_s,(v,w)\in W\}$が操作によって変化せず，
+  すべての$(w,w_2)\in W_2$に対して$\sigma_{sw_2}$と$\delta_s(w_2)$が操作によって変化しない．
 
-  逆は，図\ref{fig:proof-invariability-of-paths}のような$E_{yx}$を，$d_{yx}=d'_{yx}$かつ$\sigma_{yx}=\sigma'_{yx}$を満たすように，$E_{yx}\neq E'_{yx}$とするには，少なくとも一辺の削除と一辺の挿入が必要である．
-  挿入時，レイヤーの距離より長い辺を挿入すると$E_{yx}=E'_{yx}$である．また，レイヤーの距離が等しくなるように結ぶと，$\sigma_{yx}\neq\sigma'_{yx}$となる．また，レイヤーの距離より短い辺を挿入すると$d_{yx}\neq d'_{yx}$になる．また，削除時，$e\notin E_{yx}$である辺を削除すると，$E_{yx}=E'_{yx}$である．また，$e\in E_{yx}$である辺を削除すると，$d_{yx}\neq d'_{yx}$または$\sigma_{yx}\neq\sigma'_{yx}$となる．
-  したがってそのような操作は不可能で，逆も成り立つ．
+  すべての$w_2\in W_2$に対して$\delta_s(w_2)$が変化しないので，同様に，
+  集合$W_3=\{(w_2,w_3)|(w_2,w_3)\in E_s,(w,w_2)\in W_2\}$が操作によって変化せず，
+  すべての$(w_2,w_3)\in W_3$に対して$\sigma_{sw_3}$と$\delta_s(w_3)$が操作によって変化しない．
 
-  \begin{figure}
-    \centering
-    \def\svgwidth{.5\columnwidth}
-    \input{proof-invariability-of-paths.pdf_tex}
-    \caption{$s$と$t$の一般的な最短経路}
-    \label{fig:proof-invariability-of-paths}
-  \end{figure}
+  同じことを繰り返すと，集合$W^*=W\cup W_2\cup W_3\cup\cdots\cup W_k$が操作によって変化せず，すべての$(\hat{w},w)\in W^*$に対して$\sigma_{sw}$は操作によって変化しないことが言える．（$G_s$が有向アサイクリックグラフなので，上記の操作によって作られる$W^*$は有限集合である．また，$(\hat{w},w)\in\{(\hat{w},w)|(\hat{w},w)\in W^*,\{w'|(w,w')\in E_s\}=\varnothing\}$に対して，$\delta_s(w)=0$なので，この条件は消去できる）
+
+  
+  また，各$W_i$は$W_i=\{(w_{i-1},w_i)|(w_{i-1},w_i)\in\mathcal{N}^{i-1}_G(v)\times\mathcal{N}^i_G(v),(w_{i-1},w_i)\in E_s,d_{sw_i}=d_{sv}+d_{vw_{i-1}}+l_{w_{i-1}w_i}\}$と書き換えられるので，$G$は連結グラフであることから，$W^*=\cup_{i=0}W_i=\{(\hat{w},w)|(\hat{w},w)\in\cup_{i=0}\mathcal{N}^{i-1}_G(v)\times\mathcal{N}^i_G(v),(\hat{w},w)\in E_s,d_{sw}=d_{sv}+d_{v\hat{w}}+l_{\hat{w}w}\}=\{(\hat{w},w)|(\hat{w},w)\in E_s,d_{sw}=d_{sv}+d_{v\hat{w}}+l_{\hat{w}w}\}$とできる．
+
+  よって，\ref{item:explicit-invariability-of-pairwise-dependency}$\Rightarrow$\ref{item:implicit-invariability-of-pairwise-dependency}が成り立つ．
+
+  \ref{item:implicit-invariability-of-pairwise-dependency}$\Rightarrow$\ref{item:explicit-invariability-of-pairwise-dependency}も，先の手順を逆向きに適用することにより導出できる．
 \end{proof}
 
+まとめると，補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}における$X$が変化するような$s,v$の組を見つけることによって，空振りが含まれるが，ペア依存度$\delta_s(v)$を更新する．

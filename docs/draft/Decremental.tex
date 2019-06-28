@@ -63,38 +63,6 @@ $d'_{st}$で表す．
 \section{媒介中心性の更新}
 媒介中心性を更新する前に，すべての頂点に対するペア依存度を更新する必要がある．すべての頂点に対するペア依存度を更新した後，各頂点$x$について，$B'_x=\sum_{z\neq x}\delta'_{z}(x)$として辺削除後の媒介中心性を求める．
 
-\begin{figure}[tb]
-  \centering
-  \def\svgwidth{.35\linewidth}
-  \input{decremental-dist-idea-1.pdf_tex}
-  \caption{$z$への最短経路長が変化する頂点を求める例．数字は$z$への最短経路長を表す}
-  \label{fig:decremental-dist-idea-1}
-\end{figure}
-
-\begin{figure}[tb]
-  \centering
-  \def\svgwidth{.35\linewidth}
-  \input{decremental-dist-idea-2.pdf_tex}
-  \caption{$z$への最短経路長の更新例．数字は$z$への最短経路長を表す}
-  \label{fig:decremental-dist-idea-2}
-\end{figure}
-
-\begin{figure}[tb]
-  \centering
-  \def\svgwidth{.35\linewidth}
-  \input{decremental-dist-idea-3.pdf_tex}
-  \caption{$z$への最短経路長の更新例．数字は$z$への最短経路長を表す}
-  \label{fig:decremental-dist-idea-3}
-\end{figure}
-
-\begin{figure}[tb]
-  \centering
-  \def\svgwidth{.35\linewidth}
-  \input{decremental-sigma-idea-1.pdf_tex}
-  \caption{$z$への最短経路数が変化する頂点を求める例．数字は$z$への最短経路長を表す}
-  \label{fig:decremental-sigma-idea-1}
-\end{figure}
-
 \section{計算量の解析}
 \section{概要}
 
