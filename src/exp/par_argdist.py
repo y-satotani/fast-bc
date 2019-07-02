@@ -2,11 +2,12 @@
 from itertools import chain, product
 
 print("\n".join([
-    "{} {} {} {} {}".format(seed, gtype, n, k, qtype)
+    "-s {} -t {} -n {} -k {} -q {}".format(seed, gtype, n, k, qtype)
+    for _ in range(10)
     for seed in range(100)
     for gtype in ('RRG', 'ER', 'BA')
-    for n in chain(range(10, 100, 10), range(100, 1000+1, 100))
-    for k in chain(range(4, 10, 2), range(10, 100+1, 10))
+    for n in (10, 50, 100, 500, 1000)
+    for k in (4, 16, 64)
     for qtype in ('insert', 'delete')
     if n > k
 ]))
