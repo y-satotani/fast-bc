@@ -10,13 +10,12 @@
 #include "dybc/incremental.h"
 #include "dybc/decremental.h"
 
-void make_graph(igraph_t* G, char* name, int n, int k, const char* weight);
-void choice_noadjacent_pair(igraph_t* G, int* u, int* v);
-
 static struct argp_option options[] = {
   {0, 'n', "N", 0, "Network size"},
   {0, 'k', "N", 0, "Average degree"},
   {0, 't', "(BA|ER|RRG)", 0, "Network topology"},
+  {0, 'f', "FILE", 0, "Input file"},
+  {0, 'w', "WEIGHT", 0, "Weight"},
   {0, 'q', "(insert|delete)", 0, "Query"},
   {0, 's', "N", 0, "Seed"},
   {0}
@@ -26,9 +25,14 @@ struct arguments {
   int n;
   int k;
   char* name;
+  char* file;
+  char* weight;
   char* mode;
   long int seed;
 };
+
+void make_graph(igraph_t* G, struct arguments* args);
+void choice_noadjacent_pair(igraph_t* G, int* u, int* v);
 
 static error_t parse_opt(int key, char* arg, struct argp_state* state);
 
@@ -37,12 +41,13 @@ static struct argp argp = {options, parse_opt, 0, 0};
 int main(int argc, char* argv[]) {
   // Initialization
   struct arguments args;
+  args.weight = "length";
   argp_parse(&argp, argc, argv, 0, 0, &args);
   igraph_t G;
-  const char* weight = "length";
+  const char* weight = args.weight;
   igraph_i_set_attribute_table(&igraph_cattribute_table);
   igraph_rng_seed(igraph_rng_default(), args.seed);
-  make_graph(&G, args.name, args.n, args.k, weight);
+  make_graph(&G, &args);
 
   // Make augmented distance
   igraph_matrix_t D;
@@ -91,8 +96,8 @@ int main(int argc, char* argv[]) {
   end = clock();
   time_igraph = (double)(end - start) / CLOCKS_PER_SEC;
 
-  printf("%ld,%s,%d,%d,%s,%f,%f,%f\n",
-         args.seed, args.name, args.n, args.k, args.mode,
+  printf("%s,%d,%d,%s,%ld,%f,%f,%f\n",
+         args.name, args.n, args.k, args.mode, args.seed,
          igraph_matrix_maxdifference(&D, &Dtrain),
          time_update, time_igraph);
 
@@ -105,20 +110,34 @@ int main(int argc, char* argv[]) {
   return 0;
 }
 
-void make_graph(igraph_t* G, char* name, int n, int k, const char* weight) {
-  assert(k % 2 == 0);
-  if(strcmp(name, "RRG") == 0)
-    igraph_k_regular_game(G, n, k, 0, 0);
-  else if(strcmp(name, "ER") == 0)
-    igraph_erdos_renyi_game(G, IGRAPH_ERDOS_RENYI_GNM, n, n*k/2, 0, 0);
-  else if(strcmp(name, "BA") == 0)
-    igraph_barabasi_game(G, n, 1, k/2, 0, 1, 1, 0, IGRAPH_BARABASI_BAG, 0);
-  else
-    assert(0);
-  // set weights
-  for(igraph_integer_t eid = 0; eid < igraph_ecount(G); eid++) {
-    long int l = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
-    SETEAN(G, weight, eid, l);
+void make_graph(igraph_t* G, struct arguments* args) {
+  if(!(args->file)) {
+    // Generate graph
+    assert(args->k % 2 == 0);
+    if(strcmp(args->name, "RRG") == 0)
+      igraph_k_regular_game(G, args->n, args->k, 0, 0);
+    else if(strcmp(args->name, "ER") == 0)
+      igraph_erdos_renyi_game
+        (G, IGRAPH_ERDOS_RENYI_GNM, args->n, args->n*args->k/2, 0, 0);
+    else if(strcmp(args->name, "BA") == 0)
+      igraph_barabasi_game
+        (G, args->n, 1, args->k/2, 0, 1, 1, 0, IGRAPH_BARABASI_BAG, 0);
+    else
+      assert(0);
+    // set weights
+    for(igraph_integer_t eid = 0; eid < igraph_ecount(G); eid++) {
+      long int l = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
+      SETEAN(G, args->weight, eid, l);
+    }
+  } else {
+    // Load graph
+    FILE* instream = fopen(args->file, "r");
+    assert(instream);
+    igraph_read_graph_graphml(G, instream, 0);
+    fclose(instream);
+    args->name = args->file;
+    args->n = igraph_vcount(G);
+    args->k = (2*igraph_ecount(G)) / igraph_vcount(G);
   }
 }
 
@@ -155,6 +174,12 @@ static error_t parse_opt(int key, char* arg, struct argp_state* state) {
     break;
   case 't':
     arguments->name = arg;
+    break;
+  case 'f':
+    arguments->file = arg;
+    break;
+  case 'w':
+    arguments->weight = arg;
     break;
   case 'q':
     arguments->mode = arg;
