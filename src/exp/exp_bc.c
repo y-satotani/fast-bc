@@ -42,6 +42,7 @@ static struct argp argp = {options, parse_opt, 0, 0};
 int main(int argc, char* argv[]) {
   // Initialization
   struct arguments args;
+  args.file = 0;
   args.weight = "length";
   argp_parse(&argp, argc, argv, 0, 0, &args);
   igraph_t G;
@@ -63,8 +64,16 @@ int main(int argc, char* argv[]) {
   igraph_integer_t u, v;
   igraph_real_t c;
   if(strcmp(args.mode, "insert") == 0) {
+    long int weight_min = -1;
+    long int weight_max = -1;
+    for(igraph_integer_t eid = 0; eid < igraph_ecount(&G); eid++) {
+      if(weight_min < 0 || weight_min > EAN(&G, weight, eid))
+        weight_min = (long int)EAN(&G, weight, eid);
+      if(weight_max < 0 || weight_max < EAN(&G, weight, eid))
+        weight_max = (long int)EAN(&G, weight, eid);
+    }
     choice_noadjacent_pair(&G, &u, &v);
-    c = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
+    c = igraph_rng_get_integer(igraph_rng_default(), weight_min, weight_max);
   } else if(strcmp(args.mode, "delete") == 0) {
     igraph_integer_t eid = igraph_rng_get_integer
       (igraph_rng_default(), 0, igraph_ecount(&G)-1);
@@ -102,7 +111,7 @@ int main(int argc, char* argv[]) {
   end = clock();
   time_igraph = (double)(end - start) / CLOCKS_PER_SEC;
 
-  printf("%s,%d,%d,%s,%ld,%f,%f,%f\n",
+  printf("%s,%d,%d,%s,%ld,%e,%e,%e\n",
          args.name, args.n, args.k, args.mode, args.seed,
          igraph_vector_maxdifference(&B, &Btrain),
          time_update, time_igraph);
