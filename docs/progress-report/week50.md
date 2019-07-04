@@ -27,3 +27,12 @@
   - 重みなし無向ネットワークなので，すべての辺の重みを1とした．
   - 挿入/削除を，対象の辺を変えてそれぞれを15回ずつ行った．
   - 挿入する辺の重みは1とした．
+
+| method   | mode   | MaxErr   |     Min |  Median |    Mean |     Max |
+| :------- | :----- | :------- | ------: | ------: | ------: | ------: |
+| brandes  | delete | NA       | 147.279 | 150.150 | 150.123 | 154.709 |
+| brandes  | insert | NA       | 148.539 | 151.830 | 154.114 | 175.629 |
+| proposed | delete | 5.82e-10 |   0.014 |   3.186 |   2.843 |   5.546 |
+| proposed | insert | 5.12e-09 |   2.625 |   3.873 |   5.038 |  15.161 |
+
+<img src="week50_files/figure-gfm/fig1-1.png" style="display: block; margin: auto;" />
