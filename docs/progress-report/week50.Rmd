@@ -1,0 +1,92 @@
+---
+title: "研究進捗報告"
+author: "里谷 佳紀"
+date: "2019年7月5日"
+documentclass: bxjsarticle
+classoption: xelatex,ja=standard,11pt
+geometry: no
+output:
+  pdf_document:
+    latex_engine: xelatex
+    template: mytemplate.tex
+    number_sections: yes
+    fig_caption: yes
+    includes:
+      in_header: header.sty
+  github_document:
+    html_preview: no
+---
+
+```{r setup, include = FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(viridis)
+theme_set(theme_light(base_size = 11, base_family = 'IPAexGothic'))
+knitr::opts_knit$get('rmarkdown.pandoc.to')
+if(knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex') {
+  devname <- 'cairo_pdf'
+  devargs <- c()
+} else {
+  devname <- 'png'
+  devargs <- c('type' = 'cairo-png')
+}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.height = 8, fig.width = 6, fig.align = 'center',
+  dev = devname, dev.args = devargs, dpi = 150
+)
+```
+
+```{r readin, include = FALSE}
+data_time <- read_csv('../res/data/bc-hep.csv') %>%
+  select(-c(name, n, k, seed)) %>%
+  gather(
+    key = 'method', value = 'time',
+    `time-proposed`, `time-brandes`
+  ) %>%
+  mutate(method = sub('time-', '', method))
+```
+
+# 研究全体の目的
+グラフと全頂点間距離と最短経路の数およびペア依存度が与えられたとき，グラフの辺が削除されたとする．
+このときの全頂点間距離と最短経路の数とペア依存度を高速に更新する方法を開発する．
+また，実験と理論の両方から既存の方法と比較することで，新方法の有用性を検証する．
+
+# 前回打ち合わせ時に定めた短期目標
+1. 修士論文の下書きの執筆
+2. 実データに対する実験
+
+# 本日までの進捗状況
+1. 章の構成を見直した．
+2. データセット`ca-HepPh`に対する実験を行った．
+
+# `ca-HepPh`に対する実験
+`SNAP`から取得した`ca-HepPh`を対象に実験を行った．
+
+* ネットワークは，12008頂点，118521辺を有する．
+* 重みなし無向ネットワークなので，すべての辺の重みを1とした．
+* 挿入/削除を，対象の辺を変えてそれぞれを15回ずつ行った．
+* 挿入する辺の重みは1とした．
+
+```{r tab1}
+data_time %>%
+group_by(method, mode) %>%
+summarise(
+  MaxErr = format(max(err), digits = 3, scientific = TRUE),
+  Min = min(time), Median = median(time),
+  Mean = mean(time), Max = max(time)
+) %>%
+ungroup() %>%
+mutate(MaxErr = ifelse(method == 'brandes', NA, MaxErr)) %>%
+knitr::kable(digits = 3)
+```
+
+```{r fig1}
+ggplot(data_time, aes(mode, time, colour = method)) +
+  geom_boxplot() + geom_jitter() +
+  xlab('操作種類') + ylab('実行時間(s)') +
+  scale_colour_viridis(discrete = TRUE, begin = 0.3, end = 0.6) +
+  theme(legend.position = c(0.8, 0.5))
+```
