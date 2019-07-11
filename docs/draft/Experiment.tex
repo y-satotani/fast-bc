@@ -21,70 +21,80 @@
 \subsection{一辺挿入時の実験結果}
 
 \subsubsection{頂点数の増加と実行時間の変化}
-図\ref{fig:exp-insert-node}は挿入時の頂点数に対する実行時間を比較したものである．各ネットワークの平均次数は$10$で固定している．それぞれの頂点数について，100個のネットワークに対する実行時間の平均を計算している．図\ref{fig:exp-insert-node}より，三種類のネットワーク全てに対して，頂点数が増加するとともに更新の平均実行時間が再計算のものと比べて短くなっていることが分かる．頂点数の増加とともに，ペア依存度を再計算する必要がある頂点が少なくなることが理由と考えられる．
+図\ref{fig:exp-insert-artificial-time}は挿入時の頂点数に対する実行時間を比較したものである．各ネットワークの平均次数は$4$で固定している．それぞれの頂点数について，\textcolor{red}{TODO: 確認}個のネットワークに対する実行時間の平均を計算している．図\ref{fig:exp-insert-artificial-time}より，二種類のネットワーク全てに対して，頂点数が増加するとともに更新の平均実行時間が再計算のものと比べて短くなっていることが分かる．頂点数の増加とともに，ペア依存度を再計算する必要がある頂点が少なくなることが理由と考えられる．
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=\linewidth]{exp-insert-node.pdf}
+  \includegraphics[width=\linewidth]{exp-insert-artificial-time.pdf}
   \caption{挿入時の頂点数に対する実行時間の比較}
-  \label{fig:exp-insert-node}
+  \label{fig:exp-insert-artificial-time}
 \end{figure}
 
 \subsubsection{頂点数と次数の変化と高速化の変化}
-より多くの頂点数と次数の組に対して，提案法がどの程度高速化されたか検証するための実験を行った．図\ref{fig:exp-insert-ratio}は挿入時の頂点数と平均次数に対する，2手法の実行時間の比である．先の実験同様，各頂点数と次数の組に対して更新を$100$回行い，その平均を求めた．図\ref{fig:exp-insert-ratio}より，高速化される程度はグラフの密度と関係があることが分かる．密度が増加すると，ペア依存度を再計算する必要がある頂点が少なくなることが理由と考えられる．
+\textcolor{red}{TODO: 図差し替え}
+より多くの頂点数と次数の組に対して，提案法がどの程度高速化されたか検証するための実験を行った．図\ref{fig:exp-insert-artificial-ratio}は挿入時の頂点数と平均次数に対する，2手法の実行時間の比である．先の実験同様，各頂点数と次数の組に対して更新を$100$回行い，その平均を求めた．図\ref{fig:exp-insert-artificial-ratio}より，高速化される程度はグラフの密度と関係があることが分かる．密度が増加すると，ペア依存度を再計算する必要がある頂点が少なくなることが理由と考えられる．
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=\linewidth]{exp-insert-ratio.pdf}
+  \includegraphics[width=\linewidth]{exp-insert-artificial-time.pdf}
   \caption{挿入時の頂点数と平均次数に対する実行時間の比}
-  \label{fig:exp-insert-ratio}
+  \label{fig:exp-insert-artificial-ratio}
 \end{figure}
 
 \subsubsection{ペア依存度を更新した頂点の割合と実行時間}
-ペア依存度を更新した頂点の割合と実行時間の関係を明らかにするための実験を行った．図\ref{fig:exp-insert-recalc}は挿入時にペア依存度を更新した頂点の割合に対する実行時間を表したものである．頂点数を$100$,次数を$10$とし，$100$回の更新について示した．図\ref{fig:exp-insert-recalc}より，ペア依存度を更新した頂点の割合が小さいと，実行時間が短くなることが分かる．
+\textcolor{red}{TODO: 追加実験}
+ペア依存度を更新した頂点の割合と実行時間の関係を明らかにするための実験を行った．図\ref{fig:exp-insert-artificial-recalc}は挿入時にペア依存度を更新した頂点の割合に対する実行時間を表したものである．頂点数を$100$,次数を$10$とし，$100$回の更新について示した．図\ref{fig:exp-insert-artificial-recalc}より，ペア依存度を更新した頂点の割合が小さいと，実行時間が短くなることが分かる．
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=\linewidth]{exp-insert-recalc.pdf}
+  \includegraphics[width=\linewidth]{exp-insert-artificial-time.pdf}
   \caption{挿入時にペア依存度を更新した頂点の割合に対する実行時間}
-  \label{fig:exp-insert-recalc}
+  \label{fig:exp-insert-artificial-recalc}
 \end{figure}
 
 \subsection{一辺削除時の実験結果}
 
 \subsubsection{頂点数の増加と実行時間の変化}
-図\ref{fig:exp-delete-node}は削除時の頂点数に対する実行時間を比較したものである．各ネットワークの平均次数は$10$で固定している．それぞれの頂点数について，100個のネットワークに対する実行時間の平均を計算している．図\ref{fig:exp-delete-node}より，三種類のネットワーク全てに対して，頂点数が増加するとともに更新の平均実行時間が再計算のものと比べて短くなっていることが分かる．頂点数の増加とともに，ペア依存度を再計算する必要がある頂点が少なくなることが理由と考えられる．
+図\ref{fig:exp-delete-artificial-time}は削除時の頂点数に対する実行時間を比較したものである．各ネットワークの平均次数は$10$で固定している．それぞれの頂点数について，100個のネットワークに対する実行時間の平均を計算している．図\ref{fig:exp-delete-artificial-time}より，三種類のネットワーク全てに対して，頂点数が増加するとともに更新の平均実行時間が再計算のものと比べて短くなっていることが分かる．頂点数の増加とともに，ペア依存度を再計算する必要がある頂点が少なくなることが理由と考えられる．
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=\linewidth]{exp-delete-node.pdf}
+  \includegraphics[width=\linewidth]{exp-delete-artificial-time.pdf}
   \caption{削除時の頂点数に対する実行時間の比較}
-  \label{fig:exp-delete-node}
+  \label{fig:exp-delete-artificial-time}
 \end{figure}
 
 \subsubsection{頂点数と次数の変化と高速化の変化}
-より多くの頂点数と次数の組に対して，提案法がどの程度高速化されたか検証するための実験を行った．図\ref{fig:exp-delete-ratio}は削除時の頂点数と平均次数に対する，二手法の実行時間の比である．先の実験同様，各頂点数と次数の組に対して更新を$100$回行い，その平均を求めた．図\ref{fig:exp-delete-ratio}より，高速化される程度はグラフの密度と関係があることが分かる．密度が増加すると，ペア依存度を再計算する必要がある頂点が少なくなることが理由と考えられる．BAネットワークの実行時間比が他のネットワークより大きくなっているのは，削除によってペア依存度を再計算する必要がある頂点が他のネットワークより多くなることが理由と考えられる．
+より多くの頂点数と次数の組に対して，提案法がどの程度高速化されたか検証するための実験を行った．図\ref{fig:exp-delete-artificial-ratio}は削除時の頂点数と平均次数に対する，二手法の実行時間の比である．先の実験同様，各頂点数と次数の組に対して更新を$100$回行い，その平均を求めた．図\ref{fig:exp-delete-artificial-ratio}より，高速化される程度はグラフの密度と関係があることが分かる．密度が増加すると，ペア依存度を再計算する必要がある頂点が少なくなることが理由と考えられる．BAネットワークの実行時間比が他のネットワークより大きくなっているのは，削除によってペア依存度を再計算する必要がある頂点が他のネットワークより多くなることが理由と考えられる．
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=\linewidth]{exp-delete-ratio.pdf}
+  \includegraphics[width=\linewidth]{exp-delete-artificial-time.pdf}
   \caption{削除時の頂点数と平均次数に対する実行時間の比}
-  \label{fig:exp-delete-ratio}
+  \label{fig:exp-delete-artificial-ratio}
 \end{figure}
 
 \subsubsection{ペア依存度を更新した頂点の割合と実行時間}
-ペア依存度を更新した頂点の割合と実行時間の関係を明らかにするための実験を行った．図\ref{fig:exp-delete-recalc}は削除時にペア依存度を更新した頂点の割合に対する実行時間を表したものである．頂点数を$100$,次数を$10$とし，$100$回の更新について示した．図\ref{fig:exp-delete-recalc}より，ペア依存度を更新した頂点の割合が小さいと，実行時間が短くなることが分かる．
+ペア依存度を更新した頂点の割合と実行時間の関係を明らかにするための実験を行った．図\ref{fig:exp-delete-artificial-recalc}は削除時にペア依存度を更新した頂点の割合に対する実行時間を表したものである．頂点数を$100$,次数を$10$とし，$100$回の更新について示した．図\ref{fig:exp-delete-artificial-recalc}より，ペア依存度を更新した頂点の割合が小さいと，実行時間が短くなることが分かる．
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=\linewidth]{exp-delete-recalc.pdf}
+  \includegraphics[width=\linewidth]{exp-delete-artificial-time.pdf}
   \caption{削除時にペア依存度を更新した頂点の割合に対する実行時間}
-  \label{fig:exp-delete-recalc}
+  \label{fig:exp-delete-artificial-recalc}
 \end{figure}
 
 \section{実ネットワークに対する実験}
 
 \textcolor{red}{TODO: 用いるデータセットの説明}
+
+HepPhに対する実験を行う．実験で用いるネットワークは\textcolor{red}{xxx}個の頂点と\textcolor{red}{xxx}本の辺を有する．
+
+ネットワークにランダムな辺を挿入または削除したときの実験結果を表\ref{tab:exp-hep-time}に示す．$100$回の更新の平均を求めた．結果より，実データに対しては提案手法の方が時間がかかることが分かる．実験に用いたネットワークが，人口ネットワークと比べて密度が小さく，疎なネットワークであることが原因と考えられる．
+
+\input{exp-hep-time.tex}
+
+\textcolor{red}{TODO: 道路ネットワーク}
 
 実際の道路ネットワークに対する実験を行う．実験で用いるネットワークを図\ref{fig:net-ou1}に示す．このネットワークは2270個の頂点と2663本の辺を有する．
 \begin{figure}[tb]
