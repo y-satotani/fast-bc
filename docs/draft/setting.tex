@@ -47,6 +47,14 @@
 \DeclareMathSymbol{\vrectangleblack}{\mathord}{symbolsstix}{"C5}
 \DeclareMathSymbol{\vrectangle}{\mathord}{symbolsstix}{"C6}
 
+% declare some dummy font shape to suppress warnings
+\DeclareFontShape{JT1}{mc}{m}{it}{<->ssub*mc/m/n}{}
+\DeclareFontShape{JY1}{mc}{m}{it}{<->ssub*mc/m/n}{}
+\DeclareFontShape{JT1}{mc}{m}{sc}{<->ssub*mc/m/n}{}
+\DeclareFontShape{JY1}{mc}{m}{sc}{<->ssub*mc/m/n}{}
+\DeclareFontShape{JT1}{gt}{m}{it}{<->ssub*gt/m/n}{}
+\DeclareFontShape{JY1}{gt}{m}{it}{<->ssub*gt/m/n}{}
+
 % add math operator
 \DeclareMathOperator*{\argmin}{\arg\!\min}
 \DeclareMathOperator*{\argmax}{\arg\!\max}
