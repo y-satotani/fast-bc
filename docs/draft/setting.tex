@@ -17,6 +17,8 @@
 \DeclareFieldFormat{booktitle}{#1}
 %\renewrobustcmd*{\bibinitdelim}{}
 \usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage{mwe}
 
 % setting title
 \makeatletter
@@ -99,6 +101,8 @@
 \renewcommand{\qedsymbol}{$\vrectangleblack$}
 
 % algorithm preference
+\algnewcommand{\LeftComment}[1]{\(\triangleright\) #1}
+\algrenewcommand\algorithmicindent{.5em}
 \renewcommand{\listalgorithmname}{アルゴリズムリスト}
 \renewcommand{\thealgorithm}{\arabic{chapter}.\arabic{algorithm}}
 \makeatletter
