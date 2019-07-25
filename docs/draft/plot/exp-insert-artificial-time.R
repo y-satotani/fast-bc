@@ -8,7 +8,6 @@ out_file <- paste0(sub('^--file=(.+)\\.R$', '\\1', basename(commandArgs()[4])), 
 
 data_time <- read_csv('../../res/data/bc-20190622.csv') %>%
   group_by(name, n, k, mode) %>%
-  filter(name %in% c('BA', 'ER')) %>%
   summarise(
     `proposed-max` = max(`time-proposed`),
     `proposed-mean` = mean(`time-proposed`),
@@ -19,6 +18,13 @@ data_time <- read_csv('../../res/data/bc-20190622.csv') %>%
   gather(
     key = 'method', value = 'time',
     `proposed-max`, `proposed-mean`, `brandes-mean`, `brandes-max`
+  ) %>%
+  mutate(
+    method = factor(
+      method,
+      levels=c('proposed-max', 'proposed-mean', 'brandes-max', 'brandes-mean'),
+      labels=c('更新-最大値', '更新-平均値', '再計算-最大値', '再計算-平均値')
+    )
   )
 
 gp <- ggplot(
@@ -29,8 +35,9 @@ gp <- ggplot(
   xlab('頂点数') + ylab('実行時間(s)') +
   scale_colour_viridis(discrete = TRUE) +
   theme(
+    legend.title = element_blank(),
     strip.text = element_text(colour = 'black'),
     strip.background = element_blank()
   )
 
-ggsave(out_file, gp, cairo_pdf, width = 15, height = 6, units = 'cm')
+ggsave(out_file, gp, cairo_pdf, width = 18, height = 6, units = 'cm')
