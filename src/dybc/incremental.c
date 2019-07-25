@@ -77,6 +77,8 @@ void incremental_part(igraph_t*            G,
 
   //printf("%d %d %d:\n", v, w, z);
 
+  if(n_update_path_pairs)
+    *n_update_path_pairs = 0;
   while(!igraph_2wheap_empty(&queue)) {
     igraph_integer_t x = igraph_2wheap_max_index(&queue);
     igraph_real_t d_xz = -igraph_2wheap_delete_max(&queue);
@@ -114,6 +116,8 @@ void incremental_part(igraph_t*            G,
       igraph_vector_long_push_back(&delta_set, x);
       //printf("--debug1-- %d added\n", x);
     }
+    if(n_update_path_pairs)
+      (*n_update_path_pairs)++;
   }
 
   igraph_2wheap_t delta_queue;
@@ -147,6 +151,8 @@ void incremental_part(igraph_t*            G,
         igraph_2wheap_update(&delta_queue, y, d_yz);
       }
     }
+    if(update_dep_verts)
+      igraph_vector_bool_set(update_dep_verts, x, 1);
   }
 
   igraph_vector_destroy(&dp_z);

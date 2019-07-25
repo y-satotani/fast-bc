@@ -101,6 +101,8 @@ void decremental_part(igraph_t*            G,
       }
     }
   }
+  if(n_update_path_pairs)
+    *n_update_path_pairs = igraph_vector_long_size(&affected);
 
   // update distance of vertices which have unaffected neighbor
   igraph_2wheap_t queue;
@@ -216,6 +218,8 @@ void decremental_part(igraph_t*            G,
         igraph_2wheap_update(&delta_queue, y, d_yz);
       }
     }
+    if(update_dep_verts)
+      igraph_vector_bool_set(update_dep_verts, x, 1);
   }
 
   igraph_vector_destroy(&dp_z);
