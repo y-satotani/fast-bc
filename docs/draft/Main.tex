@@ -3,11 +3,11 @@
 
 \graphicspath{{../res/figure/}{./plot/}}
 \makeatletter
-\def\input@path{{../res/figure/}}
+\def\input@path{{../res/figure/}{./table/}}
 \makeatother
 \addbibresource{../res/MyCollection.bib}
 
-\title{辺挿入・削除時の媒介中心性の高速計算法}
+\title{媒介中心性を更新するオンラインアルゴリズム}
 \author{里谷 佳紀}
 \date{\today}
 
@@ -18,11 +18,11 @@
 \chapter*{概要}
 がいようです．
 
+\setcounter{tocdepth}{1}
 \tableofcontents
 \include{Introduction}
 \include{Preliminary}
-\include{Incremental}
-\include{Decremental}
+\include{Algorithm}
 \include{Experiment}
 \chapter{結論}
 
@@ -30,10 +30,8 @@
 ありがとうございました．
 
 \appendix
-\include{Algorithm}
-%\include{Example}
 
+%\include{Example}
 \printbibliography[title=参考文献]
 
 \end{document}
-http://www.sociopatterns.org/datasets/high-school-contact-and-friendship-networks/

@@ -1,6 +1,7 @@
 \chapter{準備}
 
 \section{グラフの数学的記法}
+\label{sect:graph-theory}
 
 グラフ$G=(V,E)$，$V$は頂点集合，$E$は辺集合$\subset V\times V$
 
@@ -28,6 +29,7 @@ $G$の異なる2頂点$s,t$を両端とする有向道の中で，有向道に�
 同様に，頂点$s$から頂点$t$へのすべての最短経路で構成される有向グラフを$G_{st}=(V_{st},E_{st})$で表す．
 
 \section{最短経路長および最短経路数の性質}
+\label{sect:shortest-paths}
 
 最短経路の長さと個数について，いくつかの補題を示す．
 
@@ -118,7 +120,7 @@ $G$の異なる2頂点$s,t$を両端とする有向道の中で，有向道に�
   \end{equation*}
 \end{lemma}
 \begin{proof}
-  TBA
+  \textcolor{red}{TODO}
 \end{proof}
 
 次の補題は，重みなしグラフのある二頂点間の最短経路の個数と，その経路に含まれる短い最短経路の個数との関係を示す．
@@ -204,6 +206,8 @@ $G$の異なる2頂点$s,t$を両端とする有向道の中で，有向道に�
 \end{proof}
 
 \section{媒介中心性とペア依存度}
+\label{sect:pairwise-dependency}
+
 頂点$i$の媒介中心性$B_i$は
 \begin{equation}
   B_i=\sum_{s\neq i}\sum_{t\neq {i,s}}\frac{\sigma_{st}(i)}{\sigma_{st}}
@@ -212,119 +216,86 @@ $G$の異なる2頂点$s,t$を両端とする有向道の中で，有向道に�
 で定義される\cite{Freeman1977}．
 すなわち，頂点$i$の媒介中心性は$s$から$t$への最短経路の個数とその中で頂点$i$を通るものの個数の比を$s,t$のすべての組について足し合わせたものである．したがって，媒介中心性の大きな頂点は多くの2頂点を結ぶ最短経路上にあり，この意味で重要度が高いと言える．
 
-すべての頂点の媒介中心性を求める単純な方法は以下の通りである．まず，$s=1,2,\ldots,N$に対して，幅優先探索を用いて$s$から他のすべての頂点への最短経路を求める．その過程で，$s$から他のすべての頂点への最短経路長と最短経路数も同時に求める．次に，互いに異なる3頂点の組$\{s,t,i\}$のすべてに対して，$\sigma_{st}(i)$の値を計算する（どうやって??）．
+すべての頂点の媒介中心性を求める単純な方法は以下の通りである．まず，$s=1,2,\ldots,N$に対して，幅優先探索を用いて$s$から他のすべての頂点への最短経路を求める．その過程で，$s$から他のすべての頂点への最短経路長と最短経路数も同時に求める．次に，互いに異なる3頂点の組$\{s,t,i\}$のすべてに対して，$\sigma_{st}(i)$の値を計算する．
 最後に媒介中心性$B_i$ $(i=1,2,\ldots,N)$を(\ref{eq:betweenness-centrality})により計算する．しかしながら，この方法の計算量は$\mathcal{O}(N^3)$であり，大規模なネットワークでは膨大な計算時間が必要になる．
 
 媒介中心性の効率的計算法として最も広く用いられているのはBrandes~\cite{Brandes2001}によって提案されたアルゴリズムである．それを以下に示す．
 
-Brandesのアルゴリズムは次のペア依存度を用いて効率的に媒介中心性を計算する．
+Brandesのアルゴリズムはペア依存度を用いて効率的に媒介中心性を計算する．
+ペア依存度を使って媒介中心性を表すと，
 \begin{equation*}
   \begin{aligned}
     B_v&=\sum_{s\neq v}\sum_{t\neq v,s}\frac{\sigma_{st}(v)}{\sigma_{st}}
     &=\sum_{s\neq v}\sum_{t\neq v,s}\delta_{st}(v)
   \end{aligned}
 \end{equation*}
-で定義される．$\delta_{st}(v)=\frac{\sigma_{st}(v)}{\sigma_{st}}$は頂点$s,t,v$のペア依存度と呼ばれる．頂点$s,v$と他の頂点のペア依存度$\delta_{s}(v)=\sum_{t\neq v,s}\delta_{st}(v)$について，次のことが知られている．
+である．ここで，
 \begin{equation*}
-  \delta_{s}(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_{s}(w)).
+  \label{eq:def-pairwise-dependency}
+  \delta_{st}(v)=\frac{\sigma_{st}(v)}{\sigma_{st}}
 \end{equation*}
-Brandesのアルゴリズムはこの性質を応用して媒介中心性を高速に計算している．
+は頂点$s,t,v$のペア依存度と呼ばれる．頂点$s,v$と他の頂点のペア依存度$\delta_{s}(v)=\sum_{t\neq v,s}\delta_{st}(v)$について，次のことが知られている．
 
-このアルゴリズムの計算量を考える．ステップ2は$\mathcal{O}(M)$の時間で実行できる．
-ステップ4についても，$G$のすべての頂点を$s$からの最短経路の逆向きに一度だけ辿ることにより$\{\delta_s(i)\}_{i=1}^N$の値を更新できるため，$\mathcal{O}(M)$の時間で実行できる~\cite{Brandes2001}．
-したがって，アルゴリズム~\ref{algo:brandes}の全体の計算量は$\mathcal{O}(NM)$であり，それは$\mathcal{O}(N^3)$よりも小さい．特にグラフが疎であるとき，すなわち$M \ll N^2$が成り立つとき前者は後者に比べて非常に小さな値となる．
-
-
-\section{最短経路とペア依存度の変化に関する条件}
-
-\textcolor{red}{3章に移動する可能性あり}
-
-ここでは，一辺が挿入または削除されたあとの最短経路およびペア依存度が変化する条件について述べる．
-
-記号について，挿入または削除の操作後であることを明示するため，記号$'$をつける．例えば，操作後のグラフは$G'$と表す．
-
-\begin{lemma}
-  \label{lemma:condition-of-invariability-of-shortest-path}
-  $E_{yx}=E'_{yx}$であることの必要十分条件は，$d_{yx}=d'_{yx}$かつ$\sigma_{yx}=\sigma'_{yx}$である．
-\end{lemma}
+\begin{theorem}
+  \label{th:implicit-pairwise-dependency}
+  \begin{equation*}
+    \delta_{s}(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_{s}(w)).
+  \end{equation*}
+\end{theorem}
 \begin{proof}
-  $E_{yx}=E'_{yx}$なら$d_{yx}=d'_{yx}$かつ$\sigma_{yx}=\sigma'_{yx}$であることは自明である．
-
-  逆は，図\ref{fig:proof-invariability-of-paths}のような$E_{yx}$を，$d_{yx}=d'_{yx}$かつ$\sigma_{yx}=\sigma'_{yx}$を満たすように，$E_{yx}\neq E'_{yx}$とするには，少なくとも一辺の削除と一辺の挿入が必要である．
-  挿入時，レイヤーの距離より長い辺を挿入すると$E_{yx}=E'_{yx}$である．また，レイヤーの距離が等しくなるように結ぶと，$\sigma_{yx}\neq\sigma'_{yx}$となる．また，レイヤーの距離より短い辺を挿入すると$d_{yx}\neq d'_{yx}$になる．また，削除時，$e\notin E_{yx}$である辺を削除すると，$E_{yx}=E'_{yx}$である．また，$e\in E_{yx}$である辺を削除すると，$d_{yx}\neq d'_{yx}$または$\sigma_{yx}\neq\sigma'_{yx}$となる．
-  したがってそのような操作は不可能で，逆も成り立つ．
-
-  \begin{figure}
-    \centering
-    \def\svgwidth{.5\columnwidth}
-    \input{proof-invariability-of-paths.pdf_tex}
-    \caption{$s$と$t$の一般的な最短経路}
-    \label{fig:proof-invariability-of-paths}
-  \end{figure}
+  \textcolor{red}{TODO}
 \end{proof}
 
-\begin{lemma-without-proof}
-  \label{lemma:condition-of-invariability-of-pairwise-dependency}
-  ペア依存度
-  \begin{equation}
-    \label{eq:pairwise-dependency}
-    \delta_s(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_s(w))
-  \end{equation}
-  について，操作によって$\sigma_{sv}$および集合$W=\{w|(v,w)\in E_s\}$が変化せず，各$w\in W$の$\sigma_{sw}$および$\delta_s(w)$が操作によって変化しないならば，操作後のペア依存度
- \begin{equation}
-    \label{eq:pairwise-dependency-after-update}
-    \delta'_s(v)=\sum_{(v,w)\in E'_s}\frac{\sigma'_{sv}}{\sigma'_{sw}}(1+\delta'_s(w))
-  \end{equation}
- も変化しない．
-\end{lemma-without-proof}
+Brandesのアルゴリズムは定理\ref{th:implicit-pairwise-dependency}の性質を
+応用して媒介中心性を高速に計算している．
 
-補題\ref{lemma:condition-of-invariability-of-pairwise-dependency}の逆は成り立たない．例えば，図\ref{fig:pd-invariability-counterexample}において$\delta_s(v_1)=\delta'_s(v_1)$であるが，$\delta_s(w_1)\neq\delta'_s(w_1)$である．同様に，$\delta_s(v_2)=\delta'_s(v_2)$であるが，$\sigma_{sv_2}\neq\sigma'_{sv_2}$である．
+このアルゴリズムの計算量を考える．まず，ある$s\in V$とすべての$v\in V$に対して$\sigma_{sv}$を計算するときの計算量は，Dijkstra法より$\mathcal{O}(N\log N+M)$である．
+ステップ4についても，$G$のすべての頂点$v$を$s$からの最短経路の逆向きに一度だけ辿ることにより$\delta_s(v)$の値を更新できるため，$\mathcal{O}(M)$の時間で実行できる\cite{Brandes2001}．
+したがって，すべての$s\in V$に対するアルゴリズムの計算量は$\mathcal{O}(N^2\log N+NM)$であり，それは$\mathcal{O}(N^3)$よりも小さい．特にグラフが疎であるとき，すなわち$M \ll N^2$が成り立つとき前者は後者に比べて非常に小さな値となる．
 
-\begin{figure}[tb]
-  \centering
-  \def\svgwidth{.45\linewidth}
-  \input{pd-invariability-counterexample.pdf_tex}
-  \caption{補題\ref{lemma:condition-of-invariability-of-pairwise-dependency}の逆の反例}
-  \label{fig:pd-invariability-counterexample}
-\end{figure}
+\begin{algorithm}[H]
+  \caption{Brandesのアルゴリズム}
+  \label{algo:brandes}
+  \begin{multicols}{2}
+    \begin{algorithmic}[1]
+      \Procedure{Brandes}{$G$}
+      \State $B_x\gets 0,\:\forall x\in V$
+      \ForAll{$s\in V$}
+      \State $S\gets()$ \Comment スタック
+      \State $P_w\gets (),\:\forall w\in V$ \Comment リスト
+      \State $\sigma_t\gets 0,\:\forall t\in V;\:\sigma_s\gets 1$
+      \State $d_t\gets -1,\:\forall t\in V;\:d_s\gets 0$
+      \State $Q\gets ()$ \Comment 順位キュー
+      \State $\mathrm{push}(Q, s)$
+      \While{$\lvert Q\rvert>0$}
+      \State $v\gets\mathrm{pop}(Q)$
+      \State $\mathrm{push}(S, v)$
+      \ForAll{$w\in\mathcal{N}_G(v)$}
+      \If{$d_w<0\lor d_v+l_{vw}<d_w$}
+      \State $d_w\gets d_v+l_{vw}$
+      \State $\sigma_w\gets\sigma_v$
+      \State $P_w\gets(v)$
+      \State $\mathrm{updatekey}(Q, w, d_w)$
+      \EndIf
+      \If{$d_w=d_v+l_{vw}$}
+      \State $\sigma_w\gets\sigma_w+\sigma_v$
+      \State $\mathrm{append}(P_w, v)$
+      \EndIf
+      \EndFor
+      \EndWhile
+      \State $\delta_v\gets 0,\:v\in V$
+      \While{$\lvert S\rvert>0$}
+      \State $w\gets\mathrm{pop}(S)$
+      \ForAll{$v\in P_w$}
+      \State $\delta_v\gets\delta_v+\frac{\sigma_v}{\sigma_w}(1+\delta_w)$
+      \EndFor
+      \If{$w\neq s$}
+      \State $B_w\gets B_w+\delta_w$
+      \EndIf
+      \EndWhile
+      \EndFor
+      \EndProcedure
+    \end{algorithmic}
+  \end{multicols}
+\end{algorithm}
 
-\begin{lemma}
-  \label{lemma:transformation-of-invariability-of-pairwise-dependency}
-  頂点$s,v$の操作前のペア依存度
-  \begin{equation}
-    \label{eq:pairwise-dependency}
-    \delta_s(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_s(w))
-  \end{equation}
-  と操作後のペア依存度
-  \begin{equation}
-    \label{eq:pairwise-dependency-after-update}
-    \delta'_s(v)=\sum_{(v,w)\in E'_s}\frac{\sigma'_{sv}}{\sigma'_{sw}}(1+\delta'_s(w))
-  \end{equation}
-  に関して，これらは同値である．
-  \begin{enumerate}
-  \item $\sigma_{sv}=\sigma'_{sv}$かつ，集合$W=\{(v,w)\in E_s\}$と集合$W'=\{(v,w)\in E'_s\}$が等しく，すべての$(v,w)\in W$に対して$\sigma_{sv}$と$\sigma_{sw}$,$\delta_s(w)$が操作によって変化しない
-    \label{item:explicit-invariability-of-pairwise-dependency}
-  \item $\sigma_{sv}=\sigma'_{sv}$かつ，集合$X=\{(x,y)|(x,y)\in E_s,d_{sy}=d_{sv}+d_{vx}+l_{xy}\}$と集合$X'=\{(x,y)|(x,y)\in E'_s,d'_{sy}=d'_{sv}+d'_{vx}+l_{xy}\}$が等しく，すべての$(x,y)\in X$に対して$\sigma_{sy}$が操作によって変化しない
-    \label{item:implicit-invariability-of-pairwise-dependency}
-  \end{enumerate}
-\end{lemma}
-\begin{proof}
-  \ref{item:explicit-invariability-of-pairwise-dependency}が成り立つならば，
-  集合$W_2=\{(w,w_2)|(w,w_2)\in E_s,(v,w)\in W\}$が操作によって変化せず，
-  すべての$(w,w_2)\in W_2$に対して$\sigma_{sw_2}$と$\delta_s(w_2)$が操作によって変化しない．
-
-  すべての$w_2\in W_2$に対して$\delta_s(w_2)$が変化しないので，同様に，
-  集合$W_3=\{(w_2,w_3)|(w_2,w_3)\in E_s,(w,w_2)\in W_2\}$が操作によって変化せず，
-  すべての$(w_2,w_3)\in W_3$に対して$\sigma_{sw_3}$と$\delta_s(w_3)$が操作によって変化しない．
-
-  同じことを繰り返すと，集合$W^*=W\cup W_2\cup W_3\cup\cdots\cup W_k$が操作によって変化せず，すべての$(\hat{w},w)\in W^*$に対して$\sigma_{sw}$は操作によって変化しないことが言える．（$G_s$が有向アサイクリックグラフなので，上記の操作によって作られる$W^*$は有限集合である．また，$(\hat{w},w)\in\{(\hat{w},w)|(\hat{w},w)\in W^*,\{w'|(w,w')\in E_s\}=\varnothing\}$に対して，$\delta_s(w)=0$なので，この条件は消去できる）
-
-  
-  また，各$W_i$は$W_i=\{(w_{i-1},w_i)|(w_{i-1},w_i)\in\mathcal{N}^{i-1}_G(v)\times\mathcal{N}^i_G(v),(w_{i-1},w_i)\in E_s,d_{sw_i}=d_{sv}+d_{vw_{i-1}}+l_{w_{i-1}w_i}\}$と書き換えられるので，$G$は連結グラフであることから，$W^*=\cup_{i=0}W_i=\{(\hat{w},w)|(\hat{w},w)\in\cup_{i=0}\mathcal{N}^{i-1}_G(v)\times\mathcal{N}^i_G(v),(\hat{w},w)\in E_s,d_{sw}=d_{sv}+d_{v\hat{w}}+l_{\hat{w}w}\}=\{(\hat{w},w)|(\hat{w},w)\in E_s,d_{sw}=d_{sv}+d_{v\hat{w}}+l_{\hat{w}w}\}$とできる．
-
-  よって，\ref{item:explicit-invariability-of-pairwise-dependency}$\Rightarrow$\ref{item:implicit-invariability-of-pairwise-dependency}が成り立つ．
-
-  \ref{item:implicit-invariability-of-pairwise-dependency}$\Rightarrow$\ref{item:explicit-invariability-of-pairwise-dependency}も，先の手順を逆向きに適用することにより導出できる．
-\end{proof}
-
-まとめると，補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}における$X$が変化するような$s,v$の組を見つけることによって，空振りが含まれるが，ペア依存度$\delta_s(v)$を更新する．
