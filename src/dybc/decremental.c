@@ -13,7 +13,9 @@ void decremental(igraph_t*            G,
                  igraph_matrix_t*     D,
                  igraph_matrix_int_t* Sigma,
                  igraph_matrix_t*     Delta,
-                 const char*          weight) {
+                 const char*          weight,
+                 igraph_integer_t*    n_update_path_pairs,
+                 igraph_integer_t*    n_update_dep_verts) {
   // add edge and set weight
   igraph_integer_t eid;
   igraph_get_eid(G, &eid, v, w, 0, 0);
@@ -23,15 +25,28 @@ void decremental(igraph_t*            G,
   // target loop
   igraph_inclist_t inclist;
   igraph_integer_t z;
+  igraph_vector_bool_t update_dep_verts;
   igraph_inclist_init(G, &inclist, IGRAPH_ALL);
+  igraph_vector_bool_init(&update_dep_verts, igraph_vcount(G));
+  *n_update_path_pairs = 0;
   for(z = 0; z < igraph_vcount(G); z++) {
+    igraph_integer_t n_update_path_pairs_sub = 0;
     if(MATRIX(*D, v, z) > MATRIX(*D, w, z))
-      decremental_part(G, &inclist, v, w, z, c, D, Sigma, Delta, weight);
+      decremental_part(G, &inclist, v, w, z, c, D, Sigma, Delta, weight,
+                       &n_update_path_pairs_sub, &update_dep_verts);
     else
-      decremental_part(G, &inclist, w, v, z, c, D, Sigma, Delta, weight);
+      decremental_part(G, &inclist, w, v, z, c, D, Sigma, Delta, weight,
+                       &n_update_path_pairs_sub, &update_dep_verts);
+    *n_update_path_pairs += n_update_path_pairs_sub;
   }
 
+  *n_update_dep_verts = 0;
+  for(z = 0; z < igraph_vcount(G); z++)
+    if(igraph_vector_bool_e(&update_dep_verts, z))
+      (*n_update_dep_verts)++;
+
   igraph_inclist_destroy(&inclist);
+  igraph_vector_bool_destroy(&update_dep_verts);
 }
 
 void decremental_part(igraph_t*            G,
@@ -43,7 +58,9 @@ void decremental_part(igraph_t*            G,
                       igraph_matrix_t*     D,
                       igraph_matrix_int_t* Sigma,
                       igraph_matrix_t*     Delta,
-                      const char*          weight) {
+                      const char*          weight,
+                      igraph_integer_t*     n_update_path_pairs,
+                      igraph_vector_bool_t* update_dep_verts) {
   if(igraph_cmp_epsilon(MATRIX(*D, v, z), c + MATRIX(*D, w, z)) < 0
      || MATRIX(*Sigma, w, z) == 0)
     return;

@@ -35,6 +35,120 @@ struct arguments {
 void make_graph(igraph_t* G, struct arguments* args);
 void choice_noadjacent_pair(igraph_t* G, int* u, int* v);
 
+double update_igraph(igraph_t* G,
+                     const char* mode,
+                     igraph_integer_t u,
+                     igraph_integer_t v,
+                     igraph_real_t c,
+                     const char* weight,
+                     igraph_vector_t* B,
+                     igraph_integer_t* n_change_deps_verts) {
+  // Calculate training data
+  igraph_vector_t Bold;
+  igraph_vector_t weights;
+  igraph_vector_init(&Bold, igraph_vcount(G));
+  igraph_vector_init(&weights, igraph_ecount(G));
+  for(igraph_integer_t eid = 0; eid < igraph_ecount(G); eid++) {
+    VECTOR(weights)[eid] = EAN(G, weight, eid);
+  }
+  igraph_betweenness(G, &Bold, igraph_vss_all(), 0, &weights, 0);
+
+  // Update graph
+  if(strcmp(mode, "insert") == 0) {
+    igraph_integer_t eid;
+    igraph_add_edge(G, u, v);
+    igraph_get_eid(G, &eid, u, v, 0, 0);
+    SETEAN(G, weight, eid, c);
+  } else if(strcmp(mode, "delete") == 0) {
+    igraph_integer_t eid;
+    igraph_get_eid(G, &eid, u, v, 0, 0);
+    igraph_delete_edges(G, igraph_ess_1(eid));
+  } else assert(0);
+  igraph_vector_resize(&weights, igraph_ecount(G));
+  for(igraph_integer_t eid = 0; eid < igraph_ecount(G); eid++) {
+    VECTOR(weights)[eid] = EAN(G, weight, eid);
+  }
+
+  // Calculate
+  clock_t start, end;
+  double time_igraph;
+  start = clock();
+  igraph_betweenness(G, B, igraph_vss_all(), 0, &weights, 0);
+  end = clock();
+  time_igraph = (double)(end - start) / CLOCKS_PER_SEC;
+  *n_change_deps_verts = 0;
+  for(igraph_integer_t x = 0; x < igraph_vcount(G); x++)
+    if(igraph_vector_e(B, x) != igraph_vector_e(&Bold, x))
+      (*n_change_deps_verts)++;
+
+  // Reset update
+  if(strcmp(mode, "insert") == 0) {
+    igraph_integer_t eid;
+    igraph_get_eid(G, &eid, u, v, 0, 0);
+    igraph_delete_edges(G, igraph_ess_1(eid));
+  } else if(strcmp(mode, "delete") == 0) {
+    igraph_integer_t eid;
+    igraph_add_edge(G, u, v);
+    igraph_get_eid(G, &eid, u, v, 0, 0);
+    SETEAN(G, weight, eid, c);
+  } else assert(0);
+  igraph_vector_destroy(&Bold);
+  igraph_vector_destroy(&weights);
+
+  return time_igraph;
+}
+
+double update_proposed(igraph_t* G,
+                       const char* mode,
+                       igraph_integer_t u,
+                       igraph_integer_t v,
+                       igraph_real_t c,
+                       const char* weight,
+                       igraph_vector_t* B,
+                       igraph_integer_t* n_update_path_pairs,
+                       igraph_integer_t* n_update_deps_verts) {
+  // Make argumented distance and pair dependency
+  igraph_matrix_t D;
+  igraph_matrix_int_t Sigma;
+  igraph_matrix_t Delta;
+  aug_dist(G, &D, &Sigma, weight);
+  pairwise_dependency(G, &Delta, weight);
+
+  // Update
+  clock_t start, end;
+  double time_update;
+  start = clock();
+  if(strcmp(mode, "insert") == 0) {
+    incremental(G, u, v, c, &D, &Sigma, &Delta, weight,
+                n_update_path_pairs, n_update_deps_verts);
+  } else if(strcmp(mode, "delete") == 0) {
+    decremental(G, u, v, &D, &Sigma, &Delta, weight,
+                n_update_path_pairs, n_update_deps_verts);
+  } else assert(0);
+  end = clock();
+
+  igraph_matrix_colsum(&Delta, B);
+  igraph_vector_scale(B, 0.5);
+  time_update = (double)(end - start) / CLOCKS_PER_SEC;
+
+  // Reset update
+  if(strcmp(mode, "insert") == 0) {
+    igraph_integer_t eid;
+    igraph_get_eid(G, &eid, u, v, 0, 0);
+    igraph_delete_edges(G, igraph_ess_1(eid));
+  } else if(strcmp(mode, "delete") == 0) {
+    igraph_integer_t eid;
+    igraph_add_edge(G, u, v);
+    igraph_get_eid(G, &eid, u, v, 0, 0);
+    SETEAN(G, weight, eid, c);
+  } else assert(0);
+  igraph_matrix_destroy(&Delta);
+  igraph_matrix_destroy(&D);
+  igraph_matrix_int_destroy(&Sigma);
+
+  return time_update;
+}
+
 static error_t parse_opt(int key, char* arg, struct argp_state* state);
 
 static struct argp argp = {options, parse_opt, 0, 0};
@@ -50,15 +164,6 @@ int main(int argc, char* argv[]) {
   igraph_i_set_attribute_table(&igraph_cattribute_table);
   igraph_rng_seed(igraph_rng_default(), args.seed);
   make_graph(&G, &args);
-
-  // Make argumented distance and pair dependency
-  igraph_matrix_t D;
-  igraph_matrix_int_t Sigma;
-  igraph_matrix_t Delta;
-  igraph_vector_t B;
-  aug_dist(&G, &D, &Sigma, weight);
-  pairwise_dependency(&G, &Delta, weight);
-  igraph_vector_init(&B, igraph_vcount(&G));
 
   // Choose edge to insert/delete
   igraph_integer_t u, v;
@@ -81,47 +186,26 @@ int main(int argc, char* argv[]) {
     c = EAN(&G, weight, eid);
   } else assert(0);
 
-  // Update
-  clock_t start, end;
-  double time_update;
-  if(strcmp(args.mode, "insert") == 0) {
-    start = clock();
-    incremental(&G, u, v, c, &D, &Sigma, &Delta, weight);
-    end = clock();
-  } else if(strcmp(args.mode, "delete") == 0) {
-    start = clock();
-    decremental(&G, u, v, &D, &Sigma, &Delta, weight);
-    end = clock();
-  } else assert(0);
-  igraph_matrix_colsum(&Delta, &B);
-  igraph_vector_scale(&B, 0.5);
-  time_update = (double)(end - start) / CLOCKS_PER_SEC;
+  igraph_vector_t B, Btrue;
+  igraph_integer_t n_update_path_pairs, n_update_deps_verts,
+    n_changed_deps_verts;
+  igraph_vector_init(&B, igraph_vcount(&G));
+  igraph_vector_init(&Btrue, igraph_vcount(&G));
+  double time_igraph
+    = update_igraph(&G, args.mode, u, v, c, weight, &Btrue,
+                    &n_changed_deps_verts);
+  double time_update
+    = update_proposed(&G, args.mode, u, v, c, weight, &B,
+                      &n_update_path_pairs, &n_update_deps_verts);
 
-  // Calculate training data
-  igraph_vector_t Btrain;
-  igraph_vector_t weights;
-  double time_igraph;
-  igraph_vector_init(&Btrain, igraph_vcount(&G));
-  igraph_vector_init(&weights, igraph_ecount(&G));
-  for(igraph_integer_t eid = 0; eid < igraph_ecount(&G); eid++) {
-    VECTOR(weights)[eid] = EAN(&G, weight, eid);
-  }
-  start = clock();
-  igraph_betweenness(&G, &Btrain, igraph_vss_all(), 0, &weights, 0);
-  end = clock();
-  time_igraph = (double)(end - start) / CLOCKS_PER_SEC;
-
-  printf("%s,%d,%d,%s,%ld,%e,%e,%e\n",
+  printf("%s,%d,%d,%s,%ld,%e,%e,%e,%d,%d,%d\n",
          args.name, args.n, args.k, args.mode, args.seed,
-         igraph_vector_maxdifference(&B, &Btrain),
-         time_update, time_igraph);
+         igraph_vector_maxdifference(&B, &Btrue),
+         time_update, time_igraph,
+         n_update_path_pairs, n_update_deps_verts, n_changed_deps_verts);
 
-  igraph_vector_destroy(&Btrain);
+  igraph_vector_destroy(&Btrue);
   igraph_vector_destroy(&B);
-  igraph_vector_destroy(&weights);
-  igraph_matrix_destroy(&Delta);
-  igraph_matrix_destroy(&D);
-  igraph_matrix_int_destroy(&Sigma);
   igraph_destroy(&G);
 
   return 0;

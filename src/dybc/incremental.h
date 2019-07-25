@@ -12,7 +12,9 @@ void incremental(igraph_t*            G,
                  igraph_matrix_t*     D,
                  igraph_matrix_int_t* Sigma,
                  igraph_matrix_t*     Delta,
-                 const char*          weight);
+                 const char*          weight,
+                 igraph_integer_t*    n_update_path_pairs,
+                 igraph_integer_t*    n_update_dep_verts);
 
 void incremental_part(igraph_t*            G,
                       igraph_inclist_t*    inclist,
@@ -23,6 +25,8 @@ void incremental_part(igraph_t*            G,
                       igraph_matrix_t*     D,
                       igraph_matrix_int_t* Sigma,
                       igraph_matrix_t*     Delta,
-                      const char*          weight);
+                      const char*          weight,
+                      igraph_integer_t*     n_update_path_pairs,
+                      igraph_vector_bool_t* update_dep_verts);
 
 #endif // _INCREMENTAL_H_
