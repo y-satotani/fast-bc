@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <argp.h>
 #include <igraph.h>
+#include "dybc/custom_igraph.h"
 #include "dybc/aug_dist.h"
 #include "dybc/betweenness.h"
 #include "dybc/incremental.h"
@@ -78,7 +79,8 @@ double update_igraph(igraph_t* G,
   time_igraph = (double)(end - start) / CLOCKS_PER_SEC;
   *n_change_deps_verts = 0;
   for(igraph_integer_t x = 0; x < igraph_vcount(G); x++)
-    if(igraph_vector_e(B, x) != igraph_vector_e(&Bold, x))
+    if(igraph_cmp_epsilon(igraph_vector_e(B, x),
+                          igraph_vector_e(&Bold, x)) != 0)
       (*n_change_deps_verts)++;
 
   // Reset update
