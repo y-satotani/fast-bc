@@ -6,7 +6,7 @@ library(viridis)
 theme_set(theme_light(base_size = 11, base_family = 'IPAexGothic'))
 out_file <- paste0(sub('^--file=(.+)\\.R$', '\\1', basename(commandArgs()[4])), '.pdf')
 
-data_time <- read_csv('../../res/data/bc-20190622.csv') %>%
+data_time <- read_csv('../../res/data/bc-20190725.csv') %>%
   group_by(name, n, k, mode) %>%
   summarise(
     `proposed-max` = max(`time-proposed`),
@@ -22,22 +22,34 @@ data_time <- read_csv('../../res/data/bc-20190622.csv') %>%
   mutate(
     method = factor(
       method,
-      levels=c('proposed-max', 'proposed-mean', 'brandes-max', 'brandes-mean'),
-      labels=c('更新-最大値', '更新-平均値', '再計算-最大値', '再計算-平均値')
-    )
+      levels = c('proposed-max', 'proposed-mean', 'brandes-max', 'brandes-mean'),
+      labels = c('更新-最大値', '更新-平均値', '再計算-最大値', '再計算-平均値')
+    ),
+    name = factor(
+      name,
+      levels = c('RRG', 'ER', 'BA'),
+      labels = c('ランダム正則グラフ', 'Erdős–Rényiモデル', 'Barabási–Albertモデル')
+    ),
+    mode = factor(
+      mode,
+      levels = c('insert', 'delete'),
+      labels = c('挿入', '削除')
+    ),
   )
 
 gp <- ggplot(
-    data_time %>% filter(k == 4, mode == 'insert'),
+    data_time %>% filter(k == 4),
     aes(n, time, colour = method, shape = method, linetype = method)
   ) +
-  facet_wrap(~name) + geom_line() + geom_point() +
+  geom_line() + geom_point() +
+  facet_grid(rows = vars(mode), cols = vars(name)) +
   xlab('頂点数') + ylab('実行時間(s)') +
-  scale_colour_viridis(discrete = TRUE) +
+  scale_colour_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
   theme(
     legend.title = element_blank(),
+    legend.position = 'top',
     strip.text = element_text(colour = 'black'),
     strip.background = element_blank()
   )
 
-ggsave(out_file, gp, cairo_pdf, width = 18, height = 6, units = 'cm')
+ggsave(out_file, gp, cairo_pdf, width = 18, height = 12, units = 'cm')
