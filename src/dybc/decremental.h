@@ -5,18 +5,6 @@
 #include <igraph.h>
 #include "aug_dist.h"
 
-/*
-  ### 考えられるデータ
-
-  * パスが更新された頂点ペアの総数
-  * ペアが更新された頂点が存在する頂点の総数
-
-  * update-path-pairs
-  * update-dep-verts
-  * changed-path-pairs
-  * changed-dep-verts
-  */
-
 void decremental(igraph_t*            G,
                  igraph_integer_t     v,
                  igraph_integer_t     w,
@@ -25,6 +13,7 @@ void decremental(igraph_t*            G,
                  igraph_matrix_t*     Delta,
                  const char*          weight,
                  igraph_integer_t*    n_update_path_pairs,
+                 igraph_integer_t*    n_update_dep_pairs,
                  igraph_integer_t*    n_update_dep_verts);
 
 void decremental_part(igraph_t*            G,
@@ -38,6 +27,7 @@ void decremental_part(igraph_t*            G,
                       igraph_matrix_t*     Delta,
                       const char*          weight,
                       igraph_integer_t*     n_update_path_pairs,
+                      igraph_integer_t*     n_update_dep_pairs,
                       igraph_vector_bool_t* update_dep_verts);
 
 #endif // _DECREMENTAL_H_

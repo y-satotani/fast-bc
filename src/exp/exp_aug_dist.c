@@ -79,16 +79,16 @@ int main(int argc, char* argv[]) {
   // Update
   clock_t start, end;
   double time_update;
-  igraph_integer_t n_update_path_pairs, n_update_dep_verts;
+  igraph_integer_t n_update_path_pairs, n_update_dep_pairs, n_update_dep_verts;
   if(strcmp(args.mode, "insert") == 0) {
     start = clock();
     incremental(&G, u, v, c, &D, &Sigma, 0, weight,
-                &n_update_path_pairs, &n_update_dep_verts);
+                &n_update_path_pairs, &n_update_dep_pairs, &n_update_dep_verts);
     end = clock();
   } else if(strcmp(args.mode, "delete") == 0) {
     start = clock();
     decremental(&G, u, v, &D, &Sigma, 0, weight,
-                &n_update_path_pairs, &n_update_dep_verts);
+                &n_update_path_pairs, &n_update_dep_pairs, &n_update_dep_verts);
     end = clock();
   } else assert(0);
   time_update = (double)(end - start) / CLOCKS_PER_SEC;

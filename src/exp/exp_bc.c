@@ -108,6 +108,7 @@ double update_proposed(igraph_t* G,
                        const char* weight,
                        igraph_vector_t* B,
                        igraph_integer_t* n_update_path_pairs,
+                       igraph_integer_t* n_update_deps_pairs,
                        igraph_integer_t* n_update_deps_verts) {
   // Make argumented distance and pair dependency
   igraph_matrix_t D;
@@ -122,10 +123,12 @@ double update_proposed(igraph_t* G,
   start = clock();
   if(strcmp(mode, "insert") == 0) {
     incremental(G, u, v, c, &D, &Sigma, &Delta, weight,
-                n_update_path_pairs, n_update_deps_verts);
+                n_update_path_pairs, n_update_deps_pairs,
+                n_update_deps_verts);
   } else if(strcmp(mode, "delete") == 0) {
     decremental(G, u, v, &D, &Sigma, &Delta, weight,
-                n_update_path_pairs, n_update_deps_verts);
+                n_update_path_pairs, n_update_deps_pairs,
+                n_update_deps_verts);
   } else assert(0);
   end = clock();
 
@@ -190,7 +193,7 @@ int main(int argc, char* argv[]) {
 
   igraph_vector_t B, Btrue;
   igraph_integer_t n_update_path_pairs, n_update_deps_verts,
-    n_changed_deps_verts;
+    n_update_deps_pairs, n_changed_deps_verts;
   igraph_vector_init(&B, igraph_vcount(&G));
   igraph_vector_init(&Btrue, igraph_vcount(&G));
   double time_igraph
@@ -198,13 +201,15 @@ int main(int argc, char* argv[]) {
                     &n_changed_deps_verts);
   double time_update
     = update_proposed(&G, args.mode, u, v, c, weight, &B,
-                      &n_update_path_pairs, &n_update_deps_verts);
+                      &n_update_path_pairs, &n_update_deps_pairs,
+                      &n_update_deps_verts);
 
-  printf("%s,%d,%d,%s,%ld,%e,%e,%e,%d,%d,%d\n",
+  printf("%s,%d,%d,%s,%ld,%e,%e,%e,%d,%d,%d,%d\n",
          args.name, args.n, args.k, args.mode, args.seed,
          igraph_vector_maxdifference(&B, &Btrue),
          time_update, time_igraph,
-         n_update_path_pairs, n_update_deps_verts, n_changed_deps_verts);
+         n_update_path_pairs, n_update_deps_pairs,
+         n_update_deps_verts, n_changed_deps_verts);
 
   igraph_vector_destroy(&Btrue);
   igraph_vector_destroy(&B);

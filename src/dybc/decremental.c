@@ -15,6 +15,7 @@ void decremental(igraph_t*            G,
                  igraph_matrix_t*     Delta,
                  const char*          weight,
                  igraph_integer_t*    n_update_path_pairs,
+                 igraph_integer_t*    n_update_dep_pairs,
                  igraph_integer_t*    n_update_dep_verts) {
   // add edge and set weight
   igraph_integer_t eid;
@@ -28,16 +29,20 @@ void decremental(igraph_t*            G,
   igraph_vector_bool_t update_dep_verts;
   igraph_inclist_init(G, &inclist, IGRAPH_ALL);
   igraph_vector_bool_init(&update_dep_verts, igraph_vcount(G));
-  *n_update_path_pairs = 0;
+  *n_update_path_pairs = *n_update_dep_pairs = 0;
   for(z = 0; z < igraph_vcount(G); z++) {
+    igraph_integer_t n_update_dep_pairs_sub = 0;
     igraph_integer_t n_update_path_pairs_sub = 0;
     if(MATRIX(*D, v, z) > MATRIX(*D, w, z))
       decremental_part(G, &inclist, v, w, z, c, D, Sigma, Delta, weight,
-                       &n_update_path_pairs_sub, &update_dep_verts);
+                       &n_update_path_pairs_sub, &n_update_dep_pairs_sub,
+                       &update_dep_verts);
     else
       decremental_part(G, &inclist, w, v, z, c, D, Sigma, Delta, weight,
-                       &n_update_path_pairs_sub, &update_dep_verts);
+                       &n_update_path_pairs_sub, &n_update_dep_pairs_sub,
+                       &update_dep_verts);
     *n_update_path_pairs += n_update_path_pairs_sub;
+    *n_update_dep_pairs += n_update_dep_pairs_sub;
   }
 
   *n_update_dep_verts = 0;
@@ -60,6 +65,7 @@ void decremental_part(igraph_t*            G,
                       igraph_matrix_t*     Delta,
                       const char*          weight,
                       igraph_integer_t*     n_update_path_pairs,
+                      igraph_integer_t*     n_update_dep_pairs,
                       igraph_vector_bool_t* update_dep_verts) {
   if(igraph_cmp_epsilon(MATRIX(*D, v, z), c + MATRIX(*D, w, z)) < 0
      || MATRIX(*Sigma, w, z) == 0)
@@ -194,6 +200,8 @@ void decremental_part(igraph_t*            G,
     igraph_2wheap_update(&delta_queue, x, MATRIX(*D, x, z));
   }
 
+  if(n_update_dep_pairs)
+    *n_update_dep_pairs = 0;
   while(Delta && !igraph_2wheap_empty(&delta_queue)) {
     igraph_integer_t x = igraph_2wheap_max_index(&delta_queue);
     igraph_real_t d_xz = igraph_2wheap_delete_max(&delta_queue);
@@ -218,6 +226,8 @@ void decremental_part(igraph_t*            G,
         igraph_2wheap_update(&delta_queue, y, d_yz);
       }
     }
+    if(n_update_dep_pairs)
+      (*n_update_dep_pairs)++;
     if(update_dep_verts)
       igraph_vector_bool_set(update_dep_verts, x, 1);
   }

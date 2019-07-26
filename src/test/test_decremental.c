@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
   igraph_vector_init(&B, igraph_vcount(&G));
   aug_dist(&G, &D, &Sigma, weight);
   pairwise_dependency(&G, &Delta, weight);
-  decremental(&G, v, w, &D, &Sigma, &Delta, weight);
+  decremental(&G, v, w, &D, &Sigma, &Delta, weight, 0, 0, 0);
   igraph_matrix_colsum(&Delta, &B);
   igraph_vector_scale(&B, 0.5);
 
