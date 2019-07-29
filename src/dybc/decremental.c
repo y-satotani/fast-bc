@@ -130,7 +130,7 @@ void decremental_part(igraph_t*            G,
     }
 
     if(d_xz_d < 0) {
-      MATRIX(*D, x, z) = 0;
+      MATRIX(*D, x, z) = IGRAPH_INFINITY;
       MATRIX(*Sigma, x, z) = 0;
       igraph_2wheap_push_with_index(&queue, x, -IGRAPH_INFINITY);
     } else {
