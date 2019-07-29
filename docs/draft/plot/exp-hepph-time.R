@@ -6,7 +6,7 @@ library(viridis)
 theme_set(theme_light(base_size = 11, base_family = 'IPAexGothic'))
 out_file <- paste0(sub('^--file=(.+)\\.R$', '\\1', basename(commandArgs()[4])), '.pdf')
 
-data_time <- read_csv('../../res/data/bc-hep.csv') %>%
+data_time <- read_csv('../../res/data/ca-hepph.csv') %>%
   select(-c(name, n, k, seed)) %>%
   gather(
     key = 'method', value = 'time',

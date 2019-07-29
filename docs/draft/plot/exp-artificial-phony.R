@@ -6,7 +6,7 @@ library(viridis)
 theme_set(theme_light(base_size = 11, base_family = 'IPAexGothic'))
 out_file <- paste0(sub('^--file=(.+)\\.R$', '\\1', basename(commandArgs()[4])), '.pdf')
 
-data_time <- read_csv('../../res/data/bc-20190725.csv') %>%
+data_time <- read_csv('../../res/data/artificial.csv') %>%
   mutate(
     `time-diff` = `time-brandes` - `time-proposed`,
     `phony-verts` = `updated-bc-verts` - `changed-bc-verts`,
