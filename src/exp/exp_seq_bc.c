@@ -27,19 +27,17 @@ double update_igraph(igraph_t* G,
                      igraph_vector_t* ipairs,
                      igraph_vector_t* dpairs,
                      igraph_vector_t* B) {
+  clock_t start, end;
+  double time_igraph;
+  start = clock();
   // Update graph
   igraph_vector_t eids;
   igraph_vector_init(&eids, 0);
   igraph_get_eids(G, &eids, dpairs, 0, IGRAPH_UNDIRECTED, 1);
   igraph_delete_edges(G, igraph_ess_vector(&eids));
   igraph_vector_destroy(&eids);
-
   igraph_add_edges(G, ipairs, 0);
-
-  // Calculate
-  clock_t start, end;
-  double time_igraph;
-  start = clock();
+  // Calculate BC
   igraph_betweenness(G, B, igraph_vss_all(), 0, 0, 0);
   end = clock();
   time_igraph = (double)(end - start) / CLOCKS_PER_SEC;
