@@ -60955,7 +60955,7 @@
 </edge>
 <edge source="2500668722" target="2500668723">
   <data key="d3">footway</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="2500668722" target="2500668730">
   <data key="d3">elevator</data>
@@ -61439,7 +61439,7 @@
 </edge>
 <edge source="2515749620" target="6564150547">
   <data key="d3">footway</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="2515749621" target="2515749627">
   <data key="d3">footway</data>
@@ -61451,7 +61451,7 @@
 </edge>
 <edge source="2515749622" target="6564150547">
   <data key="d3">footway</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="2515749623" target="2515749625">
   <data key="d3">footway</data>
@@ -63247,7 +63247,7 @@
 </edge>
 <edge source="4859896332" target="4860661446">
   <data key="d3">footway</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="4859896353" target="4859896354">
   <data key="d3">footway</data>
@@ -63311,7 +63311,7 @@
 </edge>
 <edge source="4860661074" target="4860661120">
   <data key="d3">footway</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="4860661118" target="4860661119">
   <data key="d3">footway</data>
@@ -64763,7 +64763,7 @@
 </edge>
 <edge source="974601985" target="974603100">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974601991" target="974603474">
   <data key="d3">footway</data>
@@ -64967,7 +64967,7 @@
 </edge>
 <edge source="974602222" target="974603716">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974602230" target="5604819794">
   <data key="d3">footway</data>
@@ -65067,11 +65067,11 @@
 </edge>
 <edge source="974602392" target="974603903">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974602392" target="974603467">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974602414" target="974603491">
   <data key="d3">footway</data>
@@ -65119,15 +65119,15 @@
 </edge>
 <edge source="974602464" target="974604008">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974602464" target="974603297">
   <data key="d3">pedestrian</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974602464" target="974604418">
   <data key="d3">pedestrian</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974602473" target="974604015">
   <data key="d3">service</data>
@@ -65167,7 +65167,7 @@
 </edge>
 <edge source="974602512" target="974603602">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974602522" target="4841599136">
   <data key="d3">footway</data>
@@ -65227,7 +65227,7 @@
 </edge>
 <edge source="974602606" target="4841599121">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974602625" target="974603613">
   <data key="d3">pedestrian</data>
@@ -65275,7 +65275,7 @@
 </edge>
 <edge source="974602725" target="974603012">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974602730" target="974603851">
   <data key="d3">footway</data>
@@ -65331,11 +65331,11 @@
 </edge>
 <edge source="974602809" target="974603100">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974602809" target="974603763">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974602816" target="974603975">
   <data key="d3">footway</data>
@@ -65367,7 +65367,7 @@
 </edge>
 <edge source="974602854" target="974604008">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974602858" target="974602928">
   <data key="d3">footway</data>
@@ -65427,7 +65427,7 @@
 </edge>
 <edge source="974603012" target="974604308">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974603012" target="4841599122">
   <data key="d3">path</data>
@@ -65675,7 +65675,7 @@
 </edge>
 <edge source="974603602" target="974603903">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974603644" target="4414148381">
   <data key="d3">footway</data>
@@ -65691,7 +65691,7 @@
 </edge>
 <edge source="974603763" target="974604530">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974603764" target="1924467299">
   <data key="d3">tertiary</data>
@@ -65731,7 +65731,7 @@
 </edge>
 <edge source="974604062" target="4414187123">
   <data key="d3">footway</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974604062" target="2128982273">
   <data key="d3">footway</data>
@@ -65747,7 +65747,7 @@
 </edge>
 <edge source="974604308" target="4841599121">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="974604445" target="3112051136">
   <data key="d3">unclassified</data>
@@ -67935,7 +67935,7 @@
 </edge>
 <edge source="2478365316" target="3112051315">
   <data key="d3">footway</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="2478365317" target="2478365319">
   <data key="d3">footway</data>
@@ -69231,7 +69231,7 @@
 </edge>
 <edge source="4308207121" target="4308207124">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="4308207127" target="4308207131">
   <data key="d3">path</data>
@@ -69539,7 +69539,7 @@
 </edge>
 <edge source="4414192732" target="4414192737">
   <data key="d3">pedestrian</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="4414192733" target="4414192735">
   <data key="d3">pedestrian</data>
@@ -69619,7 +69619,7 @@
 </edge>
 <edge source="4414219567" target="4414219569">
   <data key="d3">pedestrian</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="4414219568" target="4414219569">
   <data key="d3">pedestrian</data>
@@ -76911,7 +76911,7 @@
 </edge>
 <edge source="4153334508" target="3149267077">
   <data key="d3">service</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="4153334508" target="3098160190">
   <data key="d3">service</data>
@@ -77411,31 +77411,31 @@
 </edge>
 <edge source="4684712228" target="5354500997">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="4684712228" target="5354501011">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="4684712230" target="5354501001">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="4684712230" target="4684712231">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="4684712231" target="4684712232">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="4684712232" target="4684712233">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="4684712233" target="5354501002">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="4684712245" target="5354502254">
   <data key="d3">footway</data>
@@ -77567,71 +77567,71 @@
 </edge>
 <edge source="5354500997" target="5354501009">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354500998" target="5354501010">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354500998" target="5354500999">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354500999" target="5354501000">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354501000" target="5354501001">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354501002" target="5354501003">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354501003" target="5354501004">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354501004" target="5354501005">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354501005" target="5354501006">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354501006" target="5354501007">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354501007" target="5354501008">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354501008" target="5354501009">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354501011" target="5354501012">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354501012" target="5354501013">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354501013" target="5354501014">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354501014" target="5354501015">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354501015" target="5354501016">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354501016" target="5354501017">
   <data key="d3">footway</data>
@@ -77643,63 +77643,63 @@
 </edge>
 <edge source="5354501019" target="5354501020">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354501020" target="5354502221">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502221" target="5354502222">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502222" target="5354502223">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502223" target="5354502224">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502224" target="5354502225">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502225" target="5354502226">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502226" target="5354502227">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502227" target="5354502228">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502228" target="5354502229">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502229" target="5354502230">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502230" target="5354502231">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502231" target="5354502232">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502232" target="5354502233">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502233" target="5354502234">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502234" target="5354502235">
   <data key="d3">footway</data>
@@ -77711,7 +77711,7 @@
 </edge>
 <edge source="5354502236" target="5354502253">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502237" target="5354502271">
   <data key="d3">service</data>
@@ -77727,59 +77727,59 @@
 </edge>
 <edge source="5354502239" target="5354502240">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502240" target="5354502241">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502241" target="5354502242">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502242" target="5354502243">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502243" target="5354502244">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502244" target="5354502245">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502245" target="5354502246">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502246" target="5354502247">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502247" target="5354502248">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502248" target="5354502249">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502249" target="5354502250">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502250" target="5354502251">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502251" target="5354502252">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502252" target="5354502253">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502254" target="5354502255">
   <data key="d3">footway</data>
@@ -77787,63 +77787,63 @@
 </edge>
 <edge source="5354502255" target="5354502256">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502256" target="5354502257">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502257" target="5354502258">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502258" target="5354502259">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502259" target="5354502260">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502260" target="5354502261">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502261" target="5354502262">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502262" target="5354502263">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502263" target="5354502264">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502264" target="5354502265">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502265" target="5354502266">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502266" target="5354502267">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502267" target="5354502268">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502268" target="5354502269">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502269" target="5354502270">
   <data key="d3">steps</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5354502270" target="5354502271">
   <data key="d3">footway</data>
@@ -81375,7 +81375,7 @@
 </edge>
 <edge source="3141767363" target="3141767365">
   <data key="d3">residential</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="3141767365" target="3141767367">
   <data key="d3">residential</data>
@@ -81655,7 +81655,7 @@
 </edge>
 <edge source="3659576468" target="5517955668">
   <data key="d3">unclassified</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="3659576468" target="3659576469">
   <data key="d3">service</data>
@@ -84819,7 +84819,7 @@
 </edge>
 <edge source="1474851626" target="3520880469">
   <data key="d3">path</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="1474851708" target="3520880469">
   <data key="d3">path</data>
@@ -86899,7 +86899,7 @@
 </edge>
 <edge source="2468456820" target="2468836608">
   <data key="d3">footway</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="2468456820" target="2468456822">
   <data key="d3">footway</data>
@@ -88211,7 +88211,7 @@
 </edge>
 <edge source="3075282853" target="3149267561">
   <data key="d3">tertiary</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="3075282853" target="3075282859">
   <data key="d3">footway</data>
@@ -88223,7 +88223,7 @@
 </edge>
 <edge source="3075282859" target="3149267569">
   <data key="d3">footway</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="3075282861" target="3075520873">
   <data key="d3">footway</data>
@@ -91903,7 +91903,7 @@
 </edge>
 <edge source="3215633772" target="3215633776">
   <data key="d3">service</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="3215633776" target="3215633811">
   <data key="d3">service</data>
@@ -93775,7 +93775,7 @@
 </edge>
 <edge source="1923302303" target="5324858918">
   <data key="d3">unclassified</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="1923302314" target="4415120112">
   <data key="d3">unclassified</data>
@@ -97115,7 +97115,7 @@
 </edge>
 <edge source="5354460245" target="5354460246">
   <data key="d3">footway</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="5358054035" target="5358054036">
   <data key="d3">footway</data>
@@ -102615,7 +102615,7 @@
 </edge>
 <edge source="1918181175" target="1918181176">
   <data key="d3">path</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="1918181176" target="1918181178">
   <data key="d3">path</data>
@@ -105639,7 +105639,7 @@
 </edge>
 <edge source="4827162028" target="4827162029">
   <data key="d3">service</data>
-  <data key="d4">0</data>
+  <data key="d4">1</data>
 </edge>
 <edge source="4827162028" target="4827162025">
   <data key="d3">service</data>
