@@ -1,129 +1,211 @@
 \chapter{準備}
+\label{chap:preliminary}
+本章では，後の章に向けての準備をする．はじめに，最短経路や距離を含む，
+グラフ理論の基本事項を説明する．
+次に，距離や最短経路の数に関する重要な性質を示す．
+最後に，媒介中心性とその計算に用いられるペア依存度について説明する．
 
-\section{グラフの数学的記法}
+\section{グラフの数学的表現}
 \label{sect:graph-theory}
 
-グラフ$G=(V,E)$，$V$は頂点集合，$E$は辺集合$\subset V\times V$
+\textbf{グラフ}とは，二つの集合$V$と$E$の組$G=(V,E)$で，
+$E\subset V^2$を満たす．つまり，$V$から元を2個取り出した集合の部分集合である．
+$V$を\textbf{頂点集合}とよび，その元を\textbf{頂点}とよぶ．
+また，頂点集合の要素数$|V|$を\textbf{頂点数}とよぶ．
+$E$を\textbf{辺集合}とよび，その元を\textbf{辺}とよぶ．
+また，辺集合の要素数$|E|$を\textbf{頂点数}とよぶ．
+$E$の要素が順序対ならば，$G$は\textbf{有向グラフ}と呼ばれ，
+非順序対ならば$G$は\textbf{無向グラフ}と呼ばれる．
+グラフ$G=(V,E)$と$G'=(V',E')$に対して，$V'\subset V$かつ$E'\subset E$
+を満たすとき，$G'$は$G$の\textbf{部分グラフ}であるといい，$G'\in G$と記す．
+有向グラフ$G$について，各辺$(v,w)$を逆向きにしたグラフを$G$の逆と呼び，$\bar{G}$で表す．
+すなわち，$G=(V,E)$のとき，$\bar{G}=(V,\{(w,v)|(v,w)\in E\})$である．
 
-辺集合が非順序対の集合であるとき，グラフは無向と呼ばれる．
-逆に，辺集合が順序対の集合であるとき，グラフは有向と呼ばれる．
+\textbf{重み付きグラフ}とは，すべての辺$(v,w)$もしくは$\{v,w\}$に対して，
+辺の重み$l_{vw}\in\mathbb{R}$が定められているグラフである．
+以下，特に断らない限り辺の重みは正であるとする．
+また，重み付きグラフでないグラフを\textbf{重みなしグラフ}と呼ぶ．
 
-また，無向グラフの各辺$\{v,w\}\in E$および有向グラフの各辺$(v,w)\in E$には正の重み$l_{vw}>0$を与えている．
+頂点$v$と辺$e$が\textbf{接続する}とは，$v\in e$つまり，$e$の端点に$v$が
+属することをいう．頂点$v$と頂点$w$が\textbf{隣接する}とは，$\{v,w\}$が
+辺集合$E$に属することをいう．
+グラフ$G$の頂点$v$について，$v$と隣接する頂点の集合を頂点$v$の\textbf{近傍}と
+呼び，$\mathcal{N}_G(v)$で表す．また，無向グラフ$G$について$v$の近傍の数
+$|\mathcal{N}_G(v)|$を\textbf{次数}と呼び，$k(v)$あるいは$k_G(v)$と記す．
+すべての頂点の次数が等しいグラフを\textbf{正則グラフ}と呼ぶ．
 
-隣接する，接続している
-$G$の頂点$v$の近傍$\mathcal{N}_G(v)$
+有向な\textbf{道グラフ}，あるいは単に道とは，$P=(V,E)$のグラフで，
+\begin{equation*}
+  \begin{aligned}
+  V&=\{v_0,v_1,\ldots,v_k\}, \\
+  E&=\{(v_0,v_1),(v_1,v_2),\ldots,(v_{k-1},v_k)\}
+  \end{aligned}
+\end{equation*}
+を満たすものである．道グラフ$P=(\{v_i\},\{e_i\})$の頂点および辺の並びを
+示すために，次の表記を用いる．
+\[ v_1,e_1,v_2,\ldots,v_{n-1},e_n,v_n \]
+重み付き経路グラフに対して，その重みの総和を経路の長さと呼ぶ．
 
-頂点とそれに接続している辺が交互に並び，両端が頂点である列を有向道と呼ぶ．
-記号と用いると，
-\[ (v_1,e_1,v_2,\ldots,v_{n-1},e_n,v_n)\ (v_i\in V,\ e_i\in E) \]
-である．
-有向道は有向グラフとみなすことができ，例えば，有向道
-\[ (v_1,e_1,v_2,\ldots,v_{n-1},e_{n-1},v_n) \]
-を有向グラフとして表すと$G=(V,E)=(\{v_1,\ldots,v_n\},\{e_1,\ldots,e_{n-1}\})$である．
-
-$G$の異なる2頂点$s,t$を両端とする有向道の中で，有向道に含まれる辺の重みの総和が最小であるものを，$s$から$t$への最短経路と呼ぶ．
-頂点$s$から頂点$t$への最短経路の辺の重みの総和を最短経路長$d_{st}$，最短経路の数を最短経路数$\sigma_{st}$と呼ぶ．
+重み付きグラフ$G$上の頂点$s$と頂点$t$について，それらを結ぶ道$P\subset G$のうち，
+長さが最小のものを\textbf{最短経路}と呼ぶ．$G$の頂点$s$と頂点$t$の最短経路のうち，
+ひとつの長さを$s$と$t$の\textbf{最短距離}あるいは\textbf{距離}と呼び，$d_{st}$と表す．
+重みなしグラフの距離は，重みをすべて$1$と仮定して計算することが多い．
+距離と同様に，$s$と$t$を結ぶ最短経路の数を\textbf{最短経路数}と呼び，$\sigma_{st}$と記す．
+$G$が無向グラフであるならば，すべての$s,t\in S$に対して$d_{st}=d_{ts}$かつ
+$\sigma_{st}=\sigma_{ts}$である．
 以下の議論では，便宜上，すべての$s\in V$に対し$d_{ss}=0$, $\sigma_{ss}=1$とする．
+
 また，$s$から$t$への最短経路の中で頂点$v$を通るものの個数を$\sigma_{st}(v)$で表す．
 頂点$s$から他の頂点へのすべての最短経路で構成される有向グラフを$G_s=(V_s,E_s)$で表す．
 同様に，頂点$s$から頂点$t$へのすべての最短経路で構成される有向グラフを$G_{st}=(V_{st},E_{st})$で表す．
+
+\begin{example}
+  図\ref{fig:graph-diamond}にグラフの例を示す．記号を囲んだ円は頂点を表し，
+  それらを繋ぐ線分は辺を表す．頂点を識別するため，円の中に記号を入れる場合がある．
+  線分の傍らにある数字は辺の重みを表す．頂点集合は
+  \[ \{A,B,C,D,E,F,G,H\} \]
+  で，辺集合は
+  \[ \{(A,B),(A,E),(B,C),(B,D),(C,E),(D,E),(E,F),(E,G),(F,H),(G,H)\} \]
+  である．また，$B$と$H$のひとつの最短経路は
+  \[ B,(B,C),C,(C,E),E,(E,F),F,(F,H),H \]
+  である．さらに，$d_{BH}=7,\,\sigma_{BH}=4$である．
+  \begin{figure}
+    \centering
+    \def\svgwidth{.45\textwidth}
+    \input{graph-diamond.pdf_tex}
+    \caption{グラフの例}
+    \label{fig:graph-diamond}
+  \end{figure}
+\end{example}
 
 \section{最短経路長および最短経路数の性質}
 \label{sect:shortest-paths}
 
 最短経路の長さと個数について，いくつかの補題を示す．
+まず，ある頂点が最短経路に含まれる条件を示す．
 
 \begin{lemma}[Brandes~\cite{Brandes2001}]
-  $G=(V,E)$の異なる2頂点$s,t \in V$に対して，$s$から$t$への最短経路$G_{st}=(V_{st},E_{st})$が$i \in V$を含む，すなわち$i \in V_{st}$であるための必要十分条件は
+  \label{lemma:inclusion-v}
+  $G=(V,E)$の異なる2頂点$s,t \in V$に対して，$s$から$t$への最短経路
+  $G_{st}=(V_{st},E_{st})$が$i \in V$を含む，すなわち$i \in V_{st}$であるための
+  必要十分条件は
   \begin{equation}
     d_{st}=d_{si}+d_{it}
-    \label{eqn:inclusion0}
+    \label{eq:inclusion-v}
   \end{equation}
   が成り立つことである．
-  \label{lemma:1}
 \end{lemma}
 \begin{proof}
-  はじめに$i=s$の場合を考える．このとき明らかに$i \in V_{st}$であり，かつ$d_{si}+d_{it}=d_{ss}+d_{st}=d_{st}$より\eqref{eqn:inclusion0}もつねに成り立つ．$i=t$の場合も同様である．そこで以下では$i \not\in \{s,t\}$と仮定する．$G_{st}$が頂点$i$を含むならば，$G_{st}$の中に$s \rightarrow \cdots \rightarrow i \rightarrow \cdots \rightarrow t$の順に頂点を通る有向道が存在する．この有向道の長さは$d_{si}+d_{it}$で与えられるので\eqref{eqn:inclusion0}が成り立つ．次に\eqref{eqn:inclusion0}が成り立つと仮定する．頂点$s$を出発して$s$から$i$への最短経路の一つを通って$i$に行き，次に$i$から$t$への最短経路の一つを通って$t$に行く有向道を考える．この有向道は$s$から$t$への最短経路の一つである．なぜなら，その長さは$d_{si}+d_{it}$で与えられ，\eqref{eqn:inclusion0}より$s$から$t$への最短経路長$d_{st}$に等しいからである．したがって$i \in V_{st}$が成り立つ．
+  はじめに$i=s$の場合を考える．このとき明らかに$i \in V_{st}$であり，
+  かつ$d_{si}+d_{it}=d_{ss}+d_{st}=d_{st}$より\eqref{eq:inclusion-v}もつねに成り立つ．
+  $i=t$の場合も同様である．そこで以下では$i \not\in \{s,t\}$と仮定する．
+
+  $G_{st}$が頂点$i$を含むならば，$G_{st}$の中に
+  $s \rightarrow \cdots \rightarrow i \rightarrow \cdots \rightarrow t$の順に
+  頂点を通る有向道が存在する．この有向道の長さは$d_{si}+d_{it}$で与えられるので
+  \eqref{eq:inclusion-v}が成り立つ．
+
+  次に\eqref{eq:inclusion-v}が成り立つと仮定する．頂点$s$を出発して$s$から$i$への
+  最短経路の一つを通って$i$に行き，次に$i$から$t$への最短経路の一つを通って$t$に行く有向道を考える．
+  この有向道は$s$から$t$への最短経路の一つである．
+  なぜなら，その長さは$d_{si}+d_{it}$で与えられ，\eqref{eq:inclusion-v}より
+  $s$から$t$への最短経路長$d_{st}$に等しいからである．
+  したがって$i \in V_{st}$が成り立つ．
 \end{proof}
 
-\begin{lemma}
-  $G=(V,E)$の異なる2頂点$s,t\in V$と辺$\{i,j\} \in E$を考える．$s$から$t$への最短経路$G_{st}=(V_{st},E_{st})$が有向辺$(i,j)$を含む，すなわち$(i,j) \in E_{st}$が成り立つための必要十分条件は
-  \begin{equation}
-    d_{st}=d_{si}+l_{ij}+d_{jt}
-    \label{eqn:inclusion}
-  \end{equation}
-  が成り立つことである．
-  \label{lemma:2}
-\end{lemma}
-\begin{proof}
-  はじめに$i=s$, $j=t$の場合を考える．このとき明らかに$G_{st}$は
-  有向辺$(i,j)$を含み，かつ$d_{si}+l_{ij}+d_{jt}=d_{ss}+l_{st}+d_{tt}=l_{st}=d_{st}$
-  より\eqref{eqn:inclusion}も成り立つ．次に$i=s$, $j \neq t$の場合を
-  考える．このとき$(i,j)\in E_{st}$であるための必要十分条件は$G_{st}$が
-  $j$を含むことである．これは補題~\ref{lemma:1}より
-  $d_{st}=d_{sj}+d_{jt}$と等価であり，さらに右辺$d_{sj}+d_{jt}$は
-  \eqref{eqn:inclusion}の右辺と等しい．$i\neq s$, $j=t$の場合も同様である．
-  そこで以下では$s,t,i,j$がすべて異なると仮定する．
-  $G_{st}$が有向辺$(i,j)$を含むならば，$G_{st}$の中に
-  $s \rightarrow \cdots \rightarrow i \rightarrow j \rightarrow \cdots \rightarrow t$
-  の順に頂点を通る有向道が存在する．
-  この有向道の長さは$d_{si}+l_{ij}+d_{jt}$で与えられるので\eqref{eqn:inclusion}が
-  成り立つ．次に\eqref{eqn:inclusion}が成り立つと仮定する．頂点
-  $s$を出発して$s$から$i$への最短経路の一つを通って$i$に行き，次に
-  辺$\{i,j\}$を通って$j$に行き，最後に$j$から$t$への最短経路の一つを
-  通って$t$に行く有向道が存在する．この有向道は$s$から$t$への最短経路の一つで
-  ある．なぜなら，その長さは$d_{si}+l_{ij}+d_{jt}$で与えられ，
-  \eqref{eqn:inclusion}より$s$から$t$への最短経路長$d_{st}$に
-  等しいからである．したがって，$(i,j) \in E_{st}$が成り立つ．
-\end{proof}
+補題\ref{lemma:inclusion-v}の証明の考え方を用いれば，ある頂点を通過する最短経路数を導出できる．
 
-\begin{lemma}[Brandes\cite{Brandes2001}]
+\begin{lemma-without-proof}[Brandes\cite{Brandes2001}]
   $G=(V,E)$の異なる2頂点$s,t \in V$に対して，
   $s$から$t$への最短経路の中で$i$を通るものの個数$\sigma_{st}(i)$は
   次式で与えられる．
   \begin{equation}
     \sigma_{st}(i)=
-    \left\{
-    \begin{array}{ll}
-      \sigma_{si} \sigma_{it}, & d_{st}=d_{si}+d_{it}\,\mbox{のとき} \\
-      0, & \mbox{それ以外のとき}
-    \end{array}
-    \right.
-    \label{eqn:sigma_sti}
+    \begin{cases}
+      \sigma_{si} \sigma_{it}, & d_{st}=d_{si}+d_{it}\,\text{のとき} \\
+      0, & \text{それ以外のとき}
+    \end{cases}
   \end{equation}
-  \label{lemma:3}
-\end{lemma}
+\end{lemma-without-proof}
+
+次の補題は，ある辺が最短経路上にあることの必要十分条件を示すものである．
 
 \begin{lemma}
+  \label{lemma:inclusion-e}
+  $G=(V,E)$の異なる2頂点$s,t\in V$と辺$\{i,j\} \in E$を考える．$s$から$t$への最短経路
+  $G_{st}=(V_{st},E_{st})$が有向辺$(i,j)$を含む，すなわち$(i,j) \in E_{st}$が成り立つための
+  必要十分条件は
+  \begin{equation}
+    d_{st}=d_{si}+l_{ij}+d_{jt}
+    \label{eq:inclusion-e}
+  \end{equation}
+  が成り立つことである．
+\end{lemma}
+\begin{proof}
+  はじめに$i=s$, $j=t$の場合を考える．このとき明らかに$G_{st}$は
+  有向辺$(i,j)$を含み，かつ$d_{si}+l_{ij}+d_{jt}=d_{ss}+l_{st}+d_{tt}=l_{st}=d_{st}$
+  より\eqref{eq:inclusion-e}も成り立つ．
+
+  次に$i=s$, $j \neq t$の場合を考える．このとき$(i,j)\in E_{st}$であるための
+  必要十分条件は$G_{st}$が$j$を含むことである．これは補題~\ref{lemma:inclusion-v}より
+  $d_{st}=d_{sj}+d_{jt}$と等価であり，さらに右辺$d_{sj}+d_{jt}$は\eqref{eq:inclusion-e}の右辺と等しい．
+  $i\neq s$, $j=t$の場合も同様である．
+
+  そこで以下では$s,t,i,j$がすべて異なると仮定する．
+  $G_{st}$が有向辺$(i,j)$を含むならば，$G_{st}$の中に
+  $s \rightarrow \cdots \rightarrow i \rightarrow j \rightarrow \cdots \rightarrow t$
+  の順に頂点を通る有向道が存在する．
+  この有向道の長さは$d_{si}+l_{ij}+d_{jt}$で与えられるので\eqref{eq:inclusion-e}が成り立つ．
+
+  次に\eqref{eq:inclusion-e}が成り立つと仮定する．
+  頂点$s$を出発して$s$から$i$への最短経路の一つを通って$i$に行き，次に辺$\{i,j\}$を通って$j$に行き，
+  最後に$j$から$t$への最短経路の一つを通って$t$に行く有向道が存在する．
+  この有向道は$s$から$t$への最短経路の一つである．なぜなら，その長さは$d_{si}+l_{ij}+d_{jt}$で与えられ，
+  \eqref{eq:inclusion-e}より$s$から$t$への最短経路長$d_{st}$に等しいからである．
+  したがって，$(i,j) \in E_{st}$が成り立つ．
+\end{proof}
+
+補題\ref{lemma:inclusion-e}の証明の考え方を用いれば，ある辺を通る最短経路数を導出できる．
+
+\begin{lemma-without-proof}
   $G=(V,E)$の異なる2頂点$s,t \in V$に対して，
   $s$から$t$への最短経路の中で有向辺$(i,j)$を通るものの個数を
   $\sigma_{st}(i,j)$とおくと，それは次式で与えられる．
   \begin{equation*}
     \sigma_{st}(i,j)=
-    \left\{
-    \begin{array}{ll}
-      \sigma_{si} \sigma_{jt}, & d_{st}=d_{si}+l_{ij}+d_{jt}\,\mbox{のとき} \\
-      0, & \mbox{それ以外のとき}
-    \end{array}
-    \right.
-    %\label{eqn:sigma_stij}
+    \begin{cases}
+      \sigma_{si} \sigma_{jt}, & d_{st}=d_{si}+l_{ij}+d_{jt}\,\text{のとき} \\
+      0, & \text{それ以外のとき}
+    \end{cases}
   \end{equation*}
-  \label{lemma:4}
-\end{lemma}
+\end{lemma-without-proof}
 
-次の補題は，ある二頂点間の最短経路の長さと，その経路に含まれる短い最短経路の長さに関するものである．
-\begin{lemma}
+次の補題は，最短距離および最短経路数を，ほかの頂点とのもので陰に表すことができる
+ことを示している．
+
+\begin{lemma-without-proof}
   \label{lemma:distance-of-path}
-  $G=(V,E)$の異なる二頂点$s,t\in V$について，次が成り立つ．
+  $G=(V,E)$の異なるに頂点$s,t\in V$について，次が成り立つ．
   \begin{equation*}
-    d_{st}=\min\{d_{si}+d_{it}|i\in V\}
+    \begin{aligned}
+      d_{st}&=\min\{l_{si}+d_{it}|i\in\mathcal{N}_G(s)\} \\
+      \sigma_{st}&=\sum_{i\in\mathcal{N}_G(s),\,d_{st}=l_{si}+d_{it}}\sigma_{it}
+    \end{aligned}
   \end{equation*}
-\end{lemma}
+\end{lemma-without-proof}
 \begin{proof}
-  \textcolor{red}{TODO}
+  すべての辺の重みは正であるため，頂点$s$から頂点$v$までの最短経路の最後の辺は，
+  $d_{su}<d_{su}$が成立する編集号に含まれる辺$(u,v)$である．これは，補題1
+  \par $G=(V,E$の互いに異なる3頂点$s,t,v$に対して，$s$から$t$への最短経路の集合
+  $G_{st}=(V_{st},E_{st})$が$v$を含む，すなわち，$v\in E_{st}$が成り立つための
+  必要十分条件は$d_{st}=d_{sv}+d_{vt}$である．
+
+  より頂点$s$から頂点$v$までの最短経路の数は，頂点$s$から頂点$u$までの
+  最短経路の数と等しいと言える．
 \end{proof}
 
-次の補題は，重みなしグラフのある二頂点間の最短経路の個数と，その経路に含まれる短い最短経路の個数との関係を示す．
+次の補題は，重みなしグラフのある二頂点間の最短経路の個数と，
+その経路に含まれる短い最短経路の個数との関係を示す．
 \begin{lemma}
   \label{lemma:number-of-paths}
   重みなしグラフ$G=(V,E)$の異なる二頂点$s,t\in V$について，$v$を$d_{st}=d_{sv}+d_{vt}$
@@ -134,7 +216,6 @@ $G$の異なる2頂点$s,t$を両端とする有向道の中で，有向道に�
   \end{equation}
 \end{lemma}
 \begin{proof}
-  $s$と$t$の間の一般的な経路を図\ref{fig:proof-number-of-paths}に示す．
   \begin{figure}
     \centering
     \def\svgwidth{.5\columnwidth}
@@ -142,19 +223,31 @@ $G$の異なる2頂点$s,t$を両端とする有向道の中で，有向道に�
     \caption{$s$と$t$の一般的な最短経路}
     \label{fig:proof-number-of-paths}
   \end{figure}
-  $s$からの距離が一定の頂点を並べて，一つの層とする．$d_{sv}=k$なる頂点$v$の集合を，第$k$層と定義し，$L_k$と表す．$L_k$に属する頂点の数を$n_k$，$L_k$に属する$l$番目の頂点を$v_{kl}$と表す．ここで，第$k$層に属する頂点$v$は，隣接する層(第$k-1$層と第$k+1$層)以外の層に属する頂点$w$と隣接しないことに注意する．もしそのような頂点が存在すると，最短経路長が変化する．式\eqref{eq:number-of-paths}の両辺に$d_{st}-1$を掛けて，次の式\eqref{eq:number-of-paths1}を得る．
+  $s$と$t$の間の一般的な経路を図\ref{fig:proof-number-of-paths}に示す．
+  $s$からの距離が一定の頂点を並べて，一つの層とする．
+  $d_{sv}=k$なる頂点$v$の集合を，第$k$層と定義し，$L_k$と表す．
+  $L_k$に属する頂点の数を$n_k$，$L_k$に属する$l$番目の頂点を$v_{kl}$と表す．
+  ここで，第$k$層に属する頂点$v$は，隣接する層(第$k-1$層と第$k+1$層)以外の層に
+  属する頂点$w$と隣接しないことに注意する．もしそのような頂点が存在すると，
+  最短経路長が変化する．
+  式\eqref{eq:number-of-paths}の両辺に$d_{st}-1$を掛けて，次の式\eqref{eq:number-of-paths1}を得る．
+
   \begin{equation}
     \sigma_{st}(d_{st}-1)=\sum_{v}\sigma_{sv}\sigma_{vt}
     \label{eq:number-of-paths1}
   \end{equation}
+
   式\eqref{eq:number-of-paths1}の右辺を，
   図\ref{fig:proof-number-of-paths}にならって表すと，
+
   \begin{equation}
     \sum_{v}\sigma_{sv}\sigma_{vt}=
     \sum_{k=1}^m\sum_{l=1}^{n_k}\sigma_{sv_{kl}}\sigma_{v_{kl}t}
     \label{eq:number-of-paths2}
   \end{equation}
+
   が得られる．ここで，二つの頂点$v$と$w$について，次の隣接を表す記号$a$を導入する．
+
   \begin{align*}
     a_{vw}=
     \begin{cases}
@@ -162,7 +255,9 @@ $G$の異なる2頂点$s,t$を両端とする有向道の中で，有向道に�
       0 & vとwが隣接していないとき
     \end{cases}
   \end{align*}
-  各々の$\sigma_{sv_{kl}}\sigma_{v_{kl}t}$について議論する．$a$の定義を用いて式を変形すると，
+
+  各々の$\sigma_{sv_{kl}}\sigma_{v_{kl}t}$について議論する．$a_{vw}$の定義を用いて式を変形すると，
+
   \begin{align}
     &\sigma_{sv_{kl}}\sigma_{v_{kl}t}\nonumber\\
     =&\left(\sum_{v'\in L_{k-1}}\sigma_{sv'}a_{v'v_{kl}}\right)
@@ -196,6 +291,7 @@ $G$の異なる2頂点$s,t$を両端とする有向道の中で，有向道に�
     a_{sv_1}\cdots a_{v_mt}\right)
     \label{eq:number-of-paths4}
   \end{align}
+
   と変形できる．式\eqref{eq:number-of-paths4}の総和の対象が$1$となるのは，
   $a_{sv_1},\ldots,a_{v_mt}$のすべてが$1$のとき，
   すなわち，$s$と$v_1$,$v_1$と$v_2$,$\ldots$,$v_m$と$t$がすべて隣接している
@@ -208,20 +304,48 @@ $G$の異なる2頂点$s,t$を両端とする有向道の中で，有向道に�
 \section{媒介中心性とペア依存度}
 \label{sect:pairwise-dependency}
 
-頂点$i$の媒介中心性$B_i$は
-\begin{equation}
-  B_i=\sum_{s\neq i}\sum_{t\neq {i,s}}\frac{\sigma_{st}(i)}{\sigma_{st}}
-  \label{eq:betweenness-centrality}
-\end{equation}
-で定義される\cite{Freeman1977}．
-すなわち，頂点$i$の媒介中心性は$s$から$t$への最短経路の個数とその中で頂点$i$を通るものの個数の比を$s,t$のすべての組について足し合わせたものである．したがって，媒介中心性の大きな頂点は多くの2頂点を結ぶ最短経路上にあり，この意味で重要度が高いと言える．
+本説では，媒介中心性の定義からその効率的な計算方法を説明する．
 
-すべての頂点の媒介中心性を求める単純な方法は以下の通りである．まず，$s=1,2,\ldots,N$に対して，幅優先探索を用いて$s$から他のすべての頂点への最短経路を求める．その過程で，$s$から他のすべての頂点への最短経路長と最短経路数も同時に求める．次に，互いに異なる3頂点の組$\{s,t,i\}$のすべてに対して，$\sigma_{st}(i)$の値を計算する．
-最後に媒介中心性$B_i$ $(i=1,2,\ldots,N)$を(\ref{eq:betweenness-centrality})により計算する．しかしながら，この方法の計算量は$\mathcal{O}(N^3)$であり，大規模なネットワークでは膨大な計算時間が必要になる．
+\begin{definition}[Freeman\cite{Freeman1977}]
+  \label{def:betweenness-centrality}
+  頂点$i$の媒介中心性$B_v$は
+  \begin{equation}
+    B_v=\sum_{s\neq v}\sum_{t\neq {v,s}}\frac{\sigma_{st}(v)}{\sigma_{st}}
+    \label{eq:betweenness-centrality}
+  \end{equation}
+  で定義される．
+\end{definition}
 
-媒介中心性の効率的計算法として最も広く用いられているのはBrandes~\cite{Brandes2001}によって提案されたアルゴリズムである．それを以下に示す．
+すなわち，頂点$v$の媒介中心性は$s$から$t$への最短経路の個数とその中で
+頂点$v$を通るものの個数の比を$s,t$のすべての組について足し合わせたものである．
+したがって，媒介中心性の大きな頂点は多くの最短経路上にあり，この意味で重要度が高いと言える．
 
-Brandesのアルゴリズムはペア依存度を用いて効率的に媒介中心性を計算する．
+すべての頂点の媒介中心性を求める単純な方法は以下の通りである．
+まず，$s\in V$に対して，Dijkstra法を用いて$s$から他のすべての頂点への最短経路を求める．
+その過程で，$s$から他のすべての頂点への最短距離と最短経路数も同時に求める．
+次に，互いに異なる3頂点の組$\{s,t,v\}$のすべてに対して，$\sigma_{st}(v)$の値を計算する．
+最後に媒介中心性$B_v$ $(v\in V)$を定義の式により計算する．
+しかしながら，この方法の計算量は$\mathcal{O}(|V|^3)$であり，大規模なネットワークでは膨大な計算時間が必要になる．
+
+媒介中心性の効率的計算法として最も広く用いられているのは
+Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである．
+以下，Brandesのアルゴリズムについて説明する．
+まず，ペア依存度の定義を示す．
+
+\begin{definition}
+  \label{def:pairwise-dependency}
+  頂点$s,t,v$のペア依存度は次式で定義される．
+  \begin{equation}
+    \label{eq:def-pairwise-dependency}
+    \delta_{st}(v)=\frac{\sigma_{st}(v)}{\sigma_{st}}
+  \end{equation}
+  また，頂点$s,v$と他の頂点のペア依存度は次式で定義される．
+  \begin{equation}
+    \label{eq:def-sum-pairwise-dependency}
+    \delta_{s}(v)=\sum_{t\neq v,s}\delta_{st}(v)
+  \end{equation}
+\end{definition}
+
 ペア依存度を使って媒介中心性を表すと，
 \begin{equation*}
   \begin{aligned}
@@ -229,35 +353,87 @@ Brandesのアルゴリズムはペア依存度を用いて効率的に媒介中�
     &=\sum_{s\neq v}\sum_{t\neq v,s}\delta_{st}(v)
   \end{aligned}
 \end{equation*}
-である．ここで，
-\begin{equation*}
-  \label{eq:def-pairwise-dependency}
-  \delta_{st}(v)=\frac{\sigma_{st}(v)}{\sigma_{st}}
-\end{equation*}
-は頂点$s,t,v$のペア依存度と呼ばれる．頂点$s,v$と他の頂点のペア依存度$\delta_{s}(v)=\sum_{t\neq v,s}\delta_{st}(v)$について，次のことが知られている．
 
-\begin{theorem}
-  \label{th:implicit-pairwise-dependency}
-  \begin{equation*}
-    \delta_{s}(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_{s}(w)).
-  \end{equation*}
-\end{theorem}
+である．ここで，$\delta_{s}(v)$について，これらのことが知られている．
+
+\begin{lemma}
+  \label{lemma:implicit-pd-part}
+  グラフ$G=(V,E)$の異なる頂点$s,t$について，$\sigma_{st}=1$ならば，
+  頂点$v$の$s$に対するペア依存度は次のようになる．
+  \begin{equation}
+    \label{eq:implicit-pd-part}
+    \delta_{s}=\sum_{(v,w)\in E_s}(1+\delta_{s}(w))
+  \end{equation}
+\end{lemma}
 \begin{proof}
-  \textcolor{red}{TODO}
+  この補題は，図\ref{fig:implicit-pd-1}のようにすべての最短経路の辺と頂点を形成している
+  頂点$s$の木構造であることを表している．したがって，頂点$s$から頂点$t$までの
+  すべての経路もしくは，それ以外の経路上に頂点$v$は存在する．
+  例えば，頂点$v$は$w_1,w_2,w_3$の最短経路上に存在する．
+
+  \begin{figure}[tb]
+    \centering
+    \def\svgwidth{.35\linewidth}
+    \input{implicit-pd-1.pdf_tex}
+    \caption{頂点$s$の木構造}
+    \label{fig:implicit-pd-1}
+  \end{figure}
 \end{proof}
 
-Brandesのアルゴリズムは定理\ref{th:implicit-pairwise-dependency}の性質を
-応用して媒介中心性を高速に計算している．
+\begin{theorem}
+  \label{th:implicit-pd}
+  \begin{equation}
+    \label{eq:implicit-pd}
+    \delta_{s}(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_{s}(w)).
+  \end{equation}
+\end{theorem}
+\begin{proof}
+  $(v,w)\in E_s$である任意の$w$に対して，$s$から$t$への最短経路の中で
+  $v$と辺$(v,w)$を通るものの個数を$\sigma_{st}(v,(v,w))$を表すと
+  \begin{equation*}
+    \delta_{st}(v,\{v,w\})=
+    \begin{cases}
+      \cfrac{\sigma_{sv}}{\sigma_{sw}}, & t=w\text{のとき} \\
+      \cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot\cfrac{\sigma_{st}(w)}{\sigma_{st}} & t\neq w\text{のとき}
+    \end{cases}
+  \end{equation*}
+  より，
+  \[ s_{st}(v,(v,w))=\frac{\sigma_{sv}}{\sigma_{sw}}\dot\sigma_{st(w)} \]
+  がなりたち，$j=t$ならば
+  \[ \sigma_{st}(v,(v,w))=\sigma_{sv} \]
+  が成り立つ．これより，
+  \begin{align*}
+    \delta_s(v)&=\sum_{t\neq s,v}\cfrac{\sigma_{st(v)}}{\sigma_{st}} \\
+    &=\sum_{t\neq s,v}\sum_{w:(v,w)\in E_s}\cfrac{\sigma_{st}(v,(v,w))}{\sigma_{st}} \\
+    &=\sum_{w:(v,w)\in E_s}\sum_{t\neq s,v}\cfrac{\sigma_{st}(v,(v,w))}{\sigma_{st}} \\
+    &=\sum_{w:(v,w)\in E_s}\left(\sum_{t\neq s,v}\cfrac{1}{\sigma_{st}}\cdot\frac{\sigma_{sv}}{\sigma_{sw}}\cdot\sigma_{st}(w)+\cfrac{\sigma_{sv}}{\sigma_{sj}}\right) \\
+    &=\sum_{w:(v,w)\in E_s}\cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot\left(1+\sum_{t\neq s,v,w}\cfrac{\sigma_{st}(v)}{\sigma_{st}}\right) \\
+    &=\sum_{w:(v,w)\in E_s}\cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot(1+\delta_s(w))
+  \end{align*}
+  を得る．
 
-このアルゴリズムの計算量を考える．まず，ある$s\in V$とすべての$v\in V$に対して$\sigma_{sv}$を計算するときの計算量は，Dijkstra法より$\mathcal{O}(N\log N+M)$である．
-ステップ4についても，$G$のすべての頂点$v$を$s$からの最短経路の逆向きに一度だけ辿ることにより$\delta_s(v)$の値を更新できるため，$\mathcal{O}(M)$の時間で実行できる\cite{Brandes2001}．
-したがって，すべての$s\in V$に対するアルゴリズムの計算量は$\mathcal{O}(N^2\log N+NM)$であり，それは$\mathcal{O}(N^3)$よりも小さい．特にグラフが疎であるとき，すなわち$M \ll N^2$が成り立つとき前者は後者に比べて非常に小さな値となる．
+  \begin{figure}[tb]
+    \centering
+    \def\svgwidth{.35\linewidth}
+    \input{implicit-pd-2.pdf_tex}
+    \caption{頂点$s$の木構造}
+    \label{fig:implicit-pd-2}
+  \end{figure}
+\end{proof}
+
+Brandesのアルゴリズムは定理\ref{th:implicit-pd}の性質を応用して媒介中心性を高速に計算している．
+
+このアルゴリズムの計算量を考える．まず，ある$s\in V$とすべての$v\in V$に対して
+$\sigma_{sv}$を計算するときの計算量は，Dijkstra法より$\mathcal{O}(|V|\log |V|+|E|)$である．
+ステップ4についても，$G$のすべての頂点$v$を$s$からの最短経路の逆向きに一度だけ辿ることにより$\delta_s(v)$の値を更新できるため，$\mathcal{O}(|E|)$の時間で実行できる\cite{Brandes2001}．
+したがって，すべての$s\in V$に対するアルゴリズムの計算量は$\mathcal{O}(|V|^2\log |V|+|V||E|)$であり，
+それは$\mathcal{O}(|V|^3)$よりも小さい．
 
 \begin{algorithm}[H]
   \caption{Brandesのアルゴリズム}
   \label{algo:brandes}
   \begin{multicols}{2}
-    \begin{algorithmic}[1]
+    \begin{algorithmic}[1]\small
       \Procedure{Brandes}{$G$}
       \State $B_x\gets 0,\:\forall x\in V$
       \ForAll{$s\in V$}
