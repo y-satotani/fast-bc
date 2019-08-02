@@ -25,12 +25,12 @@ data_time <- read_csv('../../res/data/artificial.csv') %>%
 
 gp <- ggplot(
     data_time %>% filter(n == 1000, k %in% c(4)),
-    aes(`phony-verts`, `time-diff`, colour = mode)
+    aes(`changed-bc-verts`, `updated-bc-verts`, colour = mode)
   ) +
   geom_point(alpha = 0.2) +
   guides(colour = guide_legend(title = '操作', override.aes = list(alpha = 1))) +
   facet_grid(cols = vars(name)) +
-  xlab('空振り頂点数') + ylab('実行時間の差(s)') +
+  xlab('媒介中心性が変化した頂点数') + ylab('媒介中心性を更新した頂点数') +
   scale_colour_viridis(discrete = TRUE, begin = 0.8, end = 0.2) +
   theme(
     legend.position = 'top',

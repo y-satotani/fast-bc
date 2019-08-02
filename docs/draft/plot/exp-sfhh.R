@@ -61,5 +61,5 @@ gp_bottom <- ggplot(
     legend.title = element_blank()
   )
 
-gp <- plot_grid(gp_top, gp_bottom, ncol = 1, align = 'v', axis = 'l')
+gp <- plot_grid(gp_top, gp_bottom, ncol = 1, align = 'v', axis = 'lr')
 ggsave(out_file, gp, cairo_pdf, width = 18, height = 12, units = 'cm')
