@@ -9,9 +9,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="144.89548mm"
-   height="71.967735mm"
-   viewBox="0 0 144.89547 71.967735"
+   width="138.2039mm"
+   height="97.824699mm"
+   viewBox="0 0 138.2039 97.824699"
    version="1.1"
    id="svg8"
    inkscape:version="0.92.4 (33fec40, 2019-01-16)"
@@ -146,9 +146,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="436.5956"
-     inkscape:cy="150.59677"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="312.47074"
+     inkscape:cy="192.43064"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -182,7 +182,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(11.273284,-86.371595)">
+     transform="translate(11.273284,-73.443113)">
     <path
        style="fill:none;stroke:#000000;stroke-width:0.30000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 24.85979,122.35546 56.32902,92.835842"
@@ -376,12 +376,12 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:15.875px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.39687499"
-       x="103.99142"
+       x="104.50404"
        y="122.68336"
        id="text921-9-4-4-40-6-8"><tspan
          sodipodi:role="line"
          id="tspan919-6-3-8-59-1-7"
-         x="103.99142"
+         x="104.50404"
          y="122.68336"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke-width:0.39687499">\scriptsize{$\delta_s(v_2)=\frac{1}{1}(1+0)+\frac{1}{1}(1+0)=2$}</tspan></text>
     <text
@@ -398,12 +398,12 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:15.875px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.39687499"
-       x="49.131557"
+       x="49.644184"
        y="75.455765"
        id="text921-9-4-4-40-6-8-0"><tspan
          sodipodi:role="line"
          id="tspan919-6-3-8-59-1-7-23"
-         x="49.131557"
+         x="49.644184"
          y="75.455765"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke-width:0.39687499">\scriptsize{$\delta_s(w_1)=\frac{1}{1}(1+2)=3$}</tspan></text>
     <text
@@ -420,12 +420,12 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:15.875px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.39687499"
-       x="51.777393"
+       x="52.29002"
        y="166.20784"
        id="text921-9-4-4-40-6-8-92"><tspan
          sodipodi:role="line"
          id="tspan919-6-3-8-59-1-7-28"
-         x="51.777393"
+         x="52.29002"
          y="166.20784"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke-width:0.39687499">\scriptsize{$\delta_s(w_2)=0$}</tspan></text>
     <text
@@ -453,12 +453,12 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:15.875px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.39687499"
-       x="-64.828415"
+       x="-65.341042"
        y="141.86617"
        id="text921-9-4-4-40-6-8-9-7-1"><tspan
          sodipodi:role="line"
          id="tspan919-6-3-8-59-1-7-2-5-2"
-         x="-64.828415"
+         x="-65.341042"
          y="141.86617"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke-width:0.39687499">\scriptsize{$\delta'_s(v_1)=\frac{1}{1}(1+1.5)+\frac{1}{1}(1+1.5)=5$}</tspan></text>
     <text
