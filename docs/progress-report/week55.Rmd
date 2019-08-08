@@ -1,0 +1,54 @@
+---
+title: "研究進捗報告"
+author: "里谷 佳紀"
+date: "2019年8月8日"
+documentclass: bxjsarticle
+classoption: xelatex,ja=standard,11pt
+geometry: no
+output:
+  pdf_document:
+    latex_engine: xelatex
+    template: mytemplate.tex
+    number_sections: yes
+    fig_caption: yes
+    includes:
+      in_header: header.sty
+  github_document:
+    html_preview: no
+---
+
+```{r setup, include = FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(viridis)
+theme_set(theme_light(base_size = 11, base_family = 'IPAexGothic'))
+knitr::opts_knit$get('rmarkdown.pandoc.to')
+if(knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex') {
+  devname <- 'cairo_pdf'
+  devargs <- c()
+} else {
+  devname <- 'png'
+  devargs <- c('type' = 'cairo-png')
+}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.height = 8, fig.width = 6, fig.align = 'center',
+  dev = devname, dev.args = devargs, dpi = 150
+)
+```
+
+# 研究全体の目的
+グラフと全頂点間距離と最短経路の数およびペア依存度が与えられたとき，グラフの辺が削除されたとする．
+このときの全頂点間距離と最短経路の数とペア依存度を高速に更新する方法を開発する．
+また，実験と理論の両方から既存の方法と比較することで，新方法の有用性を検証する．
+
+# 前回打ち合わせ時に定めた短期目標
+1. 修士論文の下書きの執筆
+2. 追加実験
+
+# 本日までの進捗状況
+1. 途中であるが，第一章の完成の目処がたった．
+2. 道路ネットワークを対象とする実験を行っている．8月下旬に完了する予定である．
+
