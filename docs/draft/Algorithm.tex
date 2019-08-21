@@ -1,11 +1,14 @@
 \chapter{提案アルゴリズム}
 \label{chap:algorithm}
 
+本章では，アルゴリズムを提案する．
+まず，挿入と削除に共通した部分を説明する．
+その後，挿入と削除それぞれのアルゴリズムを説明する．
+
 \section{最短経路とペア依存度の変化に関する条件}
 \label{sect:condition-of-variability}
 
 ここでは，一辺が挿入または削除されたあとの最短経路およびペア依存度が変化する条件について述べる．
-
 記号について，挿入または削除の操作後であることを明示するため，記号$'$をつける．例えば，操作後のグラフは$G'$と表す．
 
 \begin{lemma}
@@ -13,37 +16,72 @@
   $E_{st}=E'_{st}$であることの必要十分条件は，$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$である．
 \end{lemma}
 \begin{proof}
-  $E_{st}=E'_{st}$なら$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$であることは自明である．
+  $E_{st}=E'_{st}$ならば$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$であることは自明である．
 
   逆は，図\ref{fig:proof-invariability-of-paths}のような$E_{st}$を，
-  $d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$を満たすように，$E_{st}\neq E'_{st}$とするには，
-  少なくとも一辺の削除と一辺の挿入が必要である．
+  $d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$を満たすように，$E_{st}\neq E'_{st}$にすることを考える．
 
-  挿入時，レイヤーの距離より長い辺を挿入すると$E_{st}=E'_{st}$である．
-  また，レイヤーの距離が等しくなるように結ぶと，$\sigma_{st}\neq\sigma'_{st}$となる．
-  また，レイヤーの距離より短い辺を挿入すると$d_{st}\neq d'_{st}$になる．
-  また，削除時，$e\notin E_{st}$である辺を削除すると，$E_{st}=E'_{st}$である．
+  挿入時，長さが$L_i$間の距離より長い辺を挿入すると，$E_{st}=E'_{st}$を満たす．
+  また，長さが$L_i$間の距離と等しい辺を挿入すると，$\sigma_{st}\neq\sigma'_{st}$となる．
+  また，長さが$L_i$間の距離より短い辺を挿入すると$d_{st}\neq d'_{st}$となる．
+
+  削除時，$e\notin E_{st}$である辺を削除すると，$E_{st}=E'_{st}$である．
   また，$e\in E_{st}$である辺を削除すると，$d_{st}\neq d'_{st}$または$\sigma_{st}\neq\sigma'_{st}$となる．
-  したがってそのような操作は不可能で，逆も成り立つ．
+
+  したがって$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$を満たすように，
+  $E_{st}\neq E'_{st}$とすることは不可能で，逆も成り立つ．
 
   \begin{figure}
     \centering
     \def\svgwidth{.5\columnwidth}
     \input{proof-invariability-of-paths.pdf_tex}
-    \caption{$s$と$t$の一般的な最短経路}
+    \caption{$s$と$t$の一般的な最短経路．同じ$L_i$に含まれる頂点$v$について$d_{sv}$および$d_{vt}$は一定とする．}
     \label{fig:proof-invariability-of-paths}
   \end{figure}
 \end{proof}
 
-\begin{lemma-without-proof}
+\begin{lemma}
   \label{lemma:condition-of-invariability-of-pairwise-dependency}
-  ペア依存度$\delta_s(v)$について，これらをすべて同時に満たすならば，$\delta'_s(v)=\delta_s(v)$である．
-  \begin{enumerate}
-  \item $\sigma'_{sv}=\sigma_{sv}$
-  \item 集合$W=\{w|(v,w)\in E_s\}$と集合$W'=\{w|(v,w)\in E'_s\}$が等しい
-  \item すべての$w\in W$について，$\sigma'_{sw}=\sigma_{sw}$かつ$\delta'_s(w)=\delta_s(w)$である．
-  \end{enumerate}
-\end{lemma-without-proof}
+  頂点$s,v$について，$E_{G_s}(v)=E_{G'_s}(v)$かつすべての$w\in V_{G_s}$に対して
+  $\sigma_{sw}=\sigma'_{sw}$ならば$\delta_s(v)=\delta'_s(v)$.
+\end{lemma}
+\begin{proof}
+  \begin{equation*}
+    \begin{aligned}
+      \delta_s(v)
+      &=\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_s(w)) \\
+      &=\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+
+      \sum_{w\in\mathcal{S}_{G_s}(w)}\cfrac{\sigma_{sw}}{\sigma_{sw}}(1+\delta_s(w))
+      \right) \\
+      &\vdots \\
+      &=\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+\cdots
+      \sum_{w\in\mathcal{S}_{G_s}(w)}\cfrac{\sigma_{sw}}{\sigma_{sw}}(1+\delta_s(w))
+      \cdots\right)
+      \label{eq:condition-of-invariability-of-pairwise-dependency}
+    \end{aligned}
+  \end{equation*}
+  式\eqref{eq:condition-of-invariability-of-pairwise-dependency}について，
+  $G_s$は有限で閉路を含まないので，$\delta_s(v)$が無限に展開されることはない．
+  また，$E_{G_s}(v)=E_{G'_s}(v)$ならば，$V_{G_s}(v)=V_{G'_s}(v)$かつ
+  すべての$w\in V_s(v)$に対して$\mathcal{S}_{G_s}(v)=\mathcal{S}_{G'_s}(v)$である．
+  よって，$E_{G_s}(v)=E_{G'_s}(v)$かつすべての$w\in V_{G_s}$に対して
+  $\sigma_{sw}=\sigma'_{sw}$ならば，
+  \begin{equation*}
+    \begin{aligned}
+      \delta_s(v)
+      &=\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+\cdots
+      \sum_{w\in\mathcal{S}_{G_s}(w)}\cfrac{\sigma_{sw}}{\sigma_{sw}}(1+\delta_s(w))
+      \cdots\right) \\
+      &=\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+\cdots
+      \sum_{w\in\mathcal{S}_{G_s}(w)}\cfrac{\sigma_{sw}}{\sigma_{sw}}
+      \cdots\right) \\
+      &=\sum_{w\in\mathcal{S}_{G'_s}(v)}\cfrac{\sigma'_{sv}}{\sigma'_{sw}}\left(1+\cdots
+      \sum_{w\in\mathcal{S}_{G'_s}(w)}\cfrac{\sigma'_{sw}}{\sigma'_{sw}}
+      \cdots\right) \\
+      &=\delta'_s(v).
+    \end{aligned}
+  \end{equation*}
+\end{proof}
 
 補題\ref{lemma:condition-of-invariability-of-pairwise-dependency}の逆は成り立たない．
 
@@ -64,104 +102,73 @@
 
 \begin{lemma}
   \label{lemma:transformation-of-invariability-of-pairwise-dependency}
-  頂点$s,v$の操作前のペア依存度$\delta_s(v)$と操作後のペア依存度$\delta'_s(v)$に関して，次の\ref{item:explicit-invariability-of-pairwise-dependency}と\ref{item:implicit-invariability-of-pairwise-dependency}は同値である．
+  頂点$s,v$に関して，次の\ref{item:explicit-invariability-of-pairwise-dependency}と
+  \ref{item:implicit-invariability-of-pairwise-dependency-1}と
+  \ref{item:implicit-invariability-of-pairwise-dependency-2}は同値である．
   \begin{enumerate}[label=(\alph*)]
-  \item 以下の項目が全て成り立つ
+  \item $E_{G_s}(v)=E_{G'_s}(v)$かつすべての$w\in V_{G_s}(v)$に対して$\sigma_{sw}=\sigma'_{sw}$.
     \label{item:explicit-invariability-of-pairwise-dependency}
-    \begin{enumerate}[label=\arabic*.]
-    \item $\sigma_{sv}=\sigma'_{sv}$
-    \item 集合$W=\{(v,w)|(v,w)\in E_s\}$と集合$W'=\{(v,w)|(v,w)\in E'_s\}$が等しい
-    \item すべての$(v,w)\in W$に対して$\sigma'_{sw}=\sigma_{sw}$かつ$\delta'_s(w)=\delta'_s(w)$
-    \end{enumerate}
-  \item 以下の項目が全て成り立つ
-    \label{item:implicit-invariability-of-pairwise-dependency}
-    \begin{enumerate}[label=\arabic*.]
-    \item $\sigma_{sv}=\sigma'_{sv}$
-    \item 集合$X=\{(x,y)|(x,y)\in E_s,d_{sy}=d_{sv}+d_{vx}+l_{xy}\}$と集合$X'=\{(x,y)|(x,y)\in E'_s,d'_{sy}=d'_{sv}+d'_{vx}+l_{xy}\}$が等しい
-    \item すべての$(x,y)\in X$に対して$\sigma'_{sy}=\sigma_{sy}$
-    \end{enumerate}
+  \item $V_{G_s}(v)=V_{G'_s}(v)$かつすべての$w\in V_{G_s}(v)$に対して
+    $\sigma_{sw}=\sigma'_{sw}\land\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)$.
+    \label{item:implicit-invariability-of-pairwise-dependency-1}
+  \item すべての$w\in V_s(v)$と$x\in\mathcal{N}_G(w)$に対して
+    $x\in\mathcal{S}_{G_s}(w)\land x\in\mathcal{S}_{G'_s}$
+    $\lor x\notin\mathcal{S}_{G_s}(w)\land x\notin\mathcal{S}_{G'_s}$.
+    \label{item:implicit-invariability-of-pairwise-dependency-2}
   \end{enumerate}
 \end{lemma}
 \begin{proof}
-  \ref{item:explicit-invariability-of-pairwise-dependency}が成り立つならば，
-  集合$W_2=\{(w,w_2)|(w,w_2)\in E_s,(v,w)\in W\}$が操作によって変化せず，
-  すべての$(w,w_2)\in W_2$に対して$\sigma_{sw_2}$と$\delta_s(w_2)$が操作によって変化しない．
+  まず，\ref{item:explicit-invariability-of-pairwise-dependency}$\iff$
+  \ref{item:implicit-invariability-of-pairwise-dependency-1}を証明する.
+  $\bigcup_{(w,x)\in E_s(v)}\{w,x\}=V_s(v)$なので，$E_{G_s}(v)=E_{G'_s}(v)$ならば$V_{G_s}(v)=V_{G'_s}(v)$．
+  また，$E_{G_s}(v)=E_{G'_s}(v)$ならばすべての$w\in V_{G_s}(v)$に対して
+  $\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)$である．よって
+  \ref{item:explicit-invariability-of-pairwise-dependency}$\implies$
+  \ref{item:implicit-invariability-of-pairwise-dependency-1}.
+  逆に，$V_{G_s}(v)=V_{G'_s}(v)$かつすべての$w\in V_{G_s}(v)$に対して
+  $\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)$ならば，$E_{G_s}(v)=E_{G'_s}(v)$なので
+  \ref{item:implicit-invariability-of-pairwise-dependency-1}$\implies$
+  \ref{item:explicit-invariability-of-pairwise-dependency}.
+  よって\ref{item:explicit-invariability-of-pairwise-dependency}$\iff$
+  \ref{item:implicit-invariability-of-pairwise-dependency-1}.
 
-  すべての$w_2\in W_2$に対して$\delta_s(w_2)$が変化しないので，同様に，
-  集合$W_3=\{(w_2,w_3)|(w_2,w_3)\in E_s,(w,w_2)\in W_2\}$が操作によって変化せず，
-  すべての$(w_2,w_3)\in W_3$に対して$\sigma_{sw_3}$と$\delta_s(w_3)$が操作によって変化しない．
-
-  同じことを繰り返すと，集合$W^*=W\cup W_2\cup W_3\cup\cdots\cup W_k$が操作によって変化せず，すべての$(\hat{w},w)\in W^*$に対して$\sigma_{sw}$は操作によって変化しないことが言える．（$G_s$が有向アサイクリックグラフなので，上記の操作によって作られる$W^*$は有限集合である．また，$(\hat{w},w)\in\{(\hat{w},w)|(\hat{w},w)\in W^*,\{w'|(w,w')\in E_s\}=\varnothing\}$に対して，$\delta_s(w)=0$なので，この条件は消去できる）
-  
-  また，各$W_i$は$W_i=\{(w_{i-1},w_i)|(w_{i-1},w_i)\in\mathcal{N}^{i-1}_G(v)\times\mathcal{N}^i_G(v),(w_{i-1},w_i)\in E_s,d_{sw_i}=d_{sv}+d_{vw_{i-1}}+l_{w_{i-1}w_i}\}$と書き換えられるので，$G$は連結グラフであることから，$W^*=\cup_{i=0}W_i=\{(\hat{w},w)|(\hat{w},w)\in\cup_{i=0}\mathcal{N}^{i-1}_G(v)\times\mathcal{N}^i_G(v),(\hat{w},w)\in E_s,d_{sw}=d_{sv}+d_{v\hat{w}}+l_{\hat{w}w}\}=\{(\hat{w},w)|(\hat{w},w)\in E_s,d_{sw}=d_{sv}+d_{v\hat{w}}+l_{\hat{w}w}\}$とできる．
-
-  よって，\ref{item:explicit-invariability-of-pairwise-dependency}$\Rightarrow$\ref{item:implicit-invariability-of-pairwise-dependency}が成り立つ．
-
-  \ref{item:implicit-invariability-of-pairwise-dependency}$\Rightarrow$\ref{item:explicit-invariability-of-pairwise-dependency}も，先の手順を逆向きに適用することにより導出できる．
+  次に\ref{item:implicit-invariability-of-pairwise-dependency-1}$\iff$
+  \ref{item:implicit-invariability-of-pairwise-dependency-2}を証明する.
+  \begin{equation*}
+    \begin{aligned}
+      &\forall w\in V_s(v),\,\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)\\
+      \iff&\forall w\in V_s(v),\,\mathcal{S}_{G_s}(w)\subset\mathcal{S}_{G'_s}(w)
+      \land\mathcal{S}_{G_s}(w)\supset\mathcal{S}_{G'_s}(w)\\
+      \iff&\forall w\in V_s(v),\,\left(\forall x\in\mathcal{S}_{G_s}(w),\,x\in\mathcal{S}_{G'_s}(w)\right)
+      \land\left(\forall x\in\mathcal{S}_{G'_s}(w),\,x\in\mathcal{S}_{G_s}(w)\right)\\
+      \iff&\forall w\in V_s(v),\,\left(\forall x\in\mathcal{N}_{G_s}(w),\,
+      x\in\mathcal{S}_{G_s}(w),x\in\mathcal{S}_{G'_s}(w)
+      \lor x\notin\mathcal{S}_{G_s}(w),x\notin\mathcal{S}_{G'_s}(w)\right)\\
+      &\land\left(\forall x\in\mathcal{N}_{G_s}(w),\,
+      x\in\mathcal{S}_{G'_s}(w),x\in\mathcal{S}_{G_s}(w)
+      \lor x\notin\mathcal{S}_{G'_s}(w),x\notin\mathcal{S}_{G_s}(w)\right)\\
+      \iff&\forall w\in V_s(v),\,\left(\forall x\in\mathcal{N}_{G_s}(w),\,
+      x\in\mathcal{S}_{G_s}(w),x\in\mathcal{S}_{G'_s}(w)
+      \lor x\notin\mathcal{S}_{G_s}(w),x\notin\mathcal{S}_{G'_s}(w)\right)\\
+      \iff&\forall w\in V_s(v),\,\left(\forall x\in\mathcal{N}_{G_s}(w),\,
+      x\in\mathcal{S}_{G_s}(w)\land x\in\mathcal{S}_{G'_s}(w)
+      \lor x\notin\mathcal{S}_{G_s}(w)\land x\notin\mathcal{S}_{G'_s}(w)\right)
+    \end{aligned}
+  \end{equation*}
 \end{proof}
 
-\begin{theorem}
-  補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}の
-  \ref{item:implicit-invariability-of-pairwise-dependency}が成り立つならば，
-  媒介中心性は変化しない．
-\end{theorem}
-\begin{proof}
-  補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}の
-  \ref{item:implicit-invariability-of-pairwise-dependency}が成り立つならば，
-  補題\ref{lemma:condition-of-invariability-of-pairwise-dependency}より，
-  $\delta'_s(v)=\delta_s(v)$，すなわち，媒介中心性が変化しない．よって定理が成り立つ．
-\end{proof}
-
-裏をとると，補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}の\ref{item:implicit-invariability-of-pairwise-dependency}が成り立たないような$(s,v)\in V\times V$を見つけてペア依存度$\delta_s(v)$を更新することによって，空振りがあり得るが見逃しなく更新することが可能である．
-
-ペア依存度を更新するより具体的な条件は次の通り．
-\begin{lemma}
-  \label{lemma:condition-of-update-pairwise-dependency}
-  集合$F_s(v)$を次のように定義する．
-  \[ F_s(v)=\{(x,y)|(x,y)\in E_s,d_{sy}=d_{sv}+d_{vx}+l_{xy}\}. \]
-
-  \[ (d_{sy}=d_{sx}+l_{xy})\veebar(d'_{sy}=d'_{sx}+l_{xy}) \]
-  を満たすならば，$F'_s(x)\neq F_s(x)$である．
-\end{lemma}
-\begin{proof}
-  辺$\{x,y\}\in E$と有向辺集合$E_s$と$E'_s$について，辺の更新によってとりうる
-  関係は，次の通り．
-
-  \begin{center}
-    \begin{tabular}{cccc}
-      $E_s$ & $E'_s$ & $F_s(x)\neq F_s(x)$ & $F_s(y)\neq F_s(y)$ \\
-      $x-y$ & $x-y$ & $\bot$ & $\bot$ \\
-      $x-y$ & $x\rightarrow y$ & $\bot$ & $\top$ \\
-      $x-y$ & $x\leftarrow y$ & $\top$ & $\bot$ \\
-      $x\rightarrow y$ & $x-y$ & $\bot$ & $\top$ \\
-      $x\rightarrow y$ & $x\rightarrow y$ & $\bot$ & $\bot$ \\
-      $x\rightarrow y$ & $x\leftarrow y$ & $\top$ & $\top$ \\
-      $x\leftarrow y$ & $x-y$ & $\top$ & $\bot$ \\
-      $x\leftarrow y$ & $x\rightarrow y$ & $\top$ & $\top$ \\
-      $x\leftarrow y$ & $x\leftarrow y$ & $\bot$ & $\bot$ \\
-    \end{tabular}
-  \end{center}
-
-  表の$E_s$の列の記号の意味は，次の通り．
-  \begin{align*}
-    \begin{cases}
-      x\rightarrow y & (x,y)\in E_s \\
-      x\leftarrow y & (y,x)\in E_s \\
-      x-y & (x,y)\notin E_s\text{かつ}(y,x)\notin E_s
-    \end{cases}
-  \end{align*}
-  なお，$E'_s$の列の記号の意味も$E_s$のものに倣う．
-
-  この表より，$F_s(x)\neq F'_s(x)$である条件は，$(d_{sy}=d_{sx}+l_{xy})\veebar(d'_{sy}=d'_{sx}+l_{xy})$である．
-\end{proof}
+裏をとると，補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}の
+\ref{item:implicit-invariability-of-pairwise-dependency-2}が成り立たないような
+$(s,v)\in V\times V$を見つけてペア依存度$\delta_s(v)$を更新することによって，
+空振りがあり得るが見逃しなく更新することが可能である．
+以降，本章では挿入時と削除時それぞれに対する媒介中心性更新法を説明する．
 
 \section{一辺挿入時の媒介中心性更新法}
 \label{sect:update-bc-on-insert}
-本章では，$G=(V,E)$に辺$e=\{v,w\} \not\in E$を挿入して得られるグラフを
-$G'=(V,E')$とする．$G'$における頂点$s$から頂点$t\,(\neq s)$への最短経路を
-有向グラフ$G'_{st}=(V'_{st},E'_{st})$で表し，すべての頂点から頂点$s$への最短経路を
-有向グラフ$G'_s=(V,E'_s)$で表す．また，$G'$における頂点$s$から頂点$t\,(\neq s)$への
-最短経路の個数と長さをそれぞれ$\sigma'_{st}$, $d'_{st}$で表す．
+本節では，グラフに辺が挿入されたときの媒介中心性を更新するアルゴリズムを提案する．
+$G=(V,E)$に辺$e=\{v,w\} \not\in E$を挿入して得られるグラフを$G'=(V,E')$とする．
+アルゴリズムをアルゴリズム\ref{algo:incremental-algorithm}に示す．
+以下，アルゴリズムの構成について説明する．
 
 \subsection{最短経路の更新}
 \label{subsect:update-augdist-on-insert}
@@ -182,108 +189,21 @@ $G'=(V,E')$とする．$G'$における頂点$s$から頂点$t\,(\neq s)$への�
   逆は，逆の手順を行うことによって成り立つ.
 \end{proof}
 
-\ref{lemma:update-augdist-on-insert}を満たす$x$について，前述の通りに計算する．つまり，
-\begin{align*}
-  d'_{xz}&=\min_{y\in\mathcal{N}_{G'}(x)}(l_{xy}+d'_{yz})\\
-  \sigma'_{xz}&=\sum_{y\in\mathcal{N}_{G'}(x),d'_{xz}=l_{xy}+d'_{yz}}\sigma'_{yz}.
-\end{align*}
-
+\ref{lemma:update-augdist-on-insert}を満たす$x$について，
+補題\ref{lemma:distance-and-geodesics}の通りに計算する．
 計算式より，$d'_{xz}$を計算するには，$d'_{xz}>d'_{yz}$であるすべての$y$について$d'_{yz}$を
 計算する必要がある．したがって$d'_{xz}$の昇順に計算することとなる．
 $E'_{xz}\neq E_{xz}$を満たす$x$のうち，最小の$d'_{xz}$である$x$は$x=v$である．
-そのため，$v$から計算を開始し，補題を満たすような近傍を順次順位キューに追加する．
-詳しくはアルゴリズムを参照されたし．
+そのため，$v$から計算を開始し，補題\ref{lemma:update-augdist-on-insert}を満たすような
+近傍を順次順位キューに追加する．
 
 \subsection{ペア依存度の更新}
 \label{subsect:update-delta-on-insert}
 
 挿入後のペア依存度$\delta'_z(x)$をBrandesのアルゴリズムによって求める．
-具体的には，\ref{subsect:update-augdist-on-insert}で求めた影響を受ける頂点から，
+具体的には，補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}の
+\ref{item:implicit-invariability-of-pairwise-dependency-2}を満たさない頂点から，
 $d'_{xz}$の降順となるように次式を計算しながら走査する．
-
-\[ \delta'_{z}(x)\gets\sum_{(y,x)\in E_z}\frac{\sigma'_{xz}}{\sigma'_{yz}}(1+\delta'_z(y)) \]
-
-\subsection{計算量の解析}
-\label{subsect:computational-complexity-of-incremental-algorithm}
-
-\begin{theorem}
-  \textproc{Incremental}の時間計算量は
-  \[ \mathcal{O}(N''^2k_{\max}+N''^2\log N'') \]
-  である．
-\end{theorem}
-\begin{proof}
-  アルゴリズムは以下の手順で構成される．
-  \begin{enumerate}[label=(\alph*)]
-  \item 距離と経路数の更新
-  \item ペア依存度の更新
-  \end{enumerate}
-  それぞれについて，時間計算量を求める．
-
-  \begin{enumerate}[label=(\alph*)]
-  \item 距離と経路数の更新
-    \par 更新によって変化した頂点の数を$N'$とする．すなわち，
-    \[ N'=\vert\{x|\exists z\in V\:\text{s.t.}\:d'_{xz}\neq d_{xz}\lor\sigma'_{xz}\neq\sigma_{xz}\}\vert. \]
-    ここで，$x\in V'$について，
-    \begin{enumerate}[label=\arabic*.]
-    \item $y\in\mathcal{N}_{G'}(x)$を走査するので，最悪$k_{\max}$かかる
-    \item 順位キューに追加されたので，$\log N'$かかる
-    \end{enumerate}
-    したがって，ひとつ$z\in V$を固定したときの時間計算量，すなわち
-    \textproc{IncrementalPart}の時間計算量は，
-    \[ N'k_{\max}+N'\log N' \]
-    である．
-    \par これを$N$回繰り返すが，更新が起こらない場合の時間計算量は，最初の判定
-    のみであるため，$\mathcal{O}(1)$である．したがって，距離と経路数の更新に
-    かかる時間計算量は
-    \[ \mathcal{O}(N'^2k_{\max}+N'^2\log N') \]
-    である．
-  \item ペア依存度の更新
-    \par 更新した頂点の数を$N''$とする．すなわち，
-    \[ N'=\vert\{x|\exists z\in V\:\text{s.t.}\:F'_{z}(x)\neq F_{z}(x)\}\vert. \]
-    ここで，$x\in V'$について，
-    \begin{enumerate}[label=\arabic*.]
-    \item $y\in\mathcal{N}_{G'}(x)$を走査するので，最悪$k_{\max}$かかる
-    \item 順位キューに追加されたので，$\log N''$かかる
-    \end{enumerate}
-    したがって，ひとつ$z\in V$を固定したときの時間計算量，すなわち
-    \textproc{IncrementalPart}の時間計算量は，
-    \[ N''k_{\max}+N''\log N'' \]
-    である．
-    \par これを$N$回繰り返すが，更新が起こらない場合の時間計算量は，最初の判定
-    のみであるため，$\mathcal{O}(1)$である．したがって，距離と経路数の更新に
-    かかる時間計算量は
-    \[ \mathcal{O}(N''^2k_{\max}+N''^2\log N'') \]
-    である．
-  \end{enumerate}
-
-  補題...より，$N''\geq N'$なので，全体の計算量は
-  \begin{equation*}
-    \begin{aligned}
-      &\mathcal{O}(N'^2k_{\max}+N'^2\log N'+N''^2k_{\max}+N''^2\log N'')\\
-      =&\mathcal{O}(N''^2k_{\max}+N''^2\log N'')
-    \end{aligned}
-  \end{equation*}
-  である．
-\end{proof}
-
-実際に媒介中心性が変化した頂点の数と$N''$との間の関係は，一般的な議論は難しい．
-
-\begin{example}
-  図\ref{fig:bc-many-phony}のグラフにおいて，辺$\{V,W\}$を削除したときのアルゴリズムが更新する頂点の数$N''$は$N''\sim N$であるが，
-  実際に媒介中心性が変化する頂点は$T,U,V,W$の$4$個である．
-
-  \begin{figure}[tb]
-    \centering
-    \def\svgwidth{.8\linewidth}
-    \input{bc-many-phony.pdf_tex}
-    \caption{空振りが多い状況}
-    \label{fig:bc-many-phony}
-  \end{figure}
-\end{example}
-
-\subsection{アルゴリズム}
-\label{subsect:incremental-algorithm}
-最後に，アルゴリズムを\ref{algo:incremental-algorithm}に示す．
 
 \begin{algorithm}[tbp]
   \caption{一辺挿入時のペア依存度を更新するアルゴリズム}
@@ -359,12 +279,9 @@ $d'_{xz}$の降順となるように次式を計算しながら走査する．
 
 \section{一辺削除時の媒介中心性更新法}
 \label{sect:update-bc-on-delete}
-本章では，$G=(V,E)$に辺$e=\{\alpha,\beta\} \not\in E$を削除して得られるグラフを
-$G'=(V,E')$とする．$G'$における頂点$s$から頂点$t\,(\neq s)$への最短経路を有向グラフ
-$G'_{st}=(V'_{st},E'_{st})$で表し，すべての頂点から頂点$s$への最短経
-路を有向グラフ$G'_s=(V,E'_s)$で表す．また，$G'$における頂点$s$から
-頂点$t\,(\neq s)$への最短経路の個数と長さをそれぞれ$\sigma'_{st}$, 
-$d'_{st}$で表す．
+本節では，$G=(V,E)$に辺$e=\{v,w\}\in E$を削除して得られるグラフを$G'=(V,E')$とする．
+アルゴリズムをアルゴリズム\ref{algo:decremental-algorithm}に示す．
+以下，アルゴリズムの構成について説明する．
 
 \subsection{最短経路の更新}
 \label{subsect:update-augdist-on-delete}
@@ -388,20 +305,21 @@ $d'_{st}$で表す．
   逆は，この手順を逆に行うことで証明できる．
 \end{proof}
 
-\ref{lemma:update-augdist-on-delete}を満たす$x$について，挿入時と同様に計算する．つまり，
-\begin{align*}
-  d'_{xz}&=\min_{y\in\mathcal{N}_{G'}(x)}(l_{xy}+d'_{yz})\\
-  \sigma'_{xz}&=\sum_{y\in\mathcal{N}_{G'}(x),d'_{xz}=l_{xy}+d'_{yz}}\sigma'_{yz}.
-\end{align*}
-
-計算式より，$d'_{xz}$を計算するには，$d'_{xz}>d'_{yz}$であるすべての$y$について$d'_{yz}$を
+\ref{lemma:update-augdist-on-delete}を満たす$x$について，補題\ref{lemma:distance-and-geodesics}に
+示した計算式によって計算する．
+挿入時と同様に，$d'_{xz}$を計算するには$d'_{xz}>d'_{yz}$であるすべての$y$について$d'_{yz}$を
 計算する必要がある．したがって$d'_{xz}$の昇順に計算することとなる．
-
 一方，挿入時と違い，$d'_{xz}$が最小となる$x$は直ちに求めることはできない．
-例えば，$G=(\{v,w,x,z\},\{\{x,v\},\{v,w\},\{w,z\},\{x,z\}\}),l_{xv}=l_{vw}=l_{wz}=1,l_{xz}=100$
+例えば，
+\begin{equation*}
+  \begin{aligned}
+    G=&(\{v,w,x,z\},\{\{x,v\},\{v,w\},\{w,z\},\{x,z\}\})\\
+    l_{xv}=&l_{vw}=l_{wz}=1,\,l_{xz}=100
+  \end{aligned}
+\end{equation*}
 において，$\{v,w\}$が削除されたとき，$d'_{sz}$が最小となる$s$は$v$ではなく$x$である．
 
-次の手順で$d'_{xz}$および$\sigma'_{xz}$を計算する．
+正しい順序で$d'_{xz}$および$\sigma'_{xz}$を計算するため，次の手順で計算を行う．
 \begin{enumerate}
 \item 補題\ref{lemma:update-augdist-on-delete}が成り立つ頂点を，$v$を始点として探索する
 \item その頂点の内，補題\ref{lemma:update-augdist-on-delete}を満たさない頂点と隣接する頂点について，
@@ -409,82 +327,14 @@ $d'_{st}$で表す．
 \item $d'_{xz}$と$\sigma'_{xz}$を計算した頂点を始点として，更新対象となる頂点のみを対象として，
   Dijkstra法の要領で探索を進める
 \end{enumerate}
-詳しくはアルゴリズムを参照されたし．
 
 \subsection{ペア依存度の更新}
 \label{subsect:update-delta-on-delete}
 
 削除後のペア依存度$\delta'_z(x)$をBrandesのアルゴリズムによって求める．
-具体的には，\ref{subsect:update-augdist-on-delete}で求めた影響を受ける頂点から，
+具体的には，補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}の
+\ref{item:implicit-invariability-of-pairwise-dependency-2}を満たさない頂点から，
 $d'_{xz}$の降順となるように次式を計算しながら走査する．
-\[ \delta'_{z}(x)\gets\sum_{(y,x)\in E_z}\frac{\sigma'_{xz}}{\sigma'_{yz}}(1+\delta'_z(y)) \]
-
-\subsection{計算量の解析}
-\label{subsect:computational-complexity-of-decremental-algorithm}で
-
-\begin{theorem}
-  \textproc{Decremental}の時間計算量は
-  \[ \mathcal{O}(N''^2k_{\max}+N''^2\log N'') \]
-  である．
-\end{theorem}
-\begin{proof}
-  アルゴリズムは以下の手順で構成される．
-  \begin{enumerate}[label=(\alph*)]
-  \item 距離と経路数の更新
-  \item ペア依存度の更新
-  \end{enumerate}
-  それぞれについて，時間計算量を求める．
-
-  \begin{enumerate}[label=(\alph*)]
-  \item 距離と経路数の更新
-    \par 更新によって変化した頂点の数を$N'$とする．すなわち，
-    \[ N'=\vert\{x|\exists z\in V\:\text{s.t.}\:d'_{xz}\neq d_{xz}\lor\sigma'_{xz}\neq\sigma_{xz}\}\vert. \]
-    ここで，$x\in V'$について，
-    \begin{enumerate}[label=\arabic*.]
-    \item $y\in\mathcal{N}_{G'}(x)$を走査するので，最悪$k_{\max}$かかる
-    \item 順位キューに追加されたので，$\log N'$かかる
-    \end{enumerate}
-    したがって，ひとつ$z\in V$を固定したときの時間計算量，すなわち
-    \textproc{IncrementalPart}の時間計算量は，
-    \[ N'k_{\max}+N'\log N' \]
-    である．
-    \par これを$N$回繰り返すが，更新が起こらない場合の時間計算量は，最初の判定
-    のみであるため，$\mathcal{O}(1)$である．したがって，距離と経路数の更新に
-    かかる時間計算量は
-    \[ \mathcal{O}(N'^2k_{\max}+N'^2\log N') \]
-    である．
-  \item ペア依存度の更新
-    \par 更新した頂点の数を$N''$とする．すなわち，
-    \[ N'=\vert\{x|\exists z\in V\:\text{s.t.}\:F'_{z}(x)\neq F_{z}(x)\}\vert. \]
-    ここで，$x\in V'$について，
-    \begin{enumerate}[label=\arabic*.]
-    \item $y\in\mathcal{N}_{G'}(x)$を走査するので，最悪$k_{\max}$かかる
-    \item 順位キューに追加されたので，$\log N''$かかる
-    \end{enumerate}
-    したがって，ひとつ$z\in V$を固定したときの時間計算量，すなわち
-    \textproc{IncrementalPart}の時間計算量は，
-    \[ N''k_{\max}+N''\log N'' \]
-    である．
-    \par これを$N$回繰り返すが，更新が起こらない場合の時間計算量は，最初の判定
-    のみであるため，$\mathcal{O}(1)$である．したがって，距離と経路数の更新に
-    かかる時間計算量は
-    \[ \mathcal{O}(N''^2k_{\max}+N''^2\log N'') \]
-    である．
-  \end{enumerate}
-
-  補題...より，$N''\geq N'$なので，全体の計算量は
-  \begin{equation*}
-    \begin{aligned}
-      &\mathcal{O}(N'^2k_{\max}+N'^2\log N'+N''^2k_{\max}+N''^2\log N'')\\
-      =&\mathcal{O}(N''^2k_{\max}+N''^2\log N'')
-    \end{aligned}
-  \end{equation*}
-  である．
-\end{proof}
-
-\subsection{アルゴリズム}
-\label{subsect:decremental-algorithm}
-最後に，アルゴリズムを\ref{algo:decremental-algorithm}に示す．
 
 \begin{algorithm}[tbp]
   \caption{一辺削除時のペア依存度を更新するアルゴリズム}

@@ -83,14 +83,6 @@
 
 実験結果より，ランダム正則グラフとErd\H{o}s--R\'{e}nyiモデルは
 ほぼ一致し，Barab\'{a}si--Albertモデルは定数倍と考えられる．
-したがって，理論解析の結果は，媒介中心性が変化する頂点の数を$B'$,
-定数を$c$とすると，次のように書き換えられる．
-\begin{enumerate}
-\item[] ランダム正則グラフ，Erd\H{o}s--R\'{e}nyiモデル：
-  \[ \mathcal{O}((B'+c)^2+k+(B'+c)^2\log(B'+c)) \]
-\item[] Barab\'{a}si--Albertモデル：
-  \[ \mathcal{O}((B'c)^2+k+(B'c)^2\log(B'c)) \]
-\end{enumerate}
 
 \begin{figure}[tb]
   \centering
@@ -128,16 +120,34 @@
   \label{fig:road-okayama}
 \end{figure}
 
-図\ref{fig:exp-road}は，辺をひとつ追加したときの，媒介中心性の最大値の
-分布である．辺の追加によって，最大$text{xxx}$媒介中心性の最大値を減少させる
-ことに成功した．
+図\ref{fig:exp-road-oka-correlation}は，辺をひとつ追加したときの，
+媒介中心性の最大値の分布である．
+辺の追加によって，最大$0.1607$の正規化された媒介中心性を
+$0.1379$まで減少させることに成功した．
 
-\textcolor{red}{結果待ちです，暫しお待ちを}
+具体的に，どこに挿入すれば媒介中心性が下がるのかは
+図\ref{fig:road-okayama-minmax}に示している．
 
 \begin{figure}[tb]
   \centering
+  \includegraphics[width=\textwidth]{road-oka-minmax.pdf}
+  \caption{青は媒介中心性の最大値が下がり，赤は媒介中心性の最大値が上がる，
+  それぞれベスト10を示している}
+  \label{fig:road-okayama-minmax}
+\end{figure}
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=.7\textwidth]{exp-road-oka-correlation.pdf}
   \caption{媒介中心性の最大値の分布}
-  \label{fig:exp-road}
+  \label{fig:exp-road-oka-correlation}
+\end{figure}
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=.7\textwidth]{exp-road-oka-time.pdf}
+  \caption{計算時間の積算の比較}
+  \label{fig:exp-road-oka-time}
 \end{figure}
 
 \subsection{媒介中心性のリアルタイム監視}

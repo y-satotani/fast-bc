@@ -16,6 +16,7 @@ $E$を\textbf{辺集合}とよび，その元を\textbf{辺}とよぶ．
 また，辺集合の要素数$|E|$を\textbf{頂点数}とよぶ．
 $E$の要素が順序対ならば，$G$は\textbf{有向グラフ}と呼ばれ，
 非順序対ならば$G$は\textbf{無向グラフ}と呼ばれる．
+有向グラフの辺$e=(v,w)$において，頂点$v$を始点，頂点$w$を終点と呼ぶ．
 グラフ$G=(V,E)$と$G'=(V',E')$に対して，$V'\subset V$かつ$E'\subset E$
 を満たすとき，$G'$は$G$の\textbf{部分グラフ}であるといい，$G'\in G$と記す．
 有向グラフ$G$について，各辺$(v,w)$を逆向きにしたグラフを$G$の逆と呼び，$\bar{G}$で表す．
@@ -26,13 +27,23 @@ $E$の要素が順序対ならば，$G$は\textbf{有向グラフ}と呼ばれ�
 以下，特に断らない限り辺の重みは正であるとする．
 また，重み付きグラフでないグラフを\textbf{重みなしグラフ}と呼ぶ．
 
-頂点$v$と辺$e$が\textbf{接続する}とは，$v\in e$つまり，$e$の端点に$v$が
-属することをいう．頂点$v$と頂点$w$が\textbf{隣接する}とは，$\{v,w\}$が
-辺集合$E$に属することをいう．
-グラフ$G$の頂点$v$について，$v$と隣接する頂点の集合を頂点$v$の\textbf{近傍}と
+無向グラフにおいて，頂点$v$と辺$e$が\textbf{接続する}とは，$v\in e$つまり，
+$e$の端点に$v$が属することをいう．
+頂点$v$と頂点$w$が\textbf{隣接する}とは，$\{v,w\}$が辺集合$E$に属することをいう．
+無向グラフ$G$の頂点$v$について，$v$と隣接する頂点の集合を頂点$v$の\textbf{近傍}と
 呼び，$\mathcal{N}_G(v)$で表す．また，無向グラフ$G$について$v$の近傍の数
 $|\mathcal{N}_G(v)|$を\textbf{次数}と呼び，$k(v)$あるいは$k_G(v)$と記す．
 すべての頂点の次数が等しいグラフを\textbf{正則グラフ}と呼ぶ．
+頂点$v$の近傍の近傍の和集合$\cup_{w\in\mathcal{N}_G(v)}\mathcal{N}_G(w)$を
+$\mathcal{N}_G^2(v)$と記す．便宜上，$\mathcal{N}_G^1(v)=\mathcal{N}_G(v)$で，
+一般的には$\mathcal{N}_G^i=\cup_{w\in\mathcal{N}_G^{i-1}(v)}\mathcal{N}_g(w)$である．
+
+有向グラフ$G$の頂点$v$について，$v$を終点とする辺の始点の集合を\textbf{先行}
+(predecessor)と呼び，$\mathcal{P}_G(v)$と記す．すなわち，
+$\mathcal{P}_G(v)=\{u|(u,v)\in E\}$である．
+同様に，$v$を始点とする辺の終点の集合を\textbf{後継}(successor)と呼び，
+$\mathcal{S}_G(v)$と記す．すなわち，$\mathcal{S}_G(v)=\{w|(v,w)\in E\}$である．
+近傍と同様に，$\mathcal{P}_G^i(v)$および$\mathcal{S}_G^i(v)$を用いる．
 
 有向な\textbf{道グラフ}，あるいは単に道とは，$P=(V,E)$のグラフで，
 \begin{equation*}
@@ -58,6 +69,10 @@ $\sigma_{st}=\sigma_{ts}$である．
 また，$s$から$t$への最短経路の中で頂点$v$を通るものの個数を$\sigma_{st}(v)$で表す．
 頂点$s$から他の頂点へのすべての最短経路で構成される有向グラフを$G_s=(V_s,E_s)$で表す．
 同様に，頂点$s$から頂点$t$へのすべての最短経路で構成される有向グラフを$G_{st}=(V_{st},E_{st})$で表す．
+さらに，頂点$s$と頂点$v$について，$G_s$のトポロジカルソートにおいて$v$より後に位置する頂点集合と$v$で
+構成される部分グラフを$G_s(v)=(V_s(v),E_s(v))$で表す．すなわち，
+$V_s(v)=\{w|w\in V_s,d_{sw}=d_{sv}+d_{vw}\}, E_s(v)=\{(w,x)|(w,x)\in E_s,d_{sx}=d_{sv}+d_{vw}+l_{wx}\}$
+である．
 
 \begin{example}
   図\ref{fig:graph-diamond}にグラフの例を示す．記号を囲んだ円は頂点を表し，
@@ -65,7 +80,7 @@ $\sigma_{st}=\sigma_{ts}$である．
   線分の傍らにある数字は辺の重みを表す．頂点集合は
   \[ \{A,B,C,D,E,F,G,H\} \]
   で，辺集合は
-  \[ \{(A,B),(A,E),(B,C),(B,D),(C,E),(D,E),(E,F),(E,G),(F,H),(G,H)\} \]
+  \[ \{\{A,B\},\{A,E\},\{B,C\},\{B,D\},\{C,E\},\{D,E\},\{E,F\},\{E,G\},\{F,H\},\{G,H\}\} \]
   である．また，$B$と$H$のひとつの最短経路は
   \[ B,(B,C),C,(C,E),E,(E,F),F,(F,H),H \]
   である．さらに，$d_{BH}=7,\,\sigma_{BH}=4$である．
@@ -183,8 +198,8 @@ $\sigma_{st}=\sigma_{ts}$である．
 次の補題は，最短距離および最短経路数を，ほかの頂点とのもので陰に表すことができる
 ことを示している．
 
-\begin{lemma-without-proof}
-  \label{lemma:distance-of-path}
+\begin{lemma}
+  \label{lemma:distance-and-geodesics}
   $G=(V,E)$の異なるに頂点$s,t\in V$について，次が成り立つ．
   \begin{equation*}
     \begin{aligned}
@@ -192,7 +207,7 @@ $\sigma_{st}=\sigma_{ts}$である．
       \sigma_{st}&=\sum_{i\in\mathcal{N}_G(s),\,d_{st}=l_{si}+d_{it}}\sigma_{it}
     \end{aligned}
   \end{equation*}
-\end{lemma-without-proof}
+\end{lemma}
 \begin{proof}
   すべての辺の重みは正であるため，頂点$s$から頂点$v$までの最短経路の最後の辺は，
   $d_{su}<d_{su}$が成立する編集号に含まれる辺$(u,v)$である．これは，補題1
@@ -422,10 +437,12 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
 \end{proof}
 
 Brandesのアルゴリズムは定理\ref{th:implicit-pd}の性質を応用して媒介中心性を高速に計算している．
+Brandesのアルゴリズムをアルゴリズム\ref{algo:brandes}に示す．
 
 このアルゴリズムの計算量を考える．まず，ある$s\in V$とすべての$v\in V$に対して
 $\sigma_{sv}$を計算するときの計算量は，Dijkstra法より$\mathcal{O}(|V|\log |V|+|E|)$である．
-ステップ4についても，$G$のすべての頂点$v$を$s$からの最短経路の逆向きに一度だけ辿ることにより$\delta_s(v)$の値を更新できるため，$\mathcal{O}(|E|)$の時間で実行できる\cite{Brandes2001}．
+ペア依存度の積算についても，$G$のすべての頂点$v$を$s$からの最短経路の逆向きに一度だけ辿ることにより
+$\delta_s(v)$の値を更新できるため，$\mathcal{O}(|E|)$の時間で実行できる\cite{Brandes2001}．
 したがって，すべての$s\in V$に対するアルゴリズムの計算量は$\mathcal{O}(|V|^2\log |V|+|V||E|)$であり，
 それは$\mathcal{O}(|V|^3)$よりも小さい．
 

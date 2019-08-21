@@ -1,0 +1,246 @@
+\chapter{計算量の解析}
+\label{chap:complexity-analysis}
+
+以下の議論に必要な記号を定義する．
+
+\begin{definition}
+  ある頂点$z$についてペア依存度$\delta_z(x)$を更新した頂点$x$の数，
+  すなわち，補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}の
+  \ref{item:implicit-invariability-of-pairwise-dependency-2}が成り立たない頂点の集合を
+  $V_\delta(z)$とする．また，$V_\delta(z)$に属する頂点と接する辺の集合を$E_\delta(z)$とする．
+  すなわち，
+  \begin{equation*}
+    \begin{aligned}
+      V_\delta(z)&=\{x|x\in V,\exists w\in\mathcal{N}_G(x),
+      x\in\mathcal{S}_{G_z}(w)\veebar x\in\mathcal{S}_{G'_z}(w)\}\\
+      E_\delta(z)&=\{(x,y)|(x,y)\in E,\,x\in V_\delta(z)\lor y\in V_\delta(z)\}.
+    \end{aligned}
+  \end{equation*}
+
+  同様に，アルゴリズムによって距離または最短経路数を更新した頂点の集合を$V_{\delta'}(z)$，
+  $V_{\delta'}(z)$に属する頂点と接続する辺の集合を$E_{\delta'}(z)$とする．すなわち，
+  \begin{equation*}
+    \begin{aligned}
+      V_{\delta'}(z)&=\{x|\:E_{xz}\neq E'_{xz}\} \\
+      E_{\delta'}(z)&=\{\{x,y\}|x\in V_{\delta'}(z)\lor y\in V_{\delta'}(z)\}
+    \end{aligned}
+  \end{equation*}
+
+  最後に，媒介中心性を更新した頂点の集合およびその要素と接続する辺の集合を
+  \begin{equation*}
+    \begin{aligned}
+      V_\delta&=\{x|\exists z,\,x\in V_delta(z)\} \\
+      E_\delta&=\{\{x,y\}|x\in V_\delta\lor y\in V_\delta\}
+    \end{aligned}
+  \end{equation*}
+  とする．
+\end{definition}
+
+実際に媒介中心性が変化した頂点の数と$\lvert V_\delta\rvert$の関係について，一般的な議論は難しい．
+
+\begin{example}
+  図\ref{fig:bc-many-phony}のグラフにおいて，辺$\{V,W\}$を削除したときにアルゴリズムが
+  ペア依存度を更新する頂点の数は$\lvert V_\delta\rvert\sim \lvert V\rvert$であるが，
+  実際に媒介中心性が変化する頂点は$T,U,V,W$の$4$個である．
+
+  \begin{figure}[tb]
+    \centering
+    \def\svgwidth{.8\linewidth}
+    \input{bc-many-phony.pdf_tex}
+    \caption{媒介中心性が変化しない頂点を多く更新する例}
+    \label{fig:bc-many-phony}
+  \end{figure}
+\end{example}
+
+\section{挿入時の計算量の解析}
+\label{subsect:computational-complexity-of-incremental-algorithm}
+
+\begin{lemma}
+  アルゴリズム\ref{algo:incremental-algorithm}の\textproc{Incremental}の時間計算量は，
+  \[ \mathcal{O}(\lvert V_\delta\rvert\lvert E_\delta\rvert
+  +\lvert V_\delta\rvert^2\log \lvert V_\delta\rvert) \]
+  である．
+\end{lemma}
+\begin{proof}
+  アルゴリズム\ref{algo:incremental-algorithm}の\textproc{IncrementalPart}は
+  以下の手順で構成される．
+  \begin{enumerate}[label=(\alph*)]
+  \item 距離と経路数の更新
+  \item ペア依存度の更新
+  \end{enumerate}
+  それぞれの手順について，時間計算量を求める．
+  その後，アルゴリズムの全体である\textproc{Incremental}の時間計算量を求める．
+  以下，\textproc{IncrementalPart}で注目している頂点を$z$とする．
+
+  \begin{enumerate}[label=(\alph*)]
+  \item 距離と経路数の更新
+    \par $x\in V_{\delta'}(z)$について，
+    \begin{enumerate}[label=\arabic*.]
+    \item $y\in\mathcal{N}_{G'}(x)$を走査する
+    \item 順位キューに追加されている
+    \end{enumerate}
+    ので，$z$を固定したとき，距離と最短経路数の更新に必要な時間計算量は，
+    \begin{equation}
+      \begin{aligned}
+        &\mathcal{O}(\left(\sum_{x\in V_{\delta'}(z)}\lvert\mathcal{N}_G(x)\rvert\right)
+        +\log\lvert V_{\delta'}(z)\rvert) \nonumber\\
+        &\:=\mathcal{O}(\lvert E_{\delta'}(z)\rvert
+        +\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert) \nonumber
+      \end{aligned}
+    \end{equation}
+    である．
+
+  \item ペア依存度の更新
+    \par $x\in V_\delta(z)$について，
+    \begin{enumerate}[label=\arabic*.]
+    \item $y\in\mathcal{N}_{G'}(x)$を走査する
+    \item 順位キューに追加されている
+    \end{enumerate}
+    ので，$z$を固定したとき，距離と最短経路数の更新に必要な時間計算量は，
+    \begin{equation}
+      \begin{aligned}
+        &\mathcal{O}(\left(\sum_{x\in V_\delta(z)}\lvert\mathcal{N}_G(x)\rvert\right)
+        +\log\lvert V_\delta(z)\rvert) \nonumber\\
+        &\:=\mathcal{O}(\lvert E_\delta(z)\rvert
+        +\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert) \nonumber
+      \end{aligned}
+    \end{equation}
+    である．
+  \end{enumerate}
+  
+  補題\ref{lemma:condition-of-invariability-of-pairwise-dependency}と
+  補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}より
+  $V_\delta(z)\supset V_{\delta'}(z)$なので，\textproc{IncrementalPart}全体の計算量は
+  \begin{equation*}
+    \begin{aligned}
+      &\mathcal{O}(
+        \lvert E_{\delta'}(z)\rvert+\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert
+        +\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert
+      ) \nonumber\\
+      &\:=\mathcal{O}(\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert)
+    \end{aligned}
+  \end{equation*}
+  である．
+
+  \textproc{Incremental}は\textproc{IncrementalPart}を$\lvert V\rvert$回繰り返すが，
+  更新が起こらない場合，つまり$z\notin V_\delta$が成り立つ場合の時間計算量は，
+  最初の判定のみであるため，$\mathcal{O}(1)$である．したがって，\textproc{Incremental}の時間計算量は
+  \begin{equation*}
+    \begin{aligned}
+      &\mathcal{O}(\left(
+        \sum_{z\in V_\delta}\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert)
+        \right)+\sum_{z\notin V_\delta}1 \nonumber\\
+      &=\:\mathcal{O}(\sum_{z\in V_\delta}\lvert E_\delta\rvert
+      +\lvert V_\delta\rvert\log\lvert V_\delta\rvert)\nonumber\\
+      &\:=\mathcal{O}(\lvert V_\delta\rvert\lvert E_\delta\rvert
+      +\lvert V_\delta\rvert^2\log\lvert V_\delta\rvert) \nonumber\\
+    \end{aligned}
+  \end{equation*}
+  である．
+\end{proof}
+
+\section{削除時の計算量の解析}
+\label{subsect:computational-complexity-of-decremental-algorithm}
+
+\begin{lemma}
+  アルゴリズム\ref{algo:decremental-algorithm}の\textproc{Decremental}の時間計算量は，
+  \[ \mathcal{O}(\lvert V_\delta\rvert\lvert E_\delta\rvert
+  +\lvert V_\delta\rvert^2\log \lvert V_\delta\rvert) \]
+  である．
+\end{lemma}
+\begin{proof}
+  アルゴリズム\ref{algo:decremental-algorithm}の\textproc{DecrementalPart}は
+  以下の手順で構成される．
+  \begin{enumerate}[label=(\alph*)]
+  \item 距離と経路数を更新する頂点の探索
+  \item 距離と経路数の更新
+  \item ペア依存度の更新
+  \end{enumerate}
+  それぞれの手順について，時間計算量を求める．
+  その後，アルゴリズムの全体である\textproc{Decremental}の時間計算量を求める．
+  以下，\textproc{DecrementalPart}で注目している頂点を$z$とする．
+
+  \begin{enumerate}[label=(\alph*)]
+  \item 距離と経路数を更新する頂点の探索
+    \par $x\in V_{\delta'}(z)$について，
+    \begin{enumerate}[label=\arabic*.]
+    \item $y\in\mathcal{N}_{G'}(x)$を走査する
+    \item 集合$\text{WorkSet}$に追加されている
+    \end{enumerate}
+    ので，$z$を固定したとき，距離と最短経路数を更新する頂点の探索に必要な時間計算量は，
+    \begin{equation}
+      \begin{aligned}
+        &\mathcal{O}(\left(\sum_{x\in V_{\delta'}(z)}\lvert\mathcal{N}_G(x)\rvert\right)
+        +\log\lvert V_{\delta'}(z)\rvert) \nonumber\\
+        &\:=\mathcal{O}(\lvert E_{\delta'}(z)\rvert
+        +\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert) \nonumber
+      \end{aligned}
+    \end{equation}
+    である．
+
+  \item 距離と経路数の更新
+    \par $x\in V_{\delta'}(z)$について，
+    \begin{enumerate}[label=\arabic*.]
+    \item $y\in\mathcal{N}_{G'}(x)$を走査する
+    \item 順位キューに追加されている
+    \end{enumerate}
+    ので，$z$を固定したとき，距離と最短経路数の更新に必要な時間計算量は，
+    \begin{equation}
+      \begin{aligned}
+        &\mathcal{O}(\left(\sum_{x\in V_{\delta'}(z)}\lvert\mathcal{N}_G(x)\rvert\right)
+        +\log\lvert V_{\delta'}(z)\rvert) \nonumber\\
+        &\:=\mathcal{O}(\lvert E_{\delta'}(z)\rvert
+        +\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert) \nonumber
+      \end{aligned}
+    \end{equation}
+    である．
+
+  \item ペア依存度の更新
+    \par $x\in V_\delta(z)$について，
+    \begin{enumerate}[label=\arabic*.]
+    \item $y\in\mathcal{N}_{G'}(x)$を走査する
+    \item 順位キューに追加されている
+    \end{enumerate}
+    ので，$z$を固定したとき，距離と最短経路数の更新に必要な時間計算量は，
+    \begin{equation}
+      \begin{aligned}
+        &\mathcal{O}(\left(\sum_{x\in V_\delta(z)}\lvert\mathcal{N}_G(x)\rvert\right)
+        +\log\lvert V_\delta(z)\rvert) \nonumber\\
+        &\:=\mathcal{O}(\lvert E_\delta(z)\rvert
+        +\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert) \nonumber
+      \end{aligned}
+    \end{equation}
+    である．
+  \end{enumerate}
+  
+  補題\ref{lemma:condition-of-invariability-of-pairwise-dependency}と
+  補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}より
+  $V_\delta(z)\supset V_{\delta'}(z)$なので，\textproc{DecrementalPart}全体の計算量は
+  \begin{equation*}
+    \begin{aligned}
+      &\mathcal{O}(
+        \lvert E_{\delta'}(z)\rvert+\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert
+        +\lvert E_{\delta'}(z)\rvert+\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert
+        +\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert
+      ) \nonumber\\
+      &\:=\mathcal{O}(\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert)
+    \end{aligned}
+  \end{equation*}
+  である．
+
+  \textproc{Decremental}は\textproc{DecrementalPart}を$\lvert V\rvert$回繰り返すが，
+  更新が起こらない場合，つまり$z\notin V_\delta$が成り立つ場合の時間計算量は，
+  最初の判定のみであるため，$\mathcal{O}(1)$である．したがって，\textproc{Decremental}の時間計算量は
+  \begin{equation*}
+    \begin{aligned}
+      &\mathcal{O}(\left(
+        \sum_{z\in V_\delta}\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert)
+        \right)+\sum_{z\notin V_\delta}1 \nonumber\\
+      &=\:\mathcal{O}(\sum_{z\in V_\delta}\lvert E_\delta\rvert
+      +\lvert V_\delta\rvert\log\lvert V_\delta\rvert)\nonumber\\
+      &\:=\mathcal{O}(\lvert V_\delta\rvert\lvert E_\delta\rvert
+      +\lvert V_\delta\rvert^2\log\lvert V_\delta\rvert) \nonumber\\
+    \end{aligned}
+  \end{equation*}
+  である．
+\end{proof}
