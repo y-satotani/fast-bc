@@ -3,7 +3,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(viridis)
-theme_set(theme_light(base_size = 11, base_family = 'IPAexGothic'))
+theme_set(theme_light(base_size = 9, base_family = 'IPAexGothic'))
 out_file <- paste0(sub('^--file=(.+)\\.R$', '\\1', basename(commandArgs()[4])), '.pdf')
 
 data <- read_csv(
@@ -27,13 +27,14 @@ data <- read_csv(
 
 gp <- ggplot(data, aes(`edge-id`, `time`, colour = method)) +
   geom_step() +
-  xlab('辺の数') +
-  ylab('積算計算時間[s]') +
+  xlab('累計辺数') +
+  ylab('累計実行時間(s)') +
   scale_colour_viridis(discrete = TRUE, begin = 0.3, end = 0.7) +
   theme(
     legend.title = element_blank(),
+    legend.position = 'right',
     strip.text = element_text(colour = 'black'),
     strip.background = element_blank()
   )
 
-ggsave(out_file, gp, cairo_pdf, width = 18, height = 12, units = 'cm')
+ggsave(out_file, gp, cairo_pdf, width = 9, height = 7, units = 'cm')

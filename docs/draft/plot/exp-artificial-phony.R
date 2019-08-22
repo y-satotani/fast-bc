@@ -3,10 +3,11 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(viridis)
-theme_set(theme_light(base_size = 11, base_family = 'IPAexGothic'))
+theme_set(theme_light(base_size = 9, base_family = 'IPAexGothic'))
 out_file <- paste0(sub('^--file=(.+)\\.R$', '\\1', basename(commandArgs()[4])), '.pdf')
 
 data_time <- read_csv('../../res/data/artificial.csv') %>%
+  filter(name %in% c('ER', 'BA')) %>%
   mutate(
     `time-diff` = `time-brandes` - `time-proposed`,
     `phony-verts` = `updated-bc-verts` - `changed-bc-verts`,
@@ -38,4 +39,4 @@ gp <- ggplot(
     strip.background = element_blank()
   )
 
-ggsave(out_file, gp, cairo_pdf, width = 18, height = 8, units = 'cm')
+ggsave(out_file, gp, cairo_pdf, width = 12, height = 8, units = 'cm')

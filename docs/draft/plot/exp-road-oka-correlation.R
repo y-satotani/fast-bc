@@ -3,7 +3,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(viridis)
-theme_set(theme_light(base_size = 11, base_family = 'IPAexGothic'))
+theme_set(theme_light(base_size = 9, base_family = 'IPAexGothic'))
 out_file <- paste0(sub('^--file=(.+)\\.R$', '\\1', basename(commandArgs()[4])), '.pdf')
 
 data_static <- read_csv(
@@ -27,8 +27,8 @@ data <- data_dynamic %>%
 
 gp <- ggplot(data, aes(`min-bc-on-pair`, `max-bc`)) +
   geom_point(colour = 'royalblue4', alpha = 0.3) +
-  xlab('挿入した辺と接続する媒介中心性の最小値') +
-  ylab('挿入後の媒介中心性の全体の最大値') +
+  xlab('挿入辺と接続する頂点の媒介中心性の最小値') +
+  ylab('挿入後の全体の媒介中心性の最大値') +
   theme(
     legend.title = element_blank(),
     legend.position = 'top',
@@ -36,4 +36,4 @@ gp <- ggplot(data, aes(`min-bc-on-pair`, `max-bc`)) +
     strip.background = element_blank()
   )
 
-ggsave(out_file, gp, cairo_pdf, width = 18, height = 12, units = 'cm')
+ggsave(out_file, gp, cairo_pdf, width = 9, height = 7, units = 'cm')

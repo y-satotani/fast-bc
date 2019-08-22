@@ -47,7 +47,7 @@ BrandesとPich\cite{Brandes2007}やBader\cite{Bader2007}によってこの方法
 
 他にも，PfefferとCarleyによる，最短距離に上限を設ける方法\cite{Pfeffer2012}や，
 Yoshidaによる，媒介中心性を符号化する働きをもつHypergraph Sketchを利用する方法\cite{Yoshida2014}，
-BorassiとNataleによる，ランダムに選択した二兆点間の最短経路を双方向幅優先探索により求め，
+BorassiとNataleによる，ランダムに選択した二頂点間の最短経路を双方向幅優先探索により求め，
 それを繰り返す方法\cite{Borassi2019}がある．
 
 \section{動的グラフ}
@@ -90,11 +90,12 @@ Jamourらは，articulation pointと媒介中心性の変化量の性質を示�
   \caption{最短経路と共に媒介中心性を更新するアルゴリズム}
   \begin{tabular}{ccc}
     \hline
-    アルゴリズム & 最短経路更新アルゴリズム & クエリ \\ \hline
-    \cite{Kas2013} & \cite{Ramalingam1996} & 挿入 \\ \hline
-    \cite{Nasre2014a} & \cite{Karger1993} & 挿入 \\ \hline
-    \cite{Nasre2014b} & \cite{Demetrescu2003} & 削除 \\ \hline
-    \cite{Pontecorvi2015} & \cite{Demetrescu2003} & 挿入/削除 \\ \hline
-    \cite{Bergamini2017} & \cite{Ramalingam1996} & 挿入 \\ \hline
+    アルゴリズム & 最短経路更新アルゴリズム & 辺の操作 \\ \hline
+    Kasら\cite{Kas2013} & Ramalingamら\cite{Ramalingam1996} & 挿入 \\ \hline
+    Nasreら\cite{Nasre2014a} & Kargerら\cite{Karger1993} & 挿入 \\ \hline
+    Nasreら\cite{Nasre2014b} & Demetrescuら\cite{Demetrescu2003} & 削除 \\ \hline
+    Pontecorviら\cite{Pontecorvi2015} & Demetrescuら\cite{Demetrescu2003} & 挿入/削除 \\ \hline
+    Bergaminiら\cite{Bergamini2017} & Ramalingamら\cite{Ramalingam1996} & 挿入 \\ \hline
+    本研究 & Ramalingamら\cite{Ramalingam1996} & 削除 \\ \hline
   \end{tabular}
 \end{table}

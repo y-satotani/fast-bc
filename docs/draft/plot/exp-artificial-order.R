@@ -3,10 +3,11 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(viridis)
-theme_set(theme_light(base_size = 11, base_family = 'IPAexGothic'))
+theme_set(theme_light(base_size = 9, base_family = 'IPAexGothic'))
 out_file <- paste0(sub('^--file=(.+)\\.R$', '\\1', basename(commandArgs()[4])), '.pdf')
 
 data_time <- read_csv('../../res/data/artificial.csv') %>%
+  filter(name %in% c('ER', 'BA')) %>%
   group_by(name, n, k, mode) %>%
   summarise(
     `proposed-max` = max(`time-proposed`),
@@ -52,4 +53,4 @@ gp <- ggplot(
     strip.background = element_blank()
   )
 
-ggsave(out_file, gp, cairo_pdf, width = 18, height = 12, units = 'cm')
+ggsave(out_file, gp, cairo_pdf, width = 12, height = 10, units = 'cm')
