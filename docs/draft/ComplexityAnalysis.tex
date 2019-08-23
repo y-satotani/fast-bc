@@ -82,8 +82,8 @@
     ので，$z$を固定したとき，距離と最短経路数の更新に必要な時間計算量は，
     \begin{equation}
       \begin{aligned}
-        &\mathcal{O}(\left(\sum_{x\in V_{\delta'}(z)}\lvert\mathcal{N}_G(x)\rvert\right)
-        +\log\lvert V_{\delta'}(z)\rvert) \nonumber\\
+        &\mathcal{O}(\sum_{x\in V_{\delta'}(z)}(\lvert\mathcal{N}_G(x)\rvert
+        +\log\lvert V_{\delta'}(z)\rvert)) \nonumber\\
         &\:=\mathcal{O}(\lvert E_{\delta'}(z)\rvert
         +\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert) \nonumber
       \end{aligned}
@@ -96,11 +96,11 @@
     \item $y\in\mathcal{N}_{G'}(x)$を走査する
     \item 順位キューに追加されている
     \end{enumerate}
-    ので，$z$を固定したとき，距離と最短経路数の更新に必要な時間計算量は，
+    ので，$z$を固定したとき，ペア依存度の更新に必要な時間計算量は，
     \begin{equation}
       \begin{aligned}
-        &\mathcal{O}(\left(\sum_{x\in V_\delta(z)}\lvert\mathcal{N}_G(x)\rvert\right)
-        +\log\lvert V_\delta(z)\rvert) \nonumber\\
+        &\mathcal{O}(\sum_{x\in V_\delta(z)}(\lvert\mathcal{N}_G(x)\rvert
+        +\log\lvert V_\delta(z)\rvert)) \nonumber\\
         &\:=\mathcal{O}(\lvert E_\delta(z)\rvert
         +\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert) \nonumber
       \end{aligned}
@@ -127,11 +127,11 @@
   最初の判定のみであるため，$\mathcal{O}(1)$である．したがって，\textproc{Incremental}の時間計算量は
   \begin{equation*}
     \begin{aligned}
-      &\mathcal{O}(\left(
-        \sum_{z\in V_\delta}\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert)
-        \right)+\sum_{z\notin V_\delta}1 \nonumber\\
-      &=\:\mathcal{O}(\sum_{z\in V_\delta}\lvert E_\delta\rvert
-      +\lvert V_\delta\rvert\log\lvert V_\delta\rvert)\nonumber\\
+      &\mathcal{O}(
+      \sum_{z\in V_\delta}(\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert)
+      +\sum_{z\notin V_\delta}1) \nonumber\\
+      &=\:\mathcal{O}(\sum_{z\in V_\delta}(\lvert E_\delta\rvert
+      +\lvert V_\delta\rvert\log\lvert V_\delta\rvert))\nonumber\\
       &\:=\mathcal{O}(\lvert V_\delta\rvert\lvert E_\delta\rvert
       +\lvert V_\delta\rvert^2\log\lvert V_\delta\rvert) \nonumber\\
     \end{aligned}
@@ -170,8 +170,8 @@
     ので，$z$を固定したとき，距離と最短経路数を更新する頂点の探索に必要な時間計算量は，
     \begin{equation}
       \begin{aligned}
-        &\mathcal{O}(\left(\sum_{x\in V_{\delta'}(z)}\lvert\mathcal{N}_G(x)\rvert\right)
-        +\log\lvert V_{\delta'}(z)\rvert) \nonumber\\
+        &\mathcal{O}(\sum_{x\in V_{\delta'}(z)}(\lvert\mathcal{N}_G(x)\rvert
+        +\log\lvert V_{\delta'}(z)\rvert)) \nonumber\\
         &\:=\mathcal{O}(\lvert E_{\delta'}(z)\rvert
         +\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert) \nonumber
       \end{aligned}
@@ -187,8 +187,8 @@
     ので，$z$を固定したとき，距離と最短経路数の更新に必要な時間計算量は，
     \begin{equation}
       \begin{aligned}
-        &\mathcal{O}(\left(\sum_{x\in V_{\delta'}(z)}\lvert\mathcal{N}_G(x)\rvert\right)
-        +\log\lvert V_{\delta'}(z)\rvert) \nonumber\\
+        &\mathcal{O}(\sum_{x\in V_{\delta'}(z)}(\lvert\mathcal{N}_G(x)\rvert
+        +\log\lvert V_{\delta'}(z)\rvert)) \nonumber\\
         &\:=\mathcal{O}(\lvert E_{\delta'}(z)\rvert
         +\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert) \nonumber
       \end{aligned}
@@ -201,11 +201,11 @@
     \item $y\in\mathcal{N}_{G'}(x)$を走査する
     \item 順位キューに追加されている
     \end{enumerate}
-    ので，$z$を固定したとき，距離と最短経路数の更新に必要な時間計算量は，
+    ので，$z$を固定したとき，ペア依存度の更新に必要な時間計算量は，
     \begin{equation}
       \begin{aligned}
-        &\mathcal{O}(\left(\sum_{x\in V_\delta(z)}\lvert\mathcal{N}_G(x)\rvert\right)
-        +\log\lvert V_\delta(z)\rvert) \nonumber\\
+        &\mathcal{O}(\sum_{x\in V_\delta(z)}(\lvert\mathcal{N}_G(x)\rvert
+        +\log\lvert V_\delta(z)\rvert)) \nonumber\\
         &\:=\mathcal{O}(\lvert E_\delta(z)\rvert
         +\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert) \nonumber
       \end{aligned}
@@ -233,11 +233,11 @@
   最初の判定のみであるため，$\mathcal{O}(1)$である．したがって，\textproc{Decremental}の時間計算量は
   \begin{equation*}
     \begin{aligned}
-      &\mathcal{O}(\left(
-        \sum_{z\in V_\delta}\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert)
-        \right)+\sum_{z\notin V_\delta}1 \nonumber\\
-      &=\:\mathcal{O}(\sum_{z\in V_\delta}\lvert E_\delta\rvert
-      +\lvert V_\delta\rvert\log\lvert V_\delta\rvert)\nonumber\\
+      &\mathcal{O}(
+      \sum_{z\in V_\delta}(\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert)
+      +\sum_{z\notin V_\delta}1) \nonumber\\
+      &=\:\mathcal{O}(\sum_{z\in V_\delta}(\lvert E_\delta\rvert
+      +\lvert V_\delta\rvert\log\lvert V_\delta\rvert))\nonumber\\
       &\:=\mathcal{O}(\lvert V_\delta\rvert\lvert E_\delta\rvert
       +\lvert V_\delta\rvert^2\log\lvert V_\delta\rvert) \nonumber\\
     \end{aligned}
