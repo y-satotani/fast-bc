@@ -34,9 +34,19 @@ $e$の端点に$v$が属することをいう．
 呼び，$\mathcal{N}_G(v)$で表す．また，無向グラフ$G$について$v$の近傍の数
 $|\mathcal{N}_G(v)|$を\textbf{次数}と呼び，$k(v)$あるいは$k_G(v)$と記す．
 すべての頂点の次数が等しいグラフを\textbf{正則グラフ}と呼ぶ．
-頂点$v$の近傍の近傍の和集合$\cup_{w\in\mathcal{N}_G(v)}\mathcal{N}_G(w)$を
-$\mathcal{N}_G^2(v)$と記す．便宜上，$\mathcal{N}_G^1(v)=\mathcal{N}_G(v)$で，
-一般的には$\mathcal{N}_G^i=\cup_{w\in\mathcal{N}_G^{i-1}(v)}\mathcal{N}_g(w)$である．
+頂点$v$の近傍の各頂点の近傍の和集合$\cup_{w\in\mathcal{N}_G(v)}\mathcal{N}_G(w)$を
+$\mathcal{N}_G^2(v)$と記す．$\mathcal{N}_G^1(v)=\mathcal{N}_G(v)$とし，
+$\mathcal{N}_G^i=\cup_{w\in\mathcal{N}_G^{i-1}(v)}\mathcal{N}_g(w)$とする．
+
+無向グラフ$G=(\{1,\ldots,n\},E)$に対して，次の行列$A\in\{0,1\}^{n\times n}$を
+\textbf{隣接行列}と呼ぶ．
+\begin{equation*}
+  a_{ij}=
+  \begin{cases}
+    1 & (i\text{と}j\text{が隣接する}) \\
+    0. & (i\text{と}j\text{が隣接しない})
+  \end{cases}
+\end{equation*}
 
 有向グラフ$G$の頂点$v$について，$v$を終点とする辺の始点の集合を\textbf{先行}
 (predecessor)と呼び，$\mathcal{P}_G(v)$と記す．すなわち，

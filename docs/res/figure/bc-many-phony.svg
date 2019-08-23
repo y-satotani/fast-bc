@@ -14,7 +14,7 @@
    viewBox="0 0 200.63308 71.487243"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.4 (33fec40, 2019-01-16)"
+   inkscape:version="0.92.4 (f8dce91, 2019-08-02)"
    sodipodi:docname="bc-many-phony.svg">
   <defs
      id="defs2">
@@ -147,7 +147,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4142136"
-     inkscape:cx="361.84931"
+     inkscape:cx="234.21654"
      inkscape:cy="159.87606"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -174,7 +174,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -612,12 +612,12 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:15.875px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.39687499"
-       x="73.642677"
+       x="72.584343"
        y="134.46346"
        id="text921-6-9-9-6-6-4"><tspan
          sodipodi:role="line"
          id="tspan919-7-1-4-5-9-5"
-         x="73.642677"
+         x="72.584343"
          y="134.46346"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.39687499">$\ddots$</tspan></text>
   </g>
