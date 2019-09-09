@@ -1,0 +1,114 @@
+\documentclass{article}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{multicol}
+\usepackage{geometry}
+\newgeometry{tmargin=2cm,lmargin=2cm,rmargin=2cm,bmargin=2cm}
+\usepackage[style=ieee,backend=biber,texencoding=utf8,bibencoding=utf8,dashed=false,isbn=false,url=false,doi=false,eprint=false,]{biblatex}
+\renewbibmacro{in:}{}
+\DeclareFieldFormat{journaltitle}{#1}
+\DeclareFieldFormat{booktitle}{#1}
+%\renewrobustcmd*{\bibinitdelim}{}
+\addbibresource{../res/MyCollection.bib}
+
+\title{An Exact Algorithm for Updating Betweenness Centrality on \\ Decremental Networks}
+\author{Bubo Bubo}
+
+\begin{document}
+
+\maketitle
+\section*{Abstract}
+
+\begin{multicols*}{2}
+  \section{Introduction}
+  Betweenness centrality (BC)\cite{Freeman1977} is one of various centrality, measure importance for each node on networks.
+  BC has many applications such as urban planning\cite{Crucitti2006} and webgraph optimization for advertisement\cite{Medya2018} since it implements importance as appearance on shortest paths.
+  Many algorithm to calculate BC has been developed after Brandes\cite{Brandes2001} proposed an algorithm that accumulates pair-dependencies.
+
+  While networks in real life have node and/or link alternations\cite{Holme2012}, algorithms to maintain and update BC have been also developed.
+  As there are well-known algorithms to update single source shortest paths (SSSP), it is natural to build BC update algorithms based on them.
+  Altough an incremental algorithm based on Ramalingam and Rep's (RR) algorithm\cite{Ramalingam1996} was proposed, no decremental algorithm was proposed to the best of our effort.
+
+  In this research, we provide an decremental algorithm to update BC based on RR algorithm.
+  We also examine its efficiency by both theoretical complexity analysis and experimental result.
+
+  The organization of this paper is following.
+  Section 2 shows related work concentrated to the algorithms to calculate BC and online algorithm for update of SSSP.
+  Section 3 shows graph notation will be used on the remaining of this paper.
+  Section 4 shows our proposed algorithm with some lemmas on criteria of updating pair-dependency.
+  Section 5 shows the time complexity of proposed algorithm and section 6 shows its efficiency by experiment.
+  Although worst-case complexity is same as one of Brandes', improvedment on execution time were comfirmed in many cases.
+
+  \section{Related Work}
+  Betweenness centrality (BC) were proposed in need of measurement of node significance\cite{Freeman1977}.
+  Following the definition exactly, the time complexity to calculate BC of all nodes is $\mathcal{O}(\lvert V\rvert^3)$ due to the explicit summation of pair-dependency.
+  Brandes' algorithm\cite{Brandes2001} performs this summation implicitly and reduces time complexity to $\mathcal{O}(\lvert V\rvert\lvert E\rvert+\lvert V\rvert^2\log\lvert V\rvert)$ in weighted graphs.
+  Almost all algorithms, which are developed after Brandes' algorithm, uses implicit summation idea. Some algorithms parallelize the summation\cite{Bader2006,Tan2009,Edmonds2010} or use GPGPU\cite{Shi2011,Sariyuce2013,Bernaschi2016}. Some algorithm are to approximate BC by sampling and extrapolation\cite{Brandes2007,Bader2007,Geisberger2008,Chehreghani2014,Riondato2014,Riondato2016,Borassi2019}, setting upper bound of distance\cite{Pfeffer2012}, using hypergraph sketch\cite{Yoshida2014}.
+
+  As many real networks have node/link alternation\cite{Holme2012}, algorithms to update BC for dynamic networks also have been developed.
+  To the best of our effort, the first algorithm is QUBE\cite{Lee2012} that caches maximum union cycles.
+
+  Limiting to exact algorithms, many algorithms cache single source shortest paths (SSSPs) or their subordinating metrics to update BC efficiently\cite{Green2012,Kas2013,Nasre2014a,Nasre2014b,Pontecorvi2015,Bergamini2017}.
+  Green, McColl, and Bader\cite{Green2012} developed incremental, unweighted networks.
+  Kas, Wachs, Carley and Carley\cite{Kas2013} developed incremental, weighted networks. Based on Ramalingam and Rep's algorithm\cite{Ramalingam1996}.
+  Nasre, Pontecorvi, Ramachandran\cite{Nasre2014a} developed incremental, weighted networks. Based on idea on Karger, Koller, Phillips' algorithm\cite{Karger1993}.
+  Nasre, Pontecorvi, and Ramachandran\cite{Nasre2014b} developed algorithm for decremental weighted networks. Based on Demetrescu and Italiano's algorithm\cite{Demetrescu2003}.
+  Pontecorvi and Ramachandran\cite{Pontecorvi2014} developed algorithm for fully-dynamic networks. Based on Demetrescu and Italiano's algorithm.
+  Bergamini, Meyerhenke, Ortmann, and Slobbe\cite{Bergamini2017} developed algorithm for incremental networks. Based on Ramalingam and Rep's algorithm.
+
+  Other algorithms are built on concept of caching MUCs\cite{Singh2015}, update node and edge BC simultaneously\cite{Kourtellis2015}, approximation algorithms\cite{Hayashi2015,Bergamini2015a,Bergamini2015b,Chernoskutov2015}, parallel algorithms\cite{Jamour2017}.
+
+  \section{Our Contribution}
+  However, to best of our knowledge, no algorithm for decremental networks based on Ramalingam and Rep's SSSP update algorithm.
+  The aim of this research is filling in the missing piece of the group of exact algorithms to update BC of dynamic networks.
+  In this research, we develop an algorithm based on Ramalingam and Rep's algorithm to update BC on decremental networks.
+  We also examine its efficiency by both theoretical and experimental approach.
+
+  \section{Notation}
+  A (di)graph $G$ is a pair $(V,E)$ which $V$ and $E$ are vertex and edge set respectiely.
+  $G=(V,E)$ is a undirected graph if elements of $E$ are unordered pair, denoted by $\{v,w\}\in E$.
+  Conversaly, $G=(V,E)$ is a directed graph if elements of $E$ are ordered pair, denoted by $(v,w)\in E$.
+  A graph $G=(V,E$ is said to be weighted if weights (or length) $l_{vw}$ are defined for each $e\in E$.
+  Neighbors of $v$ in $G$ is denoted by $\mathcal{N}_G(v)$. More generally, $\mathcal{N}_G^i(v)=\left(\bigcup_{w\in\mathcal{N}_G^{i-1}(v)}\mathcal{N}_G(w)\right)\setminus\left(\bigcup_{j=1}^{i-1}\mathcal{N}_G^j(v)\right)\setminus\{v\}$ and $\mathcal{N}_G^1(v)=\mathcal{N}_G(v)$.
+  Let $\mathcal{S}(v)$ and $\mathcal{P}(v)$ be successor and predecessor set of $v$ in digraph $G$ respectedly.
+  Similar to $\mathcal{N}_G^i(v)$, we introduce $\mathcal{S}_G^i(v)$ and $\mathcal{P}_G^i(v)$.
+
+  A single source shortest path (SSSP) digraph with a source vertex $s\in V$ on $G=(V,E)$ is denoted by $G_s=(V_s,E_s)$.
+  Similary, $G_{st}=(V_{st},E_{st})$ denotes SSSP digraph with source $s\in V$ and target $t\in V$ on $G=(V,E)$.
+  The distance and the number of shortest paths between two vertices $s,t\in V$ are denoted by $d_{st}$ and $\sigma_{st}$ respectedly.
+  Also, $\sigma_{st}(v)$ denotes the number of shortest paths between $s$ and $t$ which pass through $v$.
+  For convinience, let $d_{ss}=0$ and $\sigma_{ss}=1$.
+  Let $G_{s}(v)=\left(V_s(v),E_s(v)\right)$ be directed subgraph of $G_s$, which  $V_s(v)$ and $E_s(v)$ are $V_s(v)=\{w|w\in V_s,\,d_{sw}=d_{sv}+d_{vw}\}$ and $E_s(v)=\{(w,x)|(w,x)\in E_s,\,d_{sx}=d_{sv}+d_{vw}+l_{wx}\}$ respectedly.
+  The semantic definition of $G_s(v)$ would be a graph which is constituted of components behind $v$ on $G_s$.
+
+  The betweenness centrality of vertex $v$ is defined as
+  \begin{equation}
+    B_{v}=\sum_{s\neq v}\sum_{t\neq s,v}\frac{\sigma_{st}(v)}{\sigma_{st}}.
+    \label{eq:bc-base}
+  \end{equation}
+  The pair-dependency of vertex pair $s$ and $t$ on an intermediary vertex $v$ is the ratio of shortest paths between $s$ and $t$ that lie on $v$, and be denoted by $\delta_{st}(v)$ (i.e. $\delta_{st}(v)=\sigma_{st}(v)/\sigma_{st}$.)
+  The dependency of vertex $s$ on vertex $v$ is defined as sum of $\delta_{st}(v)$ for all $t\in V\setminus\{s,v\}$, and denoted by $\delta_{s\bullet}(v)$.
+  With $\delta_{s\bullet}(v)$, equation \eqref{eq:bc-base} can be rewritten as $B_{v}=\sum_{s\neq v}\delta_{s\bullet}(v)$.
+
+  \section{Proposed Algorithm}
+  \subsection{Finding affected vertices}
+  \subsection{Updating distance and the number of paths}
+  \subsection{Updating pairwise dependency}
+
+  \section{Complexity Analysis}
+
+  \section{Experiment}
+  \subsection{Comparison on synthesized networks}
+  \subsection{Minimizing/Maximizing maximum BC}
+  \subsection{Real-time BC calculation on social networks}
+
+  \section{Discussion}
+
+  \section{Conclusion}
+
+  \printbibliography[title=References]
+
+\end{multicols*}
+
+\end{document}
