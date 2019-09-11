@@ -1,0 +1,104 @@
+
+\onecolumn
+\begin{algorithm}[tbp]
+  \caption{algorithm}
+  \label{algo:decremental-algorithm}
+  \begin{algorithmic}[1]\small
+    \Procedure{Decremental}{$G,(v,w),c$}
+    \State $d'_{xz}\gets d_{xz},\:\sigma'_{xz}\gets \sigma_{xz},\:\delta'_z(x)\gets \delta_z(x)\quad\forall x,z\in V(G)$
+    \State $G'\gets(V(G),E(G)\cup\{(v,w)\}),\quad l_{vw}\gets c$
+    \ForAll{$z\in V(G)$}
+    \If{$l_{vz}>l_{wz}$}
+    \State $\textsc{DecrementalPart}(G',(v,w),z)$
+    \Else
+    \State $\textsc{DecrementalPart}(G',(w,v),z)$
+    \EndIf
+    \EndFor
+    \EndProcedure
+  \end{algorithmic}
+  \begin{multicols}{2}
+    \begin{algorithmic}[1]\small
+      \makeatletter
+      \setcounter{ALG@line}{11}
+      \makeatother
+      \Procedure{DecrementalPart}{$G',(v,w),z$}
+      \If{$d_{wz}=\infty\lor d_{vz}<l_{vw}+d_{wz}$}
+      \State \textbf{return}
+      \EndIf
+      \State $\mathrm{WorkSet}\gets\{v\}$
+      \State $\mathrm{Affected}\gets\{v\}$
+      \State
+      %\State \LeftComment 最短経路が変化する頂点の探索
+      \While{$\lvert\mathrm{WorkSet}\rvert>0$}
+      \State $x\gets\mathrm{pop}(\mathrm{WorkSet})$
+      \ForAll{$y\in\mathcal{N}_{G'}(x)$}
+      \If{$d_{yz}=l_{yx}+d_{xz}\land y\notin\mathrm{Affected}$}
+      \State $\mathrm{Affected}\gets\mathrm{Affected}\cup\{y\}$
+      \State $\mathrm{WorkSet}\gets\mathrm{WorkSet}\cup\{y\}$
+      \EndIf
+      \EndFor
+      \EndWhile
+      \State
+      %\State \LeftComment 最短経路長，最短経路数の更新
+      \State $Q\gets()$ %\Comment 第二要素をキーとする順位キュー
+      \ForAll{$x\in\mathrm{Affected}$}
+      \If{$\exists y\in\mathcal{N}_{G'}(x),\:y\notin\mathrm{Affected}$}
+      \State $\hat{d}_{xz}\gets\min(\{l_{xy}+d_{yz}\vert y\in\mathcal{N}_{G'}(x),y\notin\mathrm{Affected}\})$
+      \Else
+      \State $\hat{d}_{xz}\gets\infty$
+      \EndIf
+      \If{$\hat{d}_{xz}=\infty$}
+      \State $d'_{xz}\gets\infty,\quad\sigma'_{xz}\gets 0$
+      \Else
+      \State $\mathrm{updatekey}(Q, x, \hat{d}_{xz})$
+      \EndIf
+      \EndFor
+      \State
+      \State $S\gets\{w\}$ %\Comment $\delta_z(x)$を更新する頂点集合
+      \While{$\lvert Q\rvert>0$}
+      \State $x,\hat{d}_{xz}\gets\mathrm{popmin}(Q)$
+      \State $\mathrm{Affected}\gets\mathrm{Affected}\setminus\{x\}$
+      \State $d'_{xz}\gets\hat{d}_{xz},\quad\sigma'_{xz}\gets 0$
+      \ForAll{$y\in\mathrm{Affected}$}
+      \If{$d'_{yz}\geq l_{yx}+d'_{xz}$}
+      \State $\mathrm{updatekey}(Q,y,l_{yx}+d_{xz})$
+      \EndIf
+      \If{$d'_{xz}=l_{xy}+d'_{yz}$}
+      \State $\sigma'_{xz}\gets\sigma'_{xz}+\sigma'_{yz}$
+      \EndIf
+      \If{$d_{xz}=l_{xy}+d_{yz}\veebar d'_{xz}=l_{xy}+d'_{yz}$}
+      \State $S\gets S\cup\{y\}$
+      \EndIf
+      \If{$d_{yz}=l_{yx}+d_{xz}\veebar d'_{yz}=l_{yx}+d'_{xz}$}
+      \State $S\gets S\cup\{x\}$
+      \EndIf
+      \EndFor
+      \If{$\sigma'_{xz}\neq\sigma_{xz}$}
+      \State $S\gets S\cup\{x\}$
+      \EndIf
+      \EndWhile
+      \State
+      %\State \LeftComment ペア依存度の更新
+      \State $S\gets S\cup\mathrm{Affected}$
+      \State $\mathrm{Affected}\gets\varnothing$
+      %\State \LeftComment 各要素の第二要素をキーとする順位キュー
+      \State $R\gets((x,d'_{xz})\vert x\in S)$
+      \While{$\lvert R\rvert>0$}
+      \State $x,\_\gets\mathrm{popmax}(R)$
+      \State $\delta'_z(x)\gets 0$
+      \If{$x=z$}
+      \State \textbf{continue}
+      \EndIf
+      \ForAll{$y\in\mathcal{N}_G(x)$}
+      \If{$d'_{yz}=l_{yx}+d'_{xz}$}
+      \State $\delta'_z(x)\gets\delta'_z(x)$
+      $+\frac{\sigma'_{xz}}{\sigma'_{yz}}(1+\delta'_z(y)$
+      \ElsIf{$d_{zx}=l_{xy}+d_{yz}$}
+      \State $\mathrm{updatekey}(R, y, d'_{yz})$
+      \EndIf
+      \EndFor
+      \EndWhile
+      \EndProcedure
+    \end{algorithmic}
+  \end{multicols}
+\end{algorithm}

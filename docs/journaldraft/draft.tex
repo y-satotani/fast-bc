@@ -1,8 +1,13 @@
-\documentclass{article}
+\documentclass[twocolumn]{article}
+\usepackage{cuted}
 \usepackage{amsmath,amsthm,amssymb}
+\usepackage{algorithm,algpseudocode}
+\algnewcommand{\LeftComment}[1]{\(\triangleright\) #1}
+\algrenewcommand\algorithmicindent{.5em}
 \usepackage{graphicx}
 \usepackage{color}
 \usepackage{multicol}
+\usepackage{enumitem}
 \usepackage{geometry}
 \newgeometry{tmargin=2cm,lmargin=2cm,rmargin=2cm,bmargin=2cm}
 \usepackage[style=ieee,backend=biber,texencoding=utf8,bibencoding=utf8,dashed=false,isbn=false,url=false,doi=false,eprint=false,]{biblatex}
@@ -11,26 +16,40 @@
 \DeclareFieldFormat{booktitle}{#1}
 %\renewrobustcmd*{\bibinitdelim}{}
 \addbibresource{../res/MyCollection.bib}
+\graphicspath{{../res/figure/}{./plot/}}
+\makeatletter
+\def\input@path{{../res/figure/}{./table/}}
+\makeatother
+\addbibresource{../res/MyCollection.bib}
+
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
 
 \title{An Exact Algorithm for Updating Betweenness Centrality on \\ Decremental Networks}
 \author{Bubo Bubo}
 
 \begin{document}
 
-\maketitle
-\section*{Abstract}
+\twocolumn[
+  \begin{@twocolumnfalse}
+    \maketitle
+    \begin{abstract}
+    \end{abstract}
+  \end{@twocolumnfalse}
+]
 
-\begin{multicols*}{2}
   \section{Introduction}
   Betweenness centrality (BC)\cite{Freeman1977} is one of various centrality, measure importance for each node on networks.
   BC has many applications such as urban planning\cite{Crucitti2006} and webgraph optimization for advertisement\cite{Medya2018} since it implements importance as appearance on shortest paths.
-  Many algorithm to calculate BC has been developed after Brandes\cite{Brandes2001} proposed an algorithm that accumulates pair-dependencies.
+  Many algorithms to calculate BC has been developed after Brandes\cite{Brandes2001} proposed an algorithm that accumulates pair-dependencies.
 
   While networks in real life have node and/or link alternations\cite{Holme2012}, algorithms to maintain and update BC have been also developed.
   As there are well-known algorithms to update single source shortest paths (SSSP), it is natural to build BC update algorithms based on them.
-  Altough an incremental algorithm based on Ramalingam and Rep's (RR) algorithm\cite{Ramalingam1996} was proposed, no decremental algorithm was proposed to the best of our effort.
+  Although an incremental algorithm based on Ramalingam and Rep's (RR) algorithm\cite{Ramalingam1996} was proposed, no decremental algorithm was proposed to the best of our effort.
 
-  In this research, we provide an decremental algorithm to update BC based on RR algorithm.
+  In this research, we provide a decremental algorithm to update BC based on RR algorithm.
   We also examine its efficiency by both theoretical complexity analysis and experimental result.
 
   The organization of this paper is following.
@@ -38,7 +57,7 @@
   Section 3 shows graph notation will be used on the remaining of this paper.
   Section 4 shows our proposed algorithm with some lemmas on criteria of updating pair-dependency.
   Section 5 shows the time complexity of proposed algorithm and section 6 shows its efficiency by experiment.
-  Although worst-case complexity is same as one of Brandes', improvedment on execution time were comfirmed in many cases.
+  Although worst-case complexity is same as one of Brandes', improvement on execution time were confirmed in many cases.
 
   \section{Related Work}
   Betweenness centrality (BC) were proposed in need of measurement of node significance\cite{Freeman1977}.
@@ -59,27 +78,27 @@
 
   Other algorithms are built on concept of caching MUCs\cite{Singh2015}, update node and edge BC simultaneously\cite{Kourtellis2015}, approximation algorithms\cite{Hayashi2015,Bergamini2015a,Bergamini2015b,Chernoskutov2015}, parallel algorithms\cite{Jamour2017}.
 
-  \section{Our Contribution}
+  \subsection*{Our Contribution}
   However, to best of our knowledge, no algorithm for decremental networks based on Ramalingam and Rep's SSSP update algorithm.
   The aim of this research is filling in the missing piece of the group of exact algorithms to update BC of dynamic networks.
   In this research, we develop an algorithm based on Ramalingam and Rep's algorithm to update BC on decremental networks.
   We also examine its efficiency by both theoretical and experimental approach.
 
   \section{Notation}
-  A (di)graph $G$ is a pair $(V,E)$ which $V$ and $E$ are vertex and edge set respectiely.
+  A (di)graph $G$ is a pair $(V,E)$ which $V$ and $E$ are vertex and edge set respectively.
   $G=(V,E)$ is a undirected graph if elements of $E$ are unordered pair, denoted by $\{v,w\}\in E$.
-  Conversaly, $G=(V,E)$ is a directed graph if elements of $E$ are ordered pair, denoted by $(v,w)\in E$.
+  Conversely, $G=(V,E)$ is a directed graph if elements of $E$ are ordered pair, denoted by $(v,w)\in E$.
   A graph $G=(V,E$ is said to be weighted if weights (or length) $l_{vw}$ are defined for each $e\in E$.
   Neighbors of $v$ in $G$ is denoted by $\mathcal{N}_G(v)$. More generally, $\mathcal{N}_G^i(v)=\left(\bigcup_{w\in\mathcal{N}_G^{i-1}(v)}\mathcal{N}_G(w)\right)\setminus\left(\bigcup_{j=1}^{i-1}\mathcal{N}_G^j(v)\right)\setminus\{v\}$ and $\mathcal{N}_G^1(v)=\mathcal{N}_G(v)$.
-  Let $\mathcal{S}(v)$ and $\mathcal{P}(v)$ be successor and predecessor set of $v$ in digraph $G$ respectedly.
+  Let $\mathcal{S}(v)$ and $\mathcal{P}(v)$ be successor and predecessor set of $v$ in digraph $G$ respectively.
   Similar to $\mathcal{N}_G^i(v)$, we introduce $\mathcal{S}_G^i(v)$ and $\mathcal{P}_G^i(v)$.
 
   A single source shortest path (SSSP) digraph with a source vertex $s\in V$ on $G=(V,E)$ is denoted by $G_s=(V_s,E_s)$.
-  Similary, $G_{st}=(V_{st},E_{st})$ denotes SSSP digraph with source $s\in V$ and target $t\in V$ on $G=(V,E)$.
-  The distance and the number of shortest paths between two vertices $s,t\in V$ are denoted by $d_{st}$ and $\sigma_{st}$ respectedly.
+  Similarly, $G_{st}=(V_{st},E_{st})$ denotes SSSP digraph with source $s\in V$ and target $t\in V$ on $G=(V,E)$.
+  The distance and the number of shortest paths between two vertices $s,t\in V$ are denoted by $d_{st}$ and $\sigma_{st}$ respectively.
   Also, $\sigma_{st}(v)$ denotes the number of shortest paths between $s$ and $t$ which pass through $v$.
-  For convinience, let $d_{ss}=0$ and $\sigma_{ss}=1$.
-  Let $G_{s}(v)=\left(V_s(v),E_s(v)\right)$ be directed subgraph of $G_s$, which  $V_s(v)$ and $E_s(v)$ are $V_s(v)=\{w|w\in V_s,\,d_{sw}=d_{sv}+d_{vw}\}$ and $E_s(v)=\{(w,x)|(w,x)\in E_s,\,d_{sx}=d_{sv}+d_{vw}+l_{wx}\}$ respectedly.
+  For convenience, let $d_{ss}=0$ and $\sigma_{ss}=1$.
+  Let $G_{s}(v)=\left(V_s(v),E_s(v)\right)$ be directed subgraph of $G_s$, which  $V_s(v)$ and $E_s(v)$ are $V_s(v)=\{w|w\in V_s,\,d_{sw}=d_{sv}+d_{vw}\}$ and $E_s(v)=\{(w,x)|(w,x)\in E_s,\,d_{sx}=d_{sv}+d_{vw}+l_{wx}\}$ respectively.
   The semantic definition of $G_s(v)$ would be a graph which is constituted of components behind $v$ on $G_s$.
 
   The betweenness centrality of vertex $v$ is defined as
@@ -92,23 +111,372 @@
   With $\delta_{s\bullet}(v)$, equation \eqref{eq:bc-base} can be rewritten as $B_{v}=\sum_{s\neq v}\delta_{s\bullet}(v)$.
 
   \section{Proposed Algorithm}
-  \subsection{Finding affected vertices}
-  \subsection{Updating distance and the number of paths}
-  \subsection{Updating pairwise dependency}
+  This section shows our algorithm, which updates BC when an edge $(v,w)\in E$ is deleted.
+  The graph components and metrics are put $'$ symbol in order to indicate post-delete components/metrics (e.g. $d'_{st}$ is distance after delete).
+  An algorithm for weight increase would be easily deduced from this concept.
+
+  The algorithm update dependency $\delta_{t\bullet}(v)$ for all $t,v\in V$ by running following series of procedures for all $t\in V$: find affected vertices by delete, update $d_{st}$ and $\sigma_{st}$ for all $s\in V$, and update $\delta_{t\bullet}(v)$ for all $v\in V$.
+
+  \subsection*{Finding affected vertices}
+  \begin{lemma}
+    \label{lm:affected-vertices}
+    For $x,t\in V$, $d_{xt}\neq d'_{xt}\lor\sigma_{xt}\neq\sigma_{xt}$ if and only if $d_{xv}+l_{vw}+d_{wt}=d_{vt}$.
+  \end{lemma}
+  \begin{proof}
+    If $d_{xv}+l_{vw}+d_{wt}=d_{vt}$, at least one shortest path contains $(v,w)$ and one of the following conditions satisfies;
+    \begin{equation}
+      \begin{cases}
+        d'_{xt}>d_{xt} & \text{(all paths contain $(v,w)$)},\\
+        d'_{xt}=d_{xt},\,\sigma'_{xt}<\sigma_{xt} & \text{(otherwise)}.
+      \end{cases}
+      \label{eq:affected-vertices-1}
+    \end{equation}
+    In both cases, $d_{xt}\neq d'_{xt}\lor\sigma_{xt}\neq\sigma_{xt}$ satisfies.
+
+    Since $(v,w)$ was deleted, one of equation \eqref{eq:affected-vertices-1} satisfies if $d_{xt}\neq d'_{xt}\lor\sigma_{xt}\neq\sigma_{xt}$ and at least one path contains $(v,w)$. Therefore, $d_{xv}+l_{vw}+d_{wt}=d_{vt}$ satisfies.
+  \end{proof}
+
+  A set of affected vertices, which consists of vertices with satisfying Lemma \ref{lm:affected-vertices}, is denoted by $\mathcal{A}$.
+  Branch pruned depth first search is applied on finding $\mathcal{A}$ efficiently.
+
+  \subsection*{Updating $d_{st}$ and $\sigma_{st}$}
+  Vertices $x$, which satisfies
+  \begin{equation}
+    x\in\mathcal{A},\mathcal{N}_{G'}(x)\cap\mathcal{A}\neq\varnothing,
+    \label{eq:update-augdist-1}
+  \end{equation}
+  can be updated immediately as they have non-affected neighbors.
+  For those vertices, find $d'_{xt}$ and $\sigma'_{xt}$ by
+  \begin{equation*}
+    \begin{aligned}
+      d'_{xt}&=\min_{y\in\mathcal{N}_{G'}(x),y\notin\mathcal{A}}\{l_{xy}+d_{yt}\}, \\
+      \sigma'_{xt}&=\sum_{y\in\mathcal{N}_{G'}(x),y\notin\mathcal{A},d'_{xt}=l_{xy}+d_{yt}}\sigma_{yt}.
+    \end{aligned}
+  \end{equation*}
+
+  Remaining vertices can be updated by branch pruned Dijkstra's algorithm, that is described as follows:
+  \begin{enumerate}
+  \item push $(y,l_{yx}+d'_{xt})$ to priority queue for all $x$ satisfies \eqref{eq:update-augdist-1} and $y\in\mathcal{N}_{G'}(x)\cap\mathcal{A}$
+  \item until the priority queue has any element,
+    \begin{enumerate}
+    \item pop an element from priority queue and let it be $(x,\hat{d}_{xt})$,
+    \item update $d_{xt}$ and $\sigma_{xt}$ by
+      \begin{equation*}
+        \begin{aligned}
+          d'_{xt}&=\hat{d}_{xt}, \\
+          \sigma'_{xt}&=\sum_{y\in\mathcal{N}_{G'}(x),d'_{xt}=l_{xy}+d'_{yt}}\sigma'_{yt}.
+        \end{aligned}
+      \end{equation*}
+    \item For all $y\in\mathcal{N}_{G'}(x)$ s.t. $d_{yt}\geq l_{yx}+d'_{xt}$, push $(y,l_{yx}+d'_{xt})$.
+    \end{enumerate}
+  \end{enumerate}
+
+  \subsection*{Updating $\delta_{t\bullet}(v)$}
+  \begin{lemma}
+    \label{lm:update-delta-1}
+    For $s,x\in V$, if $E_{G_s}(x)=E'_{G_s}(x)$ and $\sigma_{sy}=\sigma'_{sy}$ for all $y\in V_{G_s(x)}$ then, $\delta_{s\bullet}(x)=\delta'_{s\bullet}(x)$.
+  \end{lemma}
+  \begin{proof}
+    \begin{align}
+      &\delta_s(v)\nonumber\\
+      =&\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_s(w)) \nonumber\\
+      =&\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+
+      \sum_{w\in\mathcal{S}_{G_s}(w)}\cfrac{\sigma_{sw}}{\sigma_{sw}}(1+\delta_s(w))
+      \right) \nonumber\\
+      &\vdots \nonumber\\
+      =&\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+\cdots
+      \sum_{w\in\mathcal{S}_{G_s}(w)}\cfrac{\sigma_{sw}}{\sigma_{sw}}(1+\delta_s(w))
+      \cdots\right)
+      \label{eq:update-delta-1}
+    \end{align}
+    On equation \eqref{eq:update-delta-1}, since $G_s$ is finite and acyclic,
+    $\delta_{s\bullet}(v)$ can not be extracted infinitely.
+    And $\delta_{s\bullet}(w)=0$ for $\mathcal{S}_{G_s}(w)=\varnothing$.
+    And, if $E_{G_s}(v)=E_{G'_s}(v)$ then, $V_{G_s}(v)=V_{G'_s}(v)$ and
+    $\mathcal{S}_{G_s}(v)=\mathcal{S}_{G'_s}(v)$ for all $w\in V_s(v)$.
+    Therefore, if $E_{G_s}(v)=E_{G'_s}(v)$ and $\sigma_{sw}=\sigma'_{sw}$ for all $w\in V_{G_s}$,
+    \begin{equation*}
+      \begin{aligned}
+        &\delta_s(v) \\
+        =&\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+\cdots
+        \sum_{w\in\mathcal{S}_{G_s}(w)}\cfrac{\sigma_{sw}}{\sigma_{sw}}(1+\delta_s(w))
+        \cdots\right) \\
+        =&\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+\cdots
+        \sum_{w\in\mathcal{S}_{G_s}(w)}\cfrac{\sigma_{sw}}{\sigma_{sw}}
+        \cdots\right) \\
+        =&\sum_{w\in\mathcal{S}_{G'_s}(v)}\cfrac{\sigma'_{sv}}{\sigma'_{sw}}\left(1+\cdots
+        \sum_{w\in\mathcal{S}_{G'_s}(w)}\cfrac{\sigma'_{sw}}{\sigma'_{sw}}
+        \cdots\right) \\
+        =&\delta'_s(v).
+      \end{aligned}
+    \end{equation*}
+  \end{proof}
+
+  The converse of Lemma \ref{lm:update-delta-1} has a counterexample.
+  \begin{example}
+    On Figure \ref{fig:update-delta},
+    $\delta_s(v_1)=\delta'_s(v_1)$ but $\delta_s(w_1)\neq\delta'_s(w_1)$.
+    Also, $\delta_s(v_2)=\delta'_s(v_2)$ but $\sigma_{sv_2}\neq\sigma'_{sv_2}$.
+  \end{example}
+
+  \begin{figure*}
+    \centering
+    \def\svgwidth{.45\linewidth}
+    \input{pd-invariability-counterexample.pdf_tex}
+    \caption{Counterexample of converse of Lemma \ref{lm:update-delta-1}.}
+    \label{fig:update-delta}
+  \end{figure*}
+
+  \begin{lemma}
+    \label{lm:update-delta-2}
+    For $s,v\in V$, These \ref{item:update-delta-2-1}, \ref{item:update-delta-2-2}, and \ref{item:update-delta-2-3} are equivalent.
+    \begin{enumerate}[label={\normalfont (\alph*)}]
+    \item $E_{G_s}(v)=E_{G'_s}(v)$ and $\sigma_{sw}=\sigma'_{sw}$ for all $w\in V_{G_s}(v)$.
+      \label{item:update-delta-2-1}
+    \item $V_{G_s}(v)=V_{G'_s}(v)$ and $\sigma_{sw}=\sigma'_{sw}\land\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)$ for all $w\in V_{G_s}(v)$.
+      \label{item:update-delta-2-2}
+    \item for all $w\in V_s(v)$ and $x\in\mathcal{N}_G(w)$,
+      $x\in\mathcal{S}_{G_s}(w)\land x\in\mathcal{S}_{G'_s}$
+      $\lor x\notin\mathcal{S}_{G_s}(w)\land x\notin\mathcal{S}_{G'_s}$.
+      \label{item:update-delta-2-3}
+    \end{enumerate}
+  \end{lemma}
+  \begin{proof}
+    Firstly, we show \ref{item:update-delta-2-1}$\iff$\ref{item:update-delta-2-2}.
+    Since $\bigcup_{(w,x)\in E_s(v)}\{w,x\}=V_s(v)$, $E_{G_s}(v)=E_{G'_s}(v)$ then $V_{G_s}(v)=V_{G'_s}(v)$.
+    And, if $E_{G_s}(v)=E_{G'_s}(v)$ then $\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)$ for all $w\in V_{G_s}(v)$. Therefore, \ref{item:update-delta-2-1}$\implies$\ref{item:update-delta-2-2}.
+
+    Conversely, if $V_{G_s}(v)=V_{G'_s}(v)$ and $\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)$ for all $w\in V_{G_s}(v)$, then, $E_{G_s}(v)=E_{G'_s}(v)$.
+    Therefore, \ref{item:update-delta-2-2}$\implies$\ref{item:update-delta-2-1}.
+    And \ref{item:update-delta-2-1}$\iff$\ref{item:update-delta-2-2}.
+
+    Next, we prove \ref{item:update-delta-2-2}$\iff$\ref{item:update-delta-2-3}.
+    \begin{equation*}
+      \begin{aligned}
+        &\forall w\in V_s(v),\,\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)\\
+        \iff&\forall w\in V_s(v),\,\mathcal{S}_{G_s}(w)\subset\mathcal{S}_{G'_s}(w)
+        \land\mathcal{S}_{G_s}(w)\supset\mathcal{S}_{G'_s}(w)\\
+        \iff&\forall w\in V_s(v),\\
+        &\,\left(\forall x\in\mathcal{S}_{G_s}(w),\,x\in\mathcal{S}_{G'_s}(w)\right)\\
+        &\land\left(\forall x\in\mathcal{S}_{G'_s}(w),\,x\in\mathcal{S}_{G_s}(w)\right)\\
+        \iff&\forall w\in V_s(v),\\
+        &\left(\forall x\in\mathcal{N}_{G_s}(w),x\in\mathcal{S}_{G_s}(w),x\in\mathcal{S}_{G'_s}(w)\right.\\
+        &\left.\lor x\notin\mathcal{S}_{G_s}(w),x\notin\mathcal{S}_{G'_s}(w)\right)\\
+        &\land\left(\forall x\in\mathcal{N}_{G_s}(w),\,x\in\mathcal{S}_{G'_s}(w),x\in\mathcal{S}_{G_s}(w)\right.\\
+        &\left.\lor x\notin\mathcal{S}_{G'_s}(w),x\notin\mathcal{S}_{G_s}(w)\right)\\
+        \iff&\forall w\in V_s(v),\\
+        &\left(\forall x\in\mathcal{N}_{G_s}(w),\,
+        x\in\mathcal{S}_{G_s}(w),x\in\mathcal{S}_{G'_s}(w)\right.\\
+        &\left.\lor x\notin\mathcal{S}_{G_s}(w),x\notin\mathcal{S}_{G'_s}(w)\right)\\
+        \iff&\forall w\in V_s(v),\,\left(\forall x\in\mathcal{N}_{G_s}(w),\right.\\
+        &\left.x\in\mathcal{S}_{G_s}(w)\land x\in\mathcal{S}_{G'_s}(w)\right.\\
+        &\left.\lor x\notin\mathcal{S}_{G_s}(w)\land x\notin\mathcal{S}_{G'_s}(w)\right)
+      \end{aligned}
+    \end{equation*}
+  \end{proof}
+
+  Our update strategy is following:
+  \begin{itemize}
+  \item find vertex pairs $(s,v)\in V\times V$ that does not satisfy condition \ref{item:update-delta-2-3} of Lemma \ref{lm:update-delta-2} and update dependency $\delta_{s\bullet}(v)$ of these vertices only.
+  \item Although unnecessary update may occur, update miss cannot occur.
+  \end{itemize}
 
   \section{Complexity Analysis}
+  Firstly, we define some notation for later discussion.
+
+  \begin{definition}
+    For a vertex $t$, a set of vertices with $\delta_{t\bullet}(x)$ is updated, in other words, vertices which are not satisfy condition \ref{item:update-delta-2-3} on Lemma \ref{lm:update-delta-2}, is denoted by $V_\delta(t)$.
+    $E_\delta(t)$ denotes an edge set consists of edges, incident to vertex in $V_\delta(t)$.
+    \begin{equation*}
+      \begin{aligned}
+        V_\delta(z)&=\{x|x\in V,\exists w\in\mathcal{N}_G(x),
+        x\in\mathcal{S}_{G_z}(w)\veebar x\in\mathcal{S}_{G'_z}(w)\}\\
+        E_\delta(z)&=\{(x,y)|(x,y)\in E,\,x\in V_\delta(z)\lor y\in V_\delta(z)\}.
+      \end{aligned}
+    \end{equation*}
+
+    Similarly, a set of vertices consists of vertices which is updated its distance or the number of paths, is denoted as $V_{\delta'}(t)$.
+    $E_{\delta'}(t)$ denotes an edge set consists of edges, incident to vertex in $V_{\delta'}(t)$.
+    \begin{equation*}
+      \begin{aligned}
+        V_{\delta'}(z)&=\{x|\:d_{xz}\neq d'_{xz}\lor\sigma_{xz}\neq\sigma'_{xz}\} \\
+        E_{\delta'}(z)&=\{\{x,y\}|x\in V_{\delta'}(z)\lor y\in V_{\delta'}(z)\}
+      \end{aligned}
+    \end{equation*}
+
+    Finally, set of vertices which is updated its BC is denoted as $V_\delta$.
+    And an edge set consists of edges, incident to vertex in $V_\delta$ is denoted as $E_\delta$.
+    \begin{equation*}
+      \begin{aligned}
+        V_\delta&=\{x|\exists z,\,x\in V_delta(z)\} \\
+        E_\delta&=\{\{x,y\}|x\in V_\delta\lor y\in V_\delta\}
+      \end{aligned}
+    \end{equation*}
+  \end{definition}
+
+  Generally speaking, discussing the relationship between the number of vertices with actually changed its BC and $\lvert V_\delta\rvert$ is difficult.
+
+  \begin{example}
+    In the graph on Figure \ref{fig:bc-many-phony}, deleting $\{V,W\}$, the number of updated vertices is $\lvert V_\delta\rvert\sim \lvert V\rvert$, while the number of changing vertices is $4$ ($T,U,V,W$).
+        
+    \begin{figure*}[tb]
+      \centering
+      \def\svgwidth{.8\linewidth}
+      \input{bc-many-phony.pdf_tex}
+      \caption{Example with many unnecessary updates.}
+      \label{fig:bc-many-phony}
+    \end{figure*}
+  \end{example}
+
+  \begin{theorem}
+    \label{tm:time-complexity}
+    The time complexity of \textproc{Decremental} on \ref{algo:decremental-algorithm} is
+    $\mathcal{O}(\lvert V_\delta\rvert\lvert E_\delta\rvert+\lvert V_\delta\rvert^2\log \lvert V_\delta\rvert)$.
+  \end{theorem}
+  \begin{proof}
+    Firstly, we find the time complexity of \textproc{DecrementalPart} on \ref{algo:decremental-algorithm}.
+    \textproc{DecrementalPart} consists of following procedures: find affected vertices by delete, update $d_{st}$ and $\sigma_{st}$ for all $s\in V$, and update $\delta_{t\bullet}(v)$ for all $v\in V$.
+    
+    \begin{enumerate}[label=(\alph*)]
+    \item Finding affected vertices
+      \par For $x\in V_{\delta'}(z)$,
+      \begin{enumerate}[label=\arabic*.]
+      \item iterate through $y\in\mathcal{N}_{G'}(x)$
+      \item $t$ is added to $\text{WorkSet}$
+      \end{enumerate}
+      Then, if we fix $t$, the time complexity to find affected vertices is:
+      \begin{equation}
+        \begin{aligned}
+          &\mathcal{O}(\sum_{x\in V_{\delta'}(z)}(\lvert\mathcal{N}_G(x)\rvert
+          +\log\lvert V_{\delta'}(z)\rvert)) \nonumber\\
+          &\:=\mathcal{O}(\lvert E_{\delta'}(z)\rvert
+          +\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert) \nonumber
+        \end{aligned}
+      \end{equation}
+
+    \item Updating $d_{xt}$ and $\sigma_{xt}$
+      \par For $x\in V_{\delta'}(z)$,
+      \begin{enumerate}[label=\arabic*.]
+      \item iterate through $y\in\mathcal{N}_{G'}(x)$
+      \item $t$ is added to the priority queue
+      \end{enumerate}
+      Then, if we fix $t$, the time complexity to update $d_{xt}$ and $\sigma_{xt}$ is:
+      \begin{equation}
+        \begin{aligned}
+          &\mathcal{O}(\sum_{x\in V_{\delta'}(z)}(\lvert\mathcal{N}_G(x)\rvert
+          +\log\lvert V_{\delta'}(z)\rvert)) \nonumber\\
+          &\:=\mathcal{O}(\lvert E_{\delta'}(z)\rvert
+          +\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert) \nonumber
+        \end{aligned}
+      \end{equation}
+      
+    \item Updating dependency $\delta_{t\bullet}(v)$
+      \par For all $x\in V_\delta(z)$,
+      \begin{enumerate}[label=\arabic*.]
+      \item iterate through $y\in\mathcal{N}_{G'}(x)$,
+      \item $x$ is added to the priority queue
+      \end{enumerate}
+      Then, if we fix $t$, the time complexity to update $\delta_{t\bullet}$ is,
+      \begin{equation}
+        \begin{aligned}
+          &\mathcal{O}(\sum_{x\in V_\delta(z)}(\lvert\mathcal{N}_G(x)\rvert
+          +\log\lvert V_\delta(z)\rvert)) \nonumber\\
+          &\:=\mathcal{O}(\lvert E_\delta(z)\rvert
+          +\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert) \nonumber
+        \end{aligned}
+      \end{equation}
+    \end{enumerate}
+
+    From Lemma \ref{lm:update-delta-1} and Lemma \ref{lm:update-delta-2}, $V_\delta(z)\supset V_{\delta'}(z)$.
+    Therefore, whole time complexity of \textproc{DecrementalPart} is
+    \begin{equation*}
+      \begin{aligned}
+        &\mathcal{O}(
+        \lvert E_{\delta'}(z)\rvert+\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert\\
+        &+\lvert E_{\delta'}(z)\rvert+\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert\\
+        &+\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert
+        ) \nonumber\\
+        &\:=\mathcal{O}(\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert)
+      \end{aligned}
+    \end{equation*}
+
+    On \textproc{Decremental}, \textproc{DecrementalPart} executed for each $t\in V$.
+    When no update occur, in other words, for vertex satisfies $t\notin V_\delta$,
+    the time complexity of \textproc{DecrementalPart} is $\mathcal{O}(1)$ since the procedure ends on first if statement.
+    Therefore, the time complexity of \textproc{Decremental} is
+    \begin{equation*}
+      \begin{aligned}
+        &\mathcal{O}(
+        \sum_{z\in V_\delta}(\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert)
+        +\sum_{z\notin V_\delta}1) \nonumber\\
+        &=\:\mathcal{O}(\sum_{z\in V_\delta}(\lvert E_\delta\rvert
+        +\lvert V_\delta\rvert\log\lvert V_\delta\rvert))\nonumber\\
+        &\:=\mathcal{O}(\lvert V_\delta\rvert\lvert E_\delta\rvert
+        +\lvert V_\delta\rvert^2\log\lvert V_\delta\rvert) \nonumber\\
+      \end{aligned}
+    \end{equation*}
+  \end{proof}
 
   \section{Experiment}
-  \subsection{Comparison on synthesized networks}
-  \subsection{Minimizing/Maximizing maximum BC}
-  \subsection{Real-time BC calculation on social networks}
+  All experiments were conducted on following environment: Intel (R) Xeon (R) CPU E-2620 v4 and 64GB RAM. All programs were compiled by gcc 7.2.0 with -O3 flag.
 
-  \section{Discussion}
+  \subsection*{On synthesized networks}
+  In this section, we compare proposed algorithm with Brandes' algorithm.
+  We used Erd{\"{o}}s-R{\'{e}}nyi network\cite{Erdos1959} and Barab{\'{a}}si-Albert network\cite{Barabasi1999} to evaluate both algorithms.
+
+  Figure \ref{fig:exp-artificial-order} shows the result of experiment.
+  The average degree of both network topologies are $k\simeq4$.
+  From the figure, we can confirm that proposed algorithm outperforms Brandes' algorithm, since the algorithm update less number of dependencies.
+
+  \begin{figure}
+    \centering
+    \includegraphics{exp-artificial-order.pdf}
+    \caption{Comparison}
+    \label{fig:exp-artificial-order}
+  \end{figure}
+
+  Figure \ref{fig:exp-artificial-update} shows the relationship between the number of updated $\delta_{s\bullet}(v)$ and execution time.
+  The order of networks is $1000$.
+  From the figure, we can confirm that when the algorithm updates more dependencies, more execution time takes.
+  The figure also indicates when the network is dense (i.e. has many edges), more execution time takes.
+
+  \begin{figure}
+    \centering
+    \includegraphics{exp-artificial-update.pdf}
+    \caption{Comparison}
+    \label{fig:exp-artificial-update}
+  \end{figure}
+
+  Figure \ref{fig:exp-artificial-phony} shows the relationship between the number of vertices with its BC was changed and updated.
+  For Barab{\'{a}}si-Albert models, $3$ times more than changed vertices were updated in worst case.
+
+  \begin{figure}
+    \centering
+    \includegraphics{exp-artificial-phony.pdf}
+    \caption{Relationship between changed BC and updated BC}
+    \label{fig:exp-artificial-phony}
+  \end{figure}
+
+  \subsection*{Minimizing/Maximizing maximal BC}
+  We used road network took from OpenStreetMap\cite{OpenStreetMap}.
+  \textcolor{red}{In experiment}
+
+  \subsection*{Real-time BC maintenance}
+  We used SFHH dataset\cite{Genois2018}. This dataset contains something.
+  Figure \ref{fig:exp-sfhh} shows execution time on update of SFHH dataset.
+  The figure indicates that the proposed algorithm outperforms Brandes' algorithm when the update amount is small.
+
+  \begin{figure}
+    \centering
+    \includegraphics{exp-sfhh.pdf}
+    \caption{Execution time on and update amount of SFHH dataset}
+    \label{fig:exp-sfhh}
+  \end{figure}
 
   \section{Conclusion}
 
   \printbibliography[title=References]
 
-\end{multicols*}
+\include{algorithm}
 
 \end{document}
