@@ -24,6 +24,7 @@ enum argkey {
   KEY_WEIGHT,
   KEY_REAL_WEIGHT,
   KEY_QUERY,
+  KEY_NO_BRANDES,
   KEY_SEED,
 };
 
@@ -41,6 +42,7 @@ static struct argp_option options[] = {
   {"real-weight", KEY_REAL_WEIGHT, 0, 0, "Use real weight on random weight"},
 
   {"query", KEY_QUERY, "(insert|delete)", 0, "Query"},
+  {"no-brandes", KEY_NO_BRANDES, 0, 0, "Disable Brandes' algorithm"},
   {"seed", KEY_SEED, "N", 0, "Seed"},
   {0}
 };
@@ -62,6 +64,7 @@ struct arguments {
   igraph_attribute_type_t weight_type;
 
   char* query;
+  int no_brandes;
   int is_given_seed;
   long int seed;
   char* graph_name;
@@ -111,7 +114,7 @@ int main(int argc, char* argv[]) {
   // Initialization
   char graph_name[1024];
   struct arguments args =
-    {-1, 0, 0, 0, NULL, 0, 0, 0, "", NULL, 1, 5, 0, "", 0, 0, graph_name};
+    {-1, 0, 0, 0, NULL, 0, 0, 0, "", NULL, 1, 5, 0, "", 0, 0, 0, graph_name};
   argp_parse(&argp, argc, argv, 0, 0, &args);
 
   igraph_t G;
@@ -137,9 +140,11 @@ int main(int argc, char* argv[]) {
     n_update_deps_pairs, n_changed_deps_verts;
   igraph_vector_init(&B, igraph_vcount(&G));
   igraph_vector_init(&Btrue, igraph_vcount(&G));
-  double time_igraph
-    = update_igraph(&G, args.query, u, v, c, args.weight_name, &Btrue,
-                    &n_changed_deps_verts);
+  double time_igraph = -1;
+  if(!args.no_brandes)
+    time_igraph
+      = update_igraph(&G, args.query, u, v, c, args.weight_name, &Btrue,
+                      &n_changed_deps_verts);
   double time_update
     = update_proposed(&G, args.query, u, v, c, args.weight_name, &B,
                       &n_update_path_pairs, &n_update_deps_pairs,
@@ -365,6 +370,9 @@ static error_t parse_opt(int key, char* arg, struct argp_state* state) {
 
   case KEY_QUERY:
     arguments->query = arg;
+    break;
+  case KEY_NO_BRANDES:
+    arguments->no_brandes = 1;
     break;
   case KEY_SEED:
     arguments->seed = atoll(arg);
