@@ -1,0 +1,189 @@
+
+\section{Proofs}
+
+\subsection{Proof of Lemma \ref{lm:affected-vertices}}
+\begin{proof}
+  If $d_{xv}+l_{vw}+d_{wt}=d_{vt}$, at least one shortest path contains $(v,w)$ and one of the following conditions satisfies;
+  \begin{equation}
+    \begin{cases}
+      d'_{xt}>d_{xt} & \text{(all paths contain $(v,w)$)},\\
+      d'_{xt}=d_{xt},\,\sigma'_{xt}<\sigma_{xt} & \text{(otherwise)}.
+    \end{cases}
+    \label{eq:affected-vertices-1}
+  \end{equation}
+  In both cases, $d_{xt}\neq d'_{xt}\lor\sigma_{xt}\neq\sigma'_{xt}$ satisfies.
+  
+  Conversely, since $(v,w)$ was deleted, one of conditions on equation \eqref{eq:affected-vertices-1} satisfies if $d_{xt}\neq d'_{xt}\lor\sigma_{xt}\neq\sigma'_{xt}$ and at least one path contains $(v,w)$.
+  Therefore, $d_{xv}+l_{vw}+d_{wt}=d_{vt}$ satisfies.
+\end{proof}
+
+\subsection{Proof of Lemma \ref{lm:update-delta-1}}
+\begin{proof}
+  \begin{align}
+    &\delta_s(v)\nonumber\\
+    =&\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_s(w)) \nonumber\\
+    =&\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+
+    \sum_{w\in\mathcal{S}_{G_s}(w)}\cfrac{\sigma_{sw}}{\sigma_{sw}}(1+\delta_s(w))
+    \right) \nonumber\\
+    &\vdots \nonumber\\
+    =&\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+\cdots
+    \sum_{w\in\mathcal{S}_{G_s}(w)}\cfrac{\sigma_{sw}}{\sigma_{sw}}(1+\delta_s(w))
+    \cdots\right)
+    \label{eq:update-delta-1}
+  \end{align}
+  On equation \eqref{eq:update-delta-1}, since $G_s$ is finite and acyclic,
+  $\delta_{s\bullet}(v)$ cannot be expanded infinitely.
+  with the following propositions: $\delta_{s\bullet}(w)=0$ for $\mathcal{S}_{G_s}(w)=\varnothing$,
+  $E_{G_s}(v)=E_{G'_s}(v)$ is satisfied if $V_{G_s}(v)=V_{G'_s}(v)$, and
+  $\mathcal{S}_{G_s}(v)=\mathcal{S}_{G'_s}(v)$,
+  if $E_{G_s}(v)=E_{G'_s}(v)$ and $\sigma_{sw}=\sigma'_{sw}$ for all $w\in V_{G_s}$,
+  \begin{equation*}
+    \begin{aligned}
+      &\delta_s(v) \\
+      =&\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+\cdots
+      \sum_{w\in\mathcal{S}_{G_s}(w)}\cfrac{\sigma_{sw}}{\sigma_{sw}}(1+\delta_s(w))
+      \cdots\right) \\
+      =&\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+\cdots
+      \sum_{w\in\mathcal{S}_{G_s}(w)}\cfrac{\sigma_{sw}}{\sigma_{sw}}
+      \cdots\right) \\
+      =&\sum_{w\in\mathcal{S}_{G'_s}(v)}\cfrac{\sigma'_{sv}}{\sigma'_{sw}}\left(1+\cdots
+      \sum_{w\in\mathcal{S}_{G'_s}(w)}\cfrac{\sigma'_{sw}}{\sigma'_{sw}}
+      \cdots\right) \\
+      =&\delta'_s(v).
+    \end{aligned}
+  \end{equation*}
+\end{proof}
+
+\subsection{Proof of Lemma \ref{lm:update-delta-2}}
+\begin{proof}
+  Firstly, we show \ref{item:update-delta-2-1}$\iff$\ref{item:update-delta-2-2}.
+  Since $\bigcup_{(w,x)\in E_s(v)}\{w,x\}=V_s(v)$, $E_{G_s}(v)=E_{G'_s}(v)$ then $V_{G_s}(v)=V_{G'_s}(v)$.
+  And, if $E_{G_s}(v)=E_{G'_s}(v)$ then $\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)$ for all $w\in V_{G_s}(v)$. Therefore, \ref{item:update-delta-2-1}$\implies$\ref{item:update-delta-2-2}.
+
+  Conversely, if $V_{G_s}(v)=V_{G'_s}(v)$ and $\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)$ for all $w\in V_{G_s}(v)$, then, $E_{G_s}(v)=E_{G'_s}(v)$.
+  Therefore, \ref{item:update-delta-2-2}$\implies$\ref{item:update-delta-2-1}.
+
+  Next, we prove \ref{item:update-delta-2-2}$\iff$\ref{item:update-delta-2-3}.
+  \begin{equation*}
+    \begin{aligned}
+      &\forall w\in V_s(v),\,\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)\\
+      \iff&\forall w\in V_s(v),\,\mathcal{S}_{G_s}(w)\subset\mathcal{S}_{G'_s}(w)
+      \land\mathcal{S}_{G_s}(w)\supset\mathcal{S}_{G'_s}(w)\\
+      \iff&\forall w\in V_s(v),
+      \,\left(\forall x\in\mathcal{S}_{G_s}(w),\,x\in\mathcal{S}_{G'_s}(w)\right)
+      \land\left(\forall x\in\mathcal{S}_{G'_s}(w),\,x\in\mathcal{S}_{G_s}(w)\right)\\
+      \iff&\forall w\in V_s(v),
+      \left(\forall x\in\mathcal{N}_{G_s}(w),x\in\mathcal{S}_{G_s}(w),x\in\mathcal{S}_{G'_s}(w)\right.
+      \left.\lor x\notin\mathcal{S}_{G_s}(w),x\notin\mathcal{S}_{G'_s}(w)\right)\\
+      &\land\left(\forall x\in\mathcal{N}_{G_s}(w),\,x\in\mathcal{S}_{G'_s}(w),x\in\mathcal{S}_{G_s}(w)\right.
+      \left.\lor x\notin\mathcal{S}_{G'_s}(w),x\notin\mathcal{S}_{G_s}(w)\right)\\
+      \iff&\forall w\in V_s(v),
+      \left(\forall x\in\mathcal{N}_{G_s}(w),\,
+      x\in\mathcal{S}_{G_s}(w),x\in\mathcal{S}_{G'_s}(w)\right.
+      \left.\lor x\notin\mathcal{S}_{G_s}(w),x\notin\mathcal{S}_{G'_s}(w)\right)\\
+      \iff&\forall w\in V_s(v),\,\left(\forall x\in\mathcal{N}_{G_s}(w),\right.
+      \left.x\in\mathcal{S}_{G_s}(w)\land x\in\mathcal{S}_{G'_s}(w)\right.
+      \left.\lor x\notin\mathcal{S}_{G_s}(w)\land x\notin\mathcal{S}_{G'_s}(w)\right)
+    \end{aligned}
+  \end{equation*}
+\end{proof}
+
+\section*{Proof of Theorem \ref{tm:time-complexity}}
+In this section, we examine the efficiency of our proposed algorithm from time complexity analysis.
+Firstly, we introduce some concepts on affected amount of graph components for later discussion.
+
+\begin{definition}
+  A set of vertices with updated its dependency on $t$ is denoted by $V_\delta(t)$. In other words, all elements $x$ in $V_\delta(t)$ had updated their $\delta_{t\bullet}(x)$..
+  $E_\delta(t)$ denotes an edge set consists of edges, incident to vertex in $V_\delta(t)$.
+  The mathematical definitions are followings:
+  \begin{equation*}
+    \begin{aligned}
+      V_\delta(t)&=\{x|x\in V,\exists w\in\mathcal{N}_G(x),
+      x\in\mathcal{S}_{G_t}(w)\veebar x\in\mathcal{S}_{G'_t}(w)\}\\
+      E_\delta(t)&=\{(x,y)|(x,y)\in E,\,x\in V_\delta(t)\lor y\in V_\delta(t)\}.
+    \end{aligned}
+  \end{equation*}
+
+  Similarly, $V_{\delta'}(t)$ denotes a vertex set consists of vertices which are updated its distance or the number of paths.
+  $E_{\delta'}(t)$ denotes an edge set consists of edges, incident to vertex in $V_{\delta'}(t)$.
+  The mathematical definitions are followings:
+  \begin{equation*}
+    \begin{aligned}
+      V_{\delta'}(t)&=\{x|\:d_{xt}\neq d'_{xt}\lor\sigma_{xt}\neq\sigma'_{xt}\} \\
+      E_{\delta'}(t)&=\{\{x,y\}|x\in V_{\delta'}(t)\lor y\in V_{\delta'}(t)\}
+    \end{aligned}
+  \end{equation*}
+\end{definition}
+
+\begin{proof}
+  Firstly, we find the time complexity of \textproc{DecrementalPart} on Algorithm \ref{algo:decremental-algorithm}.
+  \textproc{DecrementalPart} consists of following procedures: find affected vertices by delete, update $d_{st}$ and $\sigma_{st}$ for all $s\in V$, and update $\delta_{t\bullet}(v)$ for all $v\in V$.
+  
+  \begin{enumerate}[label=(\alph*)]
+  \item Finding affected vertices
+    \par From Algorithm \ref{algo:decremental-algorithm}, the algorithm iterates through $y\in\mathcal{N}_{G'}(x)$ for all $x\in V_{\delta'}(t)$ and push/pop to/from $\text{WorkSet}$.
+    Therefore, if we fix $t$, the time complexity to find affected vertices is:
+    \begin{equation}
+      \begin{aligned}
+        &\mathcal{O}(\sum_{x\in V_{\delta'}(t)}(\lvert\mathcal{N}_G(x)\rvert
+        +\log\lvert V_{\delta'}(t)\rvert)) \nonumber\\
+        &\:=\mathcal{O}(\lvert E_{\delta'}(t)\rvert
+        +\lvert V_{\delta'}(t)\rvert\log\lvert V_{\delta'}(t)\rvert) \nonumber
+      \end{aligned}
+    \end{equation}
+
+  \item Updating $d_{xt}$ and $\sigma_{xt}$
+    \par From Algorithm \ref{algo:decremental-algorithm}, the algorithm iterates through $y\in\mathcal{N}_{G'}(x)$ for all $x\in V_{\delta'}(t)$ and push/pop to/from the priority queue.
+    Therefore, if we fix $t$, the time complexity to update $d_{xt}$ and $\sigma_{xt}$ is:
+    \begin{equation}
+      \begin{aligned}
+        &\mathcal{O}(\sum_{x\in V_{\delta'}(t)}(\lvert\mathcal{N}_G(x)\rvert
+        +\log\lvert V_{\delta'}(t)\rvert)) \nonumber\\
+        &\:=\mathcal{O}(\lvert E_{\delta'}(t)\rvert
+        +\lvert V_{\delta'}(t)\rvert\log\lvert V_{\delta'}(t)\rvert) \nonumber
+      \end{aligned}
+    \end{equation}
+    
+  \item Updating dependency $\delta_{t\bullet}(v)$
+    \par From Algorithm \ref{algo:decremental-algorithm}, the algorithm iterate through $y\in\mathcal{N}_{G'}(x)$ for all $x\in V_{\delta}(t)$ and push/pop to/from the priority queue.
+    Therefore, if we fix $t$, the time complexity to update $\delta_{t\bullet}$ is:
+    \begin{equation}
+      \begin{aligned}
+        &\mathcal{O}(\sum_{x\in V_\delta(t)}(\lvert\mathcal{N}_G(x)\rvert
+        +\log\lvert V_\delta(t)\rvert)) \nonumber\\
+        &\:=\mathcal{O}(\lvert E_\delta(t)\rvert
+        +\lvert V_\delta(t)\rvert\log\lvert V_\delta(t)\rvert) \nonumber
+      \end{aligned}
+    \end{equation}
+  \end{enumerate}
+
+  Since $V_\delta(t)\supset V_{\delta'}(t)$ (see Lemma \ref{lm:update-delta-1} and Lemma \ref{lm:update-delta-2},
+  time complexity of \textproc{DecrementalPart} is
+  \begin{equation*}
+    \begin{aligned}
+      &\mathcal{O}(
+      \lvert E_{\delta'}(t)\rvert+\lvert V_{\delta'}(t)\rvert\log\lvert V_{\delta'}(t)\rvert
+      +\lvert E_{\delta'}(t)\rvert+\lvert V_{\delta'}(t)\rvert\log\lvert V_{\delta'}(t)\rvert
+      +\lvert E_\delta(t)\rvert+\lvert V_\delta(t)\rvert\log\lvert V_\delta(t)\rvert
+      ) \nonumber\\
+      &\:=\mathcal{O}(\lvert E_\delta(t)\rvert+\lvert V_\delta(t)\rvert\log\lvert V_\delta(t)\rvert)
+    \end{aligned}
+  \end{equation*}
+
+  \textproc{DecrementalPart} is called from \textproc{Decremental} for all $t\in V$.
+  For vertex $t$ satisfies $t\notin V_\delta$ (i.e. no update occur),
+  the time complexity of \textproc{DecrementalPart} is $\mathcal{O}(1)$ since the procedure ends on first if statement.
+  Therefore, the time complexity of \textproc{Decremental} is
+  \begin{equation*}
+    \begin{aligned}
+      &\mathcal{O}(
+      \sum_{t\in V_\delta}(\lvert E_\delta(t)\rvert+\lvert V_\delta(t)\rvert\log\lvert V_\delta(t)\rvert)
+      +\sum_{t\notin V_\delta}1) \nonumber\\
+      &=\:\mathcal{O}(\sum_{t\in V_\delta}(\lvert E_\delta\rvert
+      +\lvert V_\delta\rvert\log\lvert V_\delta\rvert))\nonumber\\
+      &\:=\mathcal{O}(\lvert V_\delta\rvert\lvert E_\delta\rvert
+      +\lvert V_\delta\rvert^2\log\lvert V_\delta\rvert) \nonumber.\\
+    \end{aligned}
+  \end{equation*}
+\end{proof}
+
