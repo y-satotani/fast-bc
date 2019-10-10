@@ -17,8 +17,12 @@
 \ref{subsect:computational-complexity-of-decremental-algorithm}で
 行った理論的な解析結果との関連を示す．
 
-次に，実ネットワークに対する実験を行う．ここでは，頑健な道路ネットワークの
-構築と，媒介中心性のリアルタイム計算への応用を想定した実験を行う．
+次に，実ネットワークに対する実験を行う．この実験では，実ネットワークでの性能の比較および，
+頑健な道路ネットワークの構築と，媒介中心性のリアルタイム計算への応用を想定した実験を行う．
+
+なお，すべての実験は Intel (R) Xeon (R) CPU E-2620 v4 , 64GB RAM 上で行われた．
+実験に用いたプログラムは gcc 7.2.0 によって, -O3 最適化フラグを付与してコンパイルされた．
+プログラムのソースコードは\verb|github.com/y-satotani/dynamic-betweenness|で入手できる．
 
 \section{人工ネットワークに対する実験}
 \label{sect:exp-artificial}
@@ -114,8 +118,21 @@
 \section{実ネットワークに対する実験}
 \label{sect:exp-realnet}
 
-本節では，実ネットワークに対する実験を行う．頑健な道路ネットワークの
-構築と，媒介中心性のリアルタイム計算への応用を想定した実験を行う．
+本節では，実ネットワークに対する実験を行う．
+SNAPデータセット\cite{Leskovec2016}から取得した実ネットワークでの性能評価および，
+頑健な道路ネットワークの構築と，媒介中心性のリアルタイム計算への応用を想定した実験を行う．
+
+\subsection{SNAPデータセットでの比較}
+\label{subsect:exp-real}
+
+SNAPデータセットのいくつかの実ネットワークに対して，
+提案手法とBrandesのアルゴリズムの比較実験を行った．
+両アルゴリズムを各ネットワークに対して10回実行し，その実行時間の平均値および最大値を求めた．
+実験結果を表\ref{tab:exp-real}に示す．
+
+\input{exp-misc.tex}
+
+表\ref{tab:exp-real}より，提案手法は実ネットワークでも効率よく計算できることが確認できる．
 
 \subsection{頑健な道路ネットワークの構築}
 \label{subsect:exp-road}
@@ -136,33 +153,35 @@
   \label{fig:road-okayama}
 \end{figure}
 
-図\ref{fig:exp-road-oka-correlation}は，辺をひとつ追加したときの，
+図\ref{fig:exp-road-oka-correlation-insert}は，辺をひとつ追加したときの，
+図\ref{fig:exp-road-oka-correlation-delete}は，辺をひとつ削除したときの，
 媒介中心性の最大値の分布である．
 辺の追加によって，最大$0.1607$の正規化された媒介中心性を
 $0.1379$まで減少させることに成功した．
+また，辺の追加によって，最大$0.1607$の正規化された媒介中心性を
+\textcolor{red}{xxx}まで減少させることに成功した．
+
 
 また，辺追加によって媒介中心性の最大値が増加した例もある．
 具体的に道路のどの部分に挿入すると媒介中心性が大きく減少，増加するかを
 図\ref{fig:road-okayama-minmax}に示す．
-図\ref{fig:exp-road-oka-correlation}と図\ref{fig:road-okayama-minmax}より，
-媒介中心性が大きな頂点同士を結ぶと，媒介中心性の最大値が大きく変化することが分かる．
 
-また，Brandesのアルゴリズムと提案手法それぞれの実行時間を比較した．
-実行時間の累計を比較した図を図\ref{fig:exp-road-oka-time}に示す．
-この実験において，提案手法はBrandesのアルゴリズムに比べおよそ$58$倍の性能をもつ．
+図\ref{fig:exp-road-oka-correlation-insert}および図\ref{fig:exp-road-oka-correlation-delete}と
+図\ref{fig:road-okayama-minmax}より，
+媒介中心性が大きな頂点同士を結ぶと，媒介中心性の最大値が大きく変化することが分かる．
 
 \begin{figure}[tb]
   \centering
-  \begin{minipage}{.45\textwidth}
-    \includegraphics{exp-road-oka-correlation.pdf}
-    \caption{辺挿入後の媒介中心性の最大値の分布}
-    \label{fig:exp-road-oka-correlation}
-  \end{minipage}\hfill
-  \begin{minipage}{.45\textwidth}
-    \includegraphics{exp-road-oka-time.pdf}
-    \caption{実行時間の累計の比較}
-    \label{fig:exp-road-oka-time}
-  \end{minipage}
+  \includegraphics{exp-road-oka-correlation-insert.pdf}
+  \caption{辺挿入後の媒介中心性の最大値の分布}
+  \label{fig:exp-road-oka-correlation-insert}
+\end{figure}
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics{exp-road-oka-correlation-delete.pdf}
+  \caption{辺削除後の媒介中心性の最大値の分布}
+  \label{fig:exp-road-oka-correlation-delete}
 \end{figure}
 
 \begin{figure}[tb]

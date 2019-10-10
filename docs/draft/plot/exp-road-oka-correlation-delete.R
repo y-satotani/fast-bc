@@ -18,7 +18,9 @@ data_dynamic <- read_csv(
     vert2 = col_character(),
     `max-bc` = col_double()
   )
-) %>% select(c(vert1, vert2, `max-bc`, `time-proposed`, `time-brandes`))
+) %>%
+  filter(query == 'delete') %>%
+  select(c(vert1, vert2, `max-bc`, `time-proposed`, `time-brandes`))
 
 data <- data_dynamic %>%
   inner_join(data_static, by = c('vert1' = 'vert')) %>% rename('bc1' = 'bc') %>%
@@ -27,8 +29,8 @@ data <- data_dynamic %>%
 
 gp <- ggplot(data, aes(`min-bc-on-pair`, `max-bc`)) +
   geom_point(colour = 'royalblue4', alpha = 0.3) +
-  xlab('挿入辺と接続する頂点の媒介中心性の最小値') +
-  ylab('挿入後の全体の媒介中心性の最大値') +
+  xlab('削除辺と接続する頂点の媒介中心性の最小値') +
+  ylab('削除後の全体の媒介中心性の最大値') +
   theme(
     legend.title = element_blank(),
     legend.position = 'top',
