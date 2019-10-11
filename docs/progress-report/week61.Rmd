@@ -40,21 +40,6 @@ knitr::opts_chunk$set(
 ```
 
 ```{r readin, include = FALSE}
-data_time <- read_csv('../res/data/misc.csv') %>%
-  select(c('order', 'size', 'gml', 'time-proposed', 'time-brandes')) %>%
-  rename(network = gml) %>%
-  mutate(network = sub('.gml', '', basename(network))) %>%
-  gather(
-    key = 'method', value = 'time',
-    `time-proposed`, `time-brandes`
-  ) %>%
-  mutate(method = sub('time-', '', method)) %>%
-  group_by(network, order, size, method) %>%
-  summarise(mean = mean(time), max = max(time)) %>%
-  gather(Var, val, `mean`, `max`) %>%
-  unite(Var1, method, Var, sep = '-') %>%
-  spread(Var1, val) %>%
-  ungroup()
 ```
 
 # 研究全体の目的
@@ -69,8 +54,4 @@ data_time <- read_csv('../res/data/misc.csv') %>%
 # 本日までの進捗状況
 1. 以前作成した下書きに学科のフォーマットを適用した．全部で60ページ程度になったので，どの部分を削減するか検討する．
 2. 道路ネットワークから辺を削除したときの媒介中心性の変化を調べる実験を行っている．遅くとも10月中に終了する見込み．
-
-```{r tab1}
-knitr::kable(data_time, digits = 3)
-```
 
