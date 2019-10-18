@@ -1,0 +1,99 @@
+
+\chapter{関連研究}
+\label{chap:related-work}
+
+本章では関連研究を説明する．また，本研究で提案するアルゴリズムの特徴を説明し，研究目的を述べる．
+
+Freemanによる媒介中心性の定義を，定義通りそのまま求めるとき，その時間計算量は$\mathcal{O}(|V|^3)$である．
+Brandesのアルゴリズム\cite{Brandes2001}は，ペア依存度を積算することにより媒介中心性を効率的に計算する．その時間計算量は$\mathcal{O}(|V||E|+|V|^2\log|V|)$である．
+この考え方は，この後に提案されるアルゴリズムのほぼすべてに採用されている．以下，媒介中心性を求める手法を，
+対象とする問題や特徴に分け，それぞれのグループに属する手法について簡単に説明する．
+
+\section{静的グラフ}
+本研究で取り扱う動的グラフでのアルゴリズムを説明する前に，操作が行われないようなグラフの媒介中心性計算アルゴリズムを説明する．
+YangとChen\cite{Yang2011}は重み付きグラフの辺を分割するように頂点を挿入し，重みなしグラフとして計算することによって，
+重み付きグラフの時間計算量を小さくする手法を提案した．
+Puzisら\cite{Puzis2012}は二種類の前処理（構造的に等しい頂点を同一視するものと，クリークに基づき，グラフを木としてみなすもの）
+によって，高速化する手法を提案した．
+GreenとBader\cite{Green2013}は，ペア依存度の積算に必要な情報を，最短経路の探索時に保存するのではなく，
+ペア依存度の積算時にオンデマンドで計算することによって空間計算量を削減する手法を提案した．
+Erd{\"{o}}sら\cite{Erdos2015}は，分割統治法に基づいて，Brandesのアルゴリズムを書き換えた．
+つまり，グラフを互いに素な部分グラフに分割し，それらの媒介中心性を求め，その後，それらを合わせる方法である．
+Bentertら\cite{Bentert2018}は，前処理により次数が1または2の頂点を取り除きグラフを簡単にすることで，
+実ネットワークのトポロジの媒介中心性を効率的に計算する方法を提案した．
+
+\subsection{並列アルゴリズム}
+一方，GPGPUなどハードウェアが普及したことにより，並列計算により媒介中心性を求める方法も提案されてきた．
+BaderとMadduri\cite{Bader2006}は，最短経路の計算およびペア依存度の積算を粗粒に並列化することで，高速化を図った．
+Tanら\cite{Tan2009}は，並列ランダムアクセス機械（並列的読み取り/排他的書き込み）上で，
+最短経路の計算およびペア依存度の積算の処理を細粒に並列化することで媒介中心性の計算を高速化させた．
+Edmondsら\cite{Edmonds2010}は，最短経路を計算する方法として$\Delta$--ステップ法を採用することで，
+並列的読み取り/並列的書き込みの機械上でメモリ使用量を抑えた計算法を提案した．
+ShiとZhang\cite{Shi2011}は，同じく$\Delta$--ステップ法を採用し，GPGPU上に媒介中心性を計算するプログラムを実装した．
+Sariy{\"{u}}ceら\cite{Sariyuce2013}は，同じく$\Delta$--ステップ法を，辺について並列化させGPGPU上に実装した．
+Bernaschiら\cite{Bernaschi2016}は，同行，同列でデータを共有できる2次元構造のプロセッサを駆使し，
+最短経路の計算とペア依存度の積算を並列に実行する方法を提案した．
+
+\subsection{近似アルゴリズム}
+ネットワークが大きくなるにつれ，通常のBrandesのアルゴリズムでも計算に時間がかかる場合が多くなった．
+そこで，媒介中心性の近似値を求めるアルゴリズムが提案されてきた．
+主に二つのアプローチがあり，一つは全頂点間の最短経路を求めるのではなく，ピボットと呼ばれる部分頂点集合の頂点に限定して
+最短経路の計算とペア依存度の積算を行い，ペア依存度を外挿することで媒介中心性を求める方法である\cite{Brandes2007}．
+BrandesとPich\cite{Brandes2007}やBader\cite{Bader2007}によってこの方法が提案されてから，
+より良いピボットの選択方法\cite{Geisberger2008,Chehreghani2014}や，
+標本の表現力を表すVapnik-Chernovenkis次元に基づくピボット選択数の改良\cite{Riondato2014}や，
+同じく標本の表現力を表すRademacher複雑度に基づくピボット選択数の改良\cite{Riondato2016}が提案された．
+
+他にも，PfefferとCarleyによる，最短距離に上限を設ける方法\cite{Pfeffer2012}や，
+Yoshidaによる，媒介中心性を符号化する働きをもつHypergraph Sketchを利用する方法\cite{Yoshida2014}，
+BorassiとNataleによる，ランダムに選択した二頂点間の最短経路を双方向幅優先探索により求め，
+それを繰り返す方法\cite{Borassi2019}がある．
+
+\section{動的グラフ}
+第\ref{chap:network-science}章で説明した通り，現実のネットワークは時間によってその接続が変化することが多い．
+そのため，グラフに何かしらの変更がされたときに媒介中心性の値を更新するアルゴリズムが求められる．
+この問題を解くための知られているもっとも古いアルゴリズムはLeeら\cite{Lee2012}で，
+Minimum union cycleと呼ばれる閉路の集合と媒介中心性を保持し，辺が変更されたときに媒介中心性を更新する方法である．
+また，Singh\cite{Singh2015}は，この方法を応用し，頂点に変更があったときの媒介中心性を更新する方法を提案した．
+
+その一方，最短経路やそれに関する値を保存する方法も提案されている．
+Greenら\cite{Green2012}は，辺が挿入されたときの最短距離と最短経路の数と共に媒介中心性を更新する方法を提案し，
+Nasreらが\cite{Karger1993}の方法を動的グラフに応用して，辺挿入時の媒介中心性を更新する方法を開発した\cite{Nasre2014a}．
+また，Kasら\cite{Kas2013}は，RamalingamとRepsの最短経路更新法\cite{Ramalingam1996}を応用して，
+辺挿入時の媒介中心性を更新する方法を開発した．
+また，Nasreら\cite{Nasre2014b}は，DemetrescuとItalianoの最短経路更新法\cite{Demetrescu2003}を，複数の経路に一般化して，
+辺削除時の媒介中心性を更新する方法を開発した．
+さらに，PontecorviとRamachandran\cite{Pontecorvi2015}は，DemetrescuとItalianoの最短経路更新法を応用して
+頂点追加時の媒介中心性をより効率的に更新する方法を開発した．
+Kourtellisらは，重みなしグラフの頂点媒介中心性と辺媒介中心性の両方を更新する方法を開発した\cite{Kourtellis2015}．
+Bergaminiらは，RamalingamとRepsのアルゴリズムを基に，辺挿入時の媒介中心性更新アルゴリズムを開発した\cite{Bergamini2017}．
+このアルゴリズムは，ペア依存度を陽に保存せず，媒介中心性の値を直接更新することでメモリ使用量を削減している．
+Jamourらは，articulation pointと媒介中心性の変化量の性質を示して，辺更新時の媒介中心性を更新するアルゴリズムを開発した\cite{Jamour2017}．
+媒介中心性と最短経路を同時に更新するアルゴリズムを表\ref{tab:comparizon-of-algorithms}に示す．
+
+なお，更新問題を解くにあたり，近似アルゴリズムや並列計算が用いられることがある．
+例えば，Hayashiらは，\cite{Yoshida2014}のHypergraph sketchに加えて，Two-ball indexとSpecial-purpose reachability indexを追加することで，
+グラフが操作された後の媒介中心性の近似値を計算する手法を開発した\cite{Hayashi2015}．
+また，Bergaminiらは，\cite{Riondato2014}をグラフが変更されたときの媒介中心性の近似値を求めるアルゴリズムに応用した\cite{Bergamini2015a,Bergamini2015b}．
+また，ChernoskutovらはGraph coarsingと呼ばれる媒介中心性が大きい頂点を残す前処理によって，辺挿入時の媒介中心性の近似値を求めるアルゴリズムを開発した\cite{Chernoskutov2015}．
+さらに，Jamourらの方法\cite{Jamour2017}はその多くの部分が並列計算可能である．
+
+\section{研究目的}
+現在まで多くの媒介中心性更新アルゴリズムが提案されてきた一方，
+Ramalingamらの方法に基づく辺削除時の媒介中心性更新アルゴリズムは知られていない．そこで，本稿ではRamalingamらの最短経路長更新アルゴリズムに基づく媒介中心性更新法を提案する．また，その方法の有効性を実験によって検証する．
+
+\begin{table}[tb]
+  \label{tab:comparizon-of-algorithms}
+  \centering
+  \caption{最短経路と共に媒介中心性を更新するアルゴリズム}
+  \begin{tabular}{ccc}
+    \hline
+    アルゴリズム & 最短経路更新アルゴリズム & 辺の操作 \\ \hline
+    Kasら\cite{Kas2013} & Ramalingamら\cite{Ramalingam1996} & 挿入 \\ \hline
+    Nasreら\cite{Nasre2014a} & Kargerら\cite{Karger1993} & 挿入 \\ \hline
+    Nasreら\cite{Nasre2014b} & Demetrescuら\cite{Demetrescu2003} & 削除 \\ \hline
+    Pontecorviら\cite{Pontecorvi2015} & Demetrescuら\cite{Demetrescu2003} & 挿入/削除 \\ \hline
+    Bergaminiら\cite{Bergamini2017} & Ramalingamら\cite{Ramalingam1996} & 挿入 \\ \hline
+    本研究 & Ramalingamら\cite{Ramalingam1996} & 削除 \\ \hline
+  \end{tabular}
+\end{table}

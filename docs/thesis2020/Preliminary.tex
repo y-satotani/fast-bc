@@ -1,0 +1,210 @@
+\chapter{準備}
+\label{chap:preliminary}
+本章では，後の章に向けての準備をする．はじめに，最短経路や距離を含む，
+グラフ理論の基本事項を説明する．
+次に，距離や最短経路の数に関する重要な性質を示す．
+最後に，媒介中心性とその計算に用いられるペア依存度について説明する．
+
+\section{グラフの数学的表現}
+\label{sect:graph-theory}
+
+\textbf{グラフ}とは，二つの集合$V$と$E$の組$G=(V,E)$で，
+$E\subset V^2$を満たす．つまり，$V$から元を2個取り出した集合の部分集合である．
+$V$を\textbf{頂点集合}とよび，その元を\textbf{頂点}とよぶ．
+また，頂点集合の要素数$|V|$を\textbf{頂点数}とよぶ．
+$E$を\textbf{辺集合}とよび，その元を\textbf{辺}とよぶ．
+また，辺集合の要素数$|E|$を\textbf{頂点数}とよぶ．
+$E$の要素が順序対ならば，$G$は\textbf{有向グラフ}と呼ばれ，
+非順序対ならば$G$は\textbf{無向グラフ}と呼ばれる．
+有向グラフの辺$e=(v,w)$において，頂点$v$を始点，頂点$w$を終点と呼ぶ．
+グラフ$G=(V,E)$と$G'=(V',E')$に対して，$V'\subset V$かつ$E'\subset E$
+を満たすとき，$G'$は$G$の\textbf{部分グラフ}であるといい，$G'\in G$と記す．
+有向グラフ$G$について，各辺$(v,w)$を逆向きにしたグラフを$G$の逆と呼び，$\bar{G}$で表す．
+すなわち，$G=(V,E)$のとき，$\bar{G}=(V,\{(w,v)|(v,w)\in E\})$である．
+
+\textbf{重み付きグラフ}とは，すべての辺$(v,w)$もしくは$\{v,w\}$に対して，
+辺の重み$l_{vw}\in\mathbb{R}$が定められているグラフである．
+以下，特に断らない限り辺の重みは正であるとする．
+また，重み付きグラフでないグラフを\textbf{重みなしグラフ}と呼ぶ．
+
+無向グラフにおいて，頂点$v$と辺$e$が\textbf{接続する}とは，$v\in e$つまり，
+$e$の端点に$v$が属することをいう．
+頂点$v$と頂点$w$が\textbf{隣接する}とは，$\{v,w\}$が辺集合$E$に属することをいう．
+無向グラフ$G$の頂点$v$について，$v$と隣接する頂点の集合を頂点$v$の\textbf{近傍}と
+呼び，$\mathcal{N}_G(v)$で表す．また，無向グラフ$G$について$v$の近傍の数
+$|\mathcal{N}_G(v)|$を\textbf{次数}と呼び，$k(v)$あるいは$k_G(v)$と記す．
+すべての頂点の次数が等しいグラフを\textbf{正則グラフ}と呼ぶ．
+頂点$v$の近傍の各頂点の近傍の和集合$\cup_{w\in\mathcal{N}_G(v)}\mathcal{N}_G(w)$を
+$\mathcal{N}_G^2(v)$と記す．$\mathcal{N}_G^1(v)=\mathcal{N}_G(v)$とし，
+$\mathcal{N}_G^i=\cup_{w\in\mathcal{N}_G^{i-1}(v)}\mathcal{N}_g(w)$とする．
+
+無向グラフ$G=(\{1,\ldots,n\},E)$に対して，次の行列$A\in\{0,1\}^{n\times n}$を
+\textbf{隣接行列}と呼ぶ．
+\begin{equation*}
+  a_{ij}=
+  \begin{cases}
+    1 & (i\text{と}j\text{が隣接する}) \\
+    0. & (i\text{と}j\text{が隣接しない})
+  \end{cases}
+\end{equation*}
+
+有向グラフ$G$の頂点$v$について，$v$を終点とする辺の始点の集合を\textbf{先行}
+(predecessor)と呼び，$\mathcal{P}_G(v)$と記す．すなわち，
+$\mathcal{P}_G(v)=\{u|(u,v)\in E\}$である．
+同様に，$v$を始点とする辺の終点の集合を\textbf{後継}(successor)と呼び，
+$\mathcal{S}_G(v)$と記す．すなわち，$\mathcal{S}_G(v)=\{w|(v,w)\in E\}$である．
+近傍と同様に，$\mathcal{P}_G^i(v)$および$\mathcal{S}_G^i(v)$を用いる．
+
+有向な\textbf{道グラフ}，あるいは単に道とは，$P=(V,E)$のグラフで，
+\begin{equation*}
+  \begin{aligned}
+  V&=\{v_0,v_1,\ldots,v_k\}, \\
+  E&=\{(v_0,v_1),(v_1,v_2),\ldots,(v_{k-1},v_k)\}
+  \end{aligned}
+\end{equation*}
+を満たすものである．道グラフ$P=(\{v_i\},\{e_i\})$の頂点および辺の並びを
+示すために，次の表記を用いる．
+\[ v_1,e_1,v_2,\ldots,v_{n-1},e_n,v_n \]
+重み付き経路グラフに対して，その重みの総和を経路の長さと呼ぶ．
+
+重み付きグラフ$G$上の頂点$s$と頂点$t$について，それらを結ぶ道$P\subset G$のうち，
+長さが最小のものを\textbf{最短経路}と呼ぶ．$G$の頂点$s$と頂点$t$の最短経路のうち，
+ひとつの長さを$s$と$t$の\textbf{最短距離}あるいは\textbf{距離}と呼び，$d_{st}$と表す．
+重みなしグラフの距離は，重みをすべて$1$と仮定して計算することが多い．
+距離と同様に，$s$と$t$を結ぶ最短経路の数を\textbf{最短経路数}と呼び，$\sigma_{st}$と記す．
+$G$が無向グラフであるならば，すべての$s,t\in S$に対して$d_{st}=d_{ts}$かつ
+$\sigma_{st}=\sigma_{ts}$である．
+以下の議論では，便宜上，すべての$s\in V$に対し$d_{ss}=0$, $\sigma_{ss}=1$とする．
+
+また，$s$から$t$への最短経路の中で頂点$v$を通るものの個数を$\sigma_{st}(v)$で表す．
+頂点$s$から他の頂点へのすべての最短経路で構成される有向グラフを$G_s=(V_s,E_s)$で表す．
+同様に，頂点$s$から頂点$t$へのすべての最短経路で構成される有向グラフを$G_{st}=(V_{st},E_{st})$で表す．
+さらに，頂点$s$と頂点$v$について，$G_s$のトポロジカルソートにおいて$v$より後に位置する頂点集合と$v$で
+構成される部分グラフを$G_s(v)=(V_s(v),E_s(v))$で表す．すなわち，
+$V_s(v)=\{w|w\in V_s,d_{sw}=d_{sv}+d_{vw}\}, E_s(v)=\{(w,x)|(w,x)\in E_s,d_{sx}=d_{sv}+d_{vw}+l_{wx}\}$
+である．
+
+最短経路及び最短経路数について，以下の性質が知られている．
+この補題は，最短距離および最短経路数の陰な表現を示している．
+
+\begin{lemma}
+  \label{lemma:distance-and-geodesics}
+  $G=(V,E)$の異なる二頂点$s,t\in V$について，次が成り立つ．
+  \begin{equation*}
+    \begin{aligned}
+      d_{st}&=\min\{l_{si}+d_{it}|i\in\mathcal{N}_G(s)\} \\
+      \sigma_{st}&=\sum_{i\in\mathcal{N}_G(s),\,d_{st}=l_{si}+d_{it}}\sigma_{it}
+    \end{aligned}
+  \end{equation*}
+\end{lemma}
+
+\section{媒介中心性とペア依存度}
+\label{sect:pairwise-dependency}
+
+本節では，媒介中心性の定義を示した後，効率的な媒介中心性計算アルゴリズムであるBrandesのアルゴリズムを説明する．
+
+\begin{definition}[Freeman\cite{Freeman1977}]
+  \label{def:betweenness-centrality}
+  頂点$i$の媒介中心性$B_v$は式\ref{eq:betweenness-centrality}で定義される．
+  \begin{equation}
+    B_v=\sum_{s\neq v}\sum_{t\neq {v,s}}\frac{\sigma_{st}(v)}{\sigma_{st}}
+    \label{eq:betweenness-centrality}
+  \end{equation}
+\end{definition}
+
+すなわち，頂点$v$の媒介中心性は$s$から$t$への最短経路の個数とその中で
+頂点$v$を通るものの個数の比を$s,t$のすべての組について足し合わせたものである．
+したがって，媒介中心性の大きな頂点は多くの最短経路上にあり，この意味で重要度が高いと言える．
+
+すべての頂点の媒介中心性を求める単純な方法は次の通りである．
+まず，$s\in V$に対して，Dijkstra法を用いて$s$から他のすべての頂点への最短経路を求める．
+その過程で，$s$から他のすべての頂点への最短距離と最短経路数も同時に求める．
+次に，互いに異なる3頂点の組$\{s,t,v\}$のすべてに対して，$\sigma_{st}(v)$の値を計算する．
+最後に媒介中心性$B_v$ $(v\in V)$を定義の式により計算する．
+しかしながら，この方法の計算量は$\mathcal{O}(|V|^3)$であり，大規模なネットワークでは膨大な計算時間が必要になる．
+
+媒介中心性の効率的計算法として広く用いられているのは
+Brandes\cite{Brandes2001}によって提案されたアルゴリズムである．
+以下，このアルゴリズムについて説明する．
+まず，ペア依存度の定義を示す．
+
+\begin{definition}[Brandes\cite{Brandes2001}]
+  \label{def:pairwise-dependency}
+  頂点$s,t,v$のペア依存度および頂点$s,v$と他の頂点の依存度はそれぞれ
+  式\ref{eq:def-pairwise-dependency}および式\ref{eq:def-dependency}で定義される．
+  \begin{align}
+      \delta_{st}(v)&=\frac{\sigma_{st}(v)}{\sigma_{st}}
+      \label{eq:def-pairwise-dependency} \\
+      \delta_{s\bullet}(v)&=\sum_{t\neq v,s}\delta_{st}(v)
+      \label{eq:def-dependency}
+  \end{align}
+\end{definition}
+
+依存度を使うと媒介中心性は次のように変形できる．
+\[ B_v=\sum_{s\neq v}\delta_{s\bullet}(v) \]
+
+$\delta_{s\bullet}(v)$について，次のことが知られている．
+\begin{theorem}
+  \label{th:implicit-pd}
+  \begin{equation}
+    \label{eq:implicit-pd}
+    \delta_{s\bullet}(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_{s\bullet}(w)).
+  \end{equation}
+\end{theorem}
+
+Brandesのアルゴリズムは定理\ref{th:implicit-pd}の性質を応用して媒介中心性を高速に計算している．
+Brandesのアルゴリズムをアルゴリズム\ref{algo:brandes}に示す．
+
+このアルゴリズムの計算量を考える．まず，ある$s\in V$とすべての$v\in V$に対して
+$\sigma_{sv}$を計算するときの計算量は，Dijkstra法より$\mathcal{O}(|V|\log |V|+|E|)$である．
+ペア依存度の積算についても，$G$のすべての頂点$v$を$s$からの最短経路の逆向きに一度だけ辿ることにより
+$\delta_s(v)$の値を更新できるため，$\mathcal{O}(|E|)$の時間で実行できる\cite{Brandes2001}．
+したがって，すべての$s\in V$に対するアルゴリズムの計算量は$\mathcal{O}(|V|^2\log |V|+|V||E|)$であり，
+それは$\mathcal{O}(|V|^3)$よりも小さい．
+
+\begin{algorithm}[H]
+  \caption{Brandesのアルゴリズム}
+  \label{algo:brandes}
+  \begin{multicols}{2}
+    \begin{algorithmic}[1]\small
+      \Procedure{Brandes}{$G$}
+      \State $B_x\gets 0,\:\forall x\in V$
+      \ForAll{$s\in V$}
+      \State $S\gets()$ \Comment スタック
+      \State $P_w\gets (),\:\forall w\in V$ \Comment リスト
+      \State $\sigma_t\gets 0,\:\forall t\in V;\:\sigma_s\gets 1$
+      \State $d_t\gets -1,\:\forall t\in V;\:d_s\gets 0$
+      \State $Q\gets ()$ \Comment 順位キュー
+      \State $\mathrm{push}(Q, s)$
+      \While{$\lvert Q\rvert>0$}
+      \State $v\gets\mathrm{pop}(Q)$
+      \State $\mathrm{push}(S, v)$
+      \ForAll{$w\in\mathcal{N}_G(v)$}
+      \If{$d_w<0\lor d_v+l_{vw}<d_w$}
+      \State $d_w\gets d_v+l_{vw}$
+      \State $\sigma_w\gets\sigma_v$
+      \State $P_w\gets(v)$
+      \State $\mathrm{updatekey}(Q, w, d_w)$
+      \EndIf
+      \If{$d_w=d_v+l_{vw}$}
+      \State $\sigma_w\gets\sigma_w+\sigma_v$
+      \State $\mathrm{append}(P_w, v)$
+      \EndIf
+      \EndFor
+      \EndWhile
+      \State $\delta_v\gets 0,\:v\in V$
+      \While{$\lvert S\rvert>0$}
+      \State $w\gets\mathrm{pop}(S)$
+      \ForAll{$v\in P_w$}
+      \State $\delta_v\gets\delta_v+\frac{\sigma_v}{\sigma_w}(1+\delta_w)$
+      \EndFor
+      \If{$w\neq s$}
+      \State $B_w\gets B_w+\delta_w$
+      \EndIf
+      \EndWhile
+      \EndFor
+      \EndProcedure
+    \end{algorithmic}
+  \end{multicols}
+\end{algorithm}
+

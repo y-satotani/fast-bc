@@ -1,0 +1,89 @@
+\documentclass[11pt]{jreport}
+\usepackage{geometry}
+\usepackage{graduate}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{color}
+\usepackage{amsmath,amssymb,amsthm,bm}
+\usepackage{algorithm,algpseudocode}
+\usepackage{float}
+\usepackage{multicol}
+\usepackage{caption}
+\usepackage{verbatim}
+\usepackage{calc}
+\usepackage{enumitem}
+\usepackage[
+  style=ieee,backend=biber,
+  texencoding=utf8,bibencoding=utf8,
+  dashed=false,
+  isbn=false,url=false,doi=false,eprint=false,
+]{biblatex}
+\renewbibmacro{in:}{}
+\DeclareFieldFormat{journaltitle}{#1}
+\DeclareFieldFormat{booktitle}{#1}
+%\renewrobustcmd*{\bibinitdelim}{}
+% theorem setting
+\newtheoremstyle{mythmstyle}{}{}{\rmfamily}{}{\bfseries}{}{5pt}{}
+\theoremstyle{mythmstyle}
+\newtheorem{definition}{定義}
+\newtheorem{lemma}{補題}
+\newtheorem{theorem}{定理}
+\newtheorem{corollary}{系}
+\newtheorem{assumption}{仮定}
+\newtheorem{example}{例}
+%\newtheorem{algorithm}{アルゴリズム}
+%
+\renewcommand\proofname{\gt 証明\nopunct}
+%\newenvironment{proof}{\par \noindent {\gt 証明}\ }{\hspace{\fill}$\Box$
+%\vspace{0.5\baselineskip} \par}
+%
+% algorithm setting
+\algnewcommand{\LeftComment}[1]{\(\triangleright\) #1}
+\algrenewcommand\algorithmicindent{.5em}
+\renewcommand{\listalgorithmname}{アルゴリズムリスト}
+%\renewcommand{\thealgorithm}{\arabic{chapter}.\arabic{algorithm}}
+\renewcommand{\thealgorithm}{\arabic{algorithm}}
+\makeatletter
+\renewcommand{\ALG@name}{アルゴリズム}
+%\@addtoreset{algorithm}{chapter}
+\makeatother
+%
+% path setting
+\graphicspath{{../res/figure/}{./plot/}}
+\makeatletter
+\def\input@path{{../res/figure/}{./table/}}
+\makeatother
+\addbibresource{../res/MyCollection.bib}
+%
+\title{○○に関する研究}
+\author{Bubo bubo}
+\date{平成28年2月5日} % 提出日
+\reportname{修　士　論　文} 
+\department{岡山大学大学院自然科学研究科電子情報システム工学専攻}
+\supervisor{Ptilopsis leucotis}
+
+\include{Abstract}
+
+%
+\begin{document}
+\maketitle
+
+\include{Introduction}
+%\include{NetworkScience}
+%\include{RelatedWork}
+\include{Preliminary}
+\include{Algorithm}
+\include{ComplexityAnalysis}
+\include{Experiment}
+\include{Conclusion}
+
+\acknowledgment
+本論文は筆者が岡山大学工学部情報系学科に在籍中の研究結果をまとめたものである．
+本研究を行うにあたり，ご指導を頂いた岡山大学大学院自然科学研究科
+産業創成工学専攻○○○○教授に深謝の意を表する．また，○○研究室の皆様には，
+日常の議論を通して多くの知識や示唆を頂いた．ここに謝意を表する．
+
+\appendix
+
+\printbibliography[title=参考文献]
+
+\end{document}
