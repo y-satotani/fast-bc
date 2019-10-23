@@ -19,23 +19,28 @@ data_dynamic <- read_csv(
     `max-bc` = col_double()
   )
 ) %>%
-  filter(query == 'insert') %>%
-  select(c(vert1, vert2, `max-bc`, `time-proposed`, `time-brandes`))
+  select(c(vert1, vert2, query, `max-bc`))
 
 data <- data_dynamic %>%
-  inner_join(data_static, by = c('vert1' = 'vert')) %>% rename('bc1' = 'bc') %>%
-  inner_join(data_static, by = c('vert2' = 'vert')) %>% rename('bc2' = 'bc') %>%
-  mutate(`min-bc-on-pair` = pmin(bc1, bc2))
+  inner_join(data_static, by = c('vert1' = 'vert')) %>%
+  rename('bc1' = 'bc') %>%
+  inner_join(data_static, by = c('vert2' = 'vert')) %>%
+  rename('bc2' = 'bc') %>%
+  mutate(`min-bc-on-pair` = pmin(bc1, bc2)) %>%
+  mutate(query = factor(
+    query, levels = c('insert', 'delete'), labels = c('挿入', '削除')
+  )) %>%
+  arrange(`min-bc-on-pair`)
 
-gp <- ggplot(data, aes(`min-bc-on-pair`, `max-bc`)) +
-  geom_point(colour = 'royalblue4', alpha = 0.3) +
-  xlab('挿入辺と接続する頂点の媒介中心性の最小値') +
-  ylab('挿入後の全体の媒介中心性の最大値') +
+gp <- ggplot(data, aes(`min-bc-on-pair`, `max-bc`, colour = `query`)) +
+  geom_point(alpha = 0.2) +
+  guides(colour = guide_legend(title = '操作', override.aes = list(alpha = 1))) +
+  xlab('操作辺と接続する頂点の媒介中心性の最小値') +
+  ylab('操作後の全体の媒介中心性の最大値') +
+  scale_colour_viridis(discrete = TRUE, begin = 0.8, end = 0.2) +
   theme(
     legend.title = element_blank(),
-    legend.position = 'top',
-    strip.text = element_text(colour = 'black'),
-    strip.background = element_blank()
+    legend.position = 'top'
   )
 
 ggsave(out_file, gp, cairo_pdf, width = 9, height = 7, units = 'cm')
