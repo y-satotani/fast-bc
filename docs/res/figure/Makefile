@@ -1,12 +1,15 @@
 .PHONY: all clean
 
-all: $(patsubst %.svg,%.pdf,$(shell ls | egrep "\.svg$$"))
+pdf := $(patsubst %.svg,%.pdf,$(shell ls | egrep "\.svg$$"))
+eps := $(patsubst %.svg,%.eps,$(shell ls | egrep "\.svg$$"))
+
+all: $(pdf) $(eps)
 
 %.pdf: %.svg
 	inkscape -z -f $< -A $@ --export-latex
 
-%.png: %.svg
-	inkscape -z -f $< -e $@ -d 100
+%.eps: %.svg
+	inkscape -z -f $< -E $@ -d 300
 
 clean:
-	rm *.pdf *.pdf_tex
+	rm *.pdf *.pdf_tex *.eps

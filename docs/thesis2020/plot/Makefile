@@ -1,10 +1,13 @@
-TARGETS := $(patsubst %.R,%.pdf,$(shell ls | grep R))
+pdf := $(patsubst %.R,%.pdf,$(shell ls | grep R))
+eps := $(patsubst %.R,%.eps,$(shell ls | grep R))
 
 .PHONY: all clean
 
-all: $(TARGETS)
+all: $(pdf) $(eps)
 
 %.pdf: %.R
 	Rscript $<
+%.eps: %.pdf
+	inkscape -z -f $< -E $@ -d 300
 clean:
-	rm *.pdf
+	rm *.pdf *.eps
