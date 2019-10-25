@@ -1,0 +1,97 @@
+---
+title: "研究進捗報告"
+author: "里谷 佳紀"
+date: "2019年10月25日"
+documentclass: bxjsarticle
+classoption: xelatex,ja=standard,11pt
+geometry: no
+output:
+  pdf_document:
+    latex_engine: xelatex
+    template: mytemplate.tex
+    number_sections: yes
+    fig_caption: yes
+    includes:
+      in_header: header.sty
+  github_document:
+    html_preview: no
+---
+
+```{r setup, include = FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(viridis)
+theme_set(theme_light(base_size = 8, base_family = 'IPAexGothic'))
+knitr::opts_knit$get('rmarkdown.pandoc.to')
+if(knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex') {
+  devname <- 'cairo_pdf'
+  devargs <- c()
+#  devname <- 'png'
+#  devargs <- c('type' = 'cairo-png')
+} else {
+  devname <- 'png'
+  devargs <- c('type' = 'cairo-png')
+}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  fig.height = 4, fig.width = 4, fig.align = 'center',
+  dev = devname, dev.args = devargs, dpi = 300
+)
+```
+
+```{r readin, include = FALSE}
+data_static <- read_csv(
+  '../res/data/road-oka-static.csv',
+  col_types = list(vert = col_character(), bc = col_double())
+)
+
+data_dynamic <- read_csv(
+  '../res/data/road-oka-dynamic.csv',
+  col_types = list(
+    vert1 = col_character(),
+    vert2 = col_character(),
+    `max-bc` = col_double()
+  )
+) %>%
+  select(c(vert1, vert2, query, `max-bc`))
+
+data <- data_dynamic %>%
+  inner_join(data_static, by = c('vert1' = 'vert')) %>%
+  rename('bc1' = 'bc') %>%
+  inner_join(data_static, by = c('vert2' = 'vert')) %>%
+  rename('bc2' = 'bc') %>%
+  mutate(`min-bc-on-pair` = pmin(bc1, bc2)) %>%
+  mutate(query = factor(
+    query, levels = c('insert', 'delete'), labels = c('挿入', '削除')
+  )) %>%
+  arrange(`min-bc-on-pair`)
+```
+
+# 研究全体の目的
+グラフと全頂点間距離と最短経路の数および依存度が与えられたとき，グラフの辺が削除されたとする．
+このときの全頂点間距離と最短経路の数と依存度を高速に更新する方法を開発する．
+また，実験と理論の両方から既存の方法と比較することで，新方法の有用性を検証する．
+
+# 前回打ち合わせ時に定めた短期目標
+1. 修士論文の執筆
+2. 道路ネットワークの実験の続き
+
+# 本日までの進捗状況
+1. 未着手
+2. 実験が完了した．結果を以下に示す．
+
+```{r fig1}
+ggplot(data, aes(`min-bc-on-pair`, `max-bc`, colour = `query`)) +
+  geom_point(alpha = 0.2) +
+  guides(colour = guide_legend(title = '操作', override.aes = list(alpha = 1))) +
+  xlab('操作辺と接続する頂点の媒介中心性の最小値') +
+  ylab('操作後の全体の媒介中心性の最大値') +
+  scale_colour_viridis(discrete = TRUE, begin = 0.8, end = 0.2) +
+  theme(
+    legend.title = element_blank(),
+    legend.position = 'top'
+  )
+```
+
