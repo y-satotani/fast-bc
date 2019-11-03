@@ -6,10 +6,10 @@ eps := $(patsubst %.svg,%.eps,$(shell ls | egrep "\.svg$$"))
 all: $(pdf) $(eps)
 
 %.pdf: %.svg
-	inkscape -z -f $< -A $@ --export-latex
+	inkscape -z -o $@ --export-latex $<
 
 %.eps: %.svg
-	inkscape -z -f $< -E $@ -d 300
+	inkscape -z -o $@ -d 300 $<
 
 clean:
 	rm *.pdf *.pdf_tex *.eps
