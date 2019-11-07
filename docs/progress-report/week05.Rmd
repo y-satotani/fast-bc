@@ -4,17 +4,19 @@ author: "里谷 佳紀"
 date: "平成30年5月22日"
 documentclass: bxjsarticle
 classoption: xelatex,ja=standard,11pt
-geometry: no
+geometry: false
+header-includes:
+  - \usepackage{xltxtra}
+  - \usepackage{zxjatype}
+  - \usepackage[ipaex]{zxjafont}
 output:
   pdf_document:
     latex_engine: xelatex
     template: mytemplate.tex
-    number_sections: yes
-    fig_caption: yes
-    includes:
-      in_header: header.sty
+    number_sections: true
+    fig_caption: true
   github_document:
-    html_preview: no
+    html_preview: false
 ---
 
 ```{r setup, include = FALSE}
@@ -28,10 +30,10 @@ theme_set(theme_light(base_size = 11, base_family = 'IPAexGothic'))
 knitr::opts_knit$get('rmarkdown.pandoc.to')
 if(knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex') {
   devname <- 'cairo_pdf'
-  devargs <- c()
+  devargs <- c(family = 'IPAexGothic')
 } else {
   devname <- 'png'
-  devargs <- c('type' = 'cairo-png')
+  devargs <- c(family = 'IPAexGothic', type = 'cairo-png')
 }
 knitr::opts_chunk$set(
   echo = FALSE,

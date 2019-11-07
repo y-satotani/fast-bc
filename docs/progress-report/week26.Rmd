@@ -4,17 +4,19 @@ author: "里谷 佳紀"
 date: "平成30年11月22日"
 documentclass: bxjsarticle
 classoption: xelatex,ja=standard,11pt
-geometry: no
+geometry: false
+header-includes:
+  - \usepackage{xltxtra}
+  - \usepackage{zxjatype}
+  - \usepackage[ipaex]{zxjafont}
 output:
   pdf_document:
     latex_engine: xelatex
     template: mytemplate.tex
-    number_sections: yes
-    fig_caption: yes
-    includes:
-      in_header: header.sty
+    number_sections: true
+    fig_caption: true
   github_document:
-    html_preview: no
+    html_preview: false
 ---
 
 ```{r setup, include = FALSE}
@@ -27,33 +29,16 @@ theme_set(theme_light(base_size = 11, base_family = 'IPAexGothic'))
 knitr::opts_knit$get('rmarkdown.pandoc.to')
 if(knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex') {
   devname <- 'cairo_pdf'
-  devargs <- c()
+  devargs <- c(family = 'IPAexGothic')
 } else {
   devname <- 'png'
-  devargs <- c('type' = 'cairo-png')
+  devargs <- c(family = 'IPAexGothic', type = 'cairo-png')
 }
 knitr::opts_chunk$set(
   echo = FALSE,
   fig.height = 3, fig.width = 6, fig.align = 'center',
   dev = devname, dev.args = devargs, dpi = 150
 )
-```
-
-```{r readin, include = FALSE}
-data_time <- read_csv('../res/data/result-20181117.csv') %>%
-  group_by(topology, n, k, query) %>%
-  filter(topology %in% c('barabasi-albert', 'erdos-renyi')) %>%
-  summarise(
-    `proposed-max` = max(`time-proposed`),
-    `proposed-mean` = mean(`time-proposed`),
-    `brandes-mean` = mean(`time-brandes`),
-    `brandes-max` = max(`time-brandes`)
-  ) %>%
-  ungroup() %>%
-  gather(
-    key = 'method', value = 'time',
-    `proposed-max`, `proposed-mean`, `brandes-mean`, `brandes-max`
-  )
 ```
 
 # 研究全体の目的
@@ -77,19 +62,31 @@ data_time <- read_csv('../res/data/result-20181117.csv') %>%
 一辺挿入操作に対して，次数を4に固定し頂点数を変化させたときの実行時間を示す．
 図は2個のグラフで構成され，それぞれBarabási–Albertモデル，Erdős–Rényiモデルで行った結果であることを意味する．4本の線はそれぞれBrandesのアルゴリズムの実行時間の最大値および平均値，提案手法の実行時間の最大値および平均値を表す．
 ```{r fig1}
-data_fig1 <- data_time %>% filter(k == 4, query == 'insert')
-ggplot(data_fig1, aes(n, time, colour = method, shape = method, linetype = method)) +
-  facet_wrap(~topology) + geom_line() + geom_point() +
-  xlab('頂点数') + ylab('実行時間(s)') +
-  scale_colour_viridis(discrete = TRUE)
+ggplot() + annotate(
+  'text',
+  x = 0,
+  y = 0,
+  label = '古いデータです．新しい結果を参照してください．'
+) + theme(
+  axis.title = element_blank(),
+  axis.text = element_blank(),
+  axis.ticks = element_blank(),
+  panel.grid = element_blank()
+)
 ```
 
 ## 一辺削除時の実験結果
 挿入時の実験と同じ設定で削除操作に対する実行時間を示す．
 ```{r fig2}
-data_fig1 <- data_time %>% filter(k == 4, query == 'delete')
-ggplot(data_fig1, aes(n, time, colour = method, shape = method, linetype = method)) +
-  facet_wrap(~topology) + geom_line() + geom_point() +
-  xlab('頂点数') + ylab('実行時間(s)') +
-  scale_colour_viridis(discrete = TRUE)
+ggplot() + annotate(
+  'text',
+  x = 0,
+  y = 0,
+  label = '古いデータです．新しい結果を参照してください．'
+) + theme(
+  axis.title = element_blank(),
+  axis.text = element_blank(),
+  axis.ticks = element_blank(),
+  panel.grid = element_blank()
+)
 ```

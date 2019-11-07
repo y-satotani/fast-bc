@@ -4,17 +4,19 @@ author: "里谷 佳紀"
 date: "平成30年7月17日"
 documentclass: bxjsarticle
 classoption: xelatex,ja=standard,11pt
-geometry: no
+geometry: false
+header-includes:
+  - \usepackage{xltxtra}
+  - \usepackage{zxjatype}
+  - \usepackage[ipaex]{zxjafont}
 output:
   pdf_document:
     latex_engine: xelatex
     template: mytemplate.tex
-    number_sections: yes
-    fig_caption: yes
-    includes:
-      in_header: header.sty
+    number_sections: true
+    fig_caption: true
   github_document:
-    html_preview: no
+    html_preview: false
 ---
 
 ```{r setup, include = FALSE}
@@ -26,24 +28,16 @@ library(viridis)
 theme_set(theme_light(base_size = 11, base_family = 'IPAexGothic'))
 if(knitr::opts_knit$get('rmarkdown.pandoc.to') == 'latex') {
   devname <- 'cairo_pdf'
-  devargs <- c()
+  devargs <- c(family = 'IPAexGothic')
 } else {
   devname <- 'png'
-  devargs <- c('type' = 'cairo-png')
+  devargs <- c(family = 'IPAexGothic', type = 'cairo-png')
 }
 knitr::opts_chunk$set(
   echo = FALSE,
   fig.height = 2.3, fig.width = 6, fig.align = 'center',
   dev = devname, dev.args = devargs, dpi = 150
 )
-```
-
-```{r readin, include = FALSE}
-data <- read_csv('../res/data/oubc-20180713.csv') %>%
-  gather(key = 'calc-type', value = 'time', `time-update`, `time-noupdate`) %>%
-  group_by(query, `calc-type`) %>%
-  summarise(time = mean(time)) %>%
-  ungroup()
 ```
 
 # 研究全体の目的
@@ -75,32 +69,32 @@ data <- read_csv('../res/data/oubc-20180713.csv') %>%
 
 一辺挿入時の二つのアルゴリズムの実行時間の100回の平均を示す．結果から，最初から計算する方が有効であると言える．
 ```{r fig1}
-ggplot(data %>% filter(query == 'insert'), aes(`calc-type`, time, fill = `calc-type`)) +
-  geom_bar(stat = 'identity', width = 0.2) +
-  ylab('平均実行時間(s)') +
-  scale_x_discrete(
-    '計算方法',
-    labels = c('time-noupdate' = '再計算', 'time-update' = '更新')
-  ) +
-  scale_fill_discrete(
-    '計算方法',
-    labels = c('time-noupdate' = '再計算', 'time-update' = '更新')
-  )
+ggplot() + annotate(
+  'text',
+  x = 0,
+  y = 0,
+  label = '古いデータです．新しい結果を参照してください．'
+) + theme(
+  axis.title = element_blank(),
+  axis.text = element_blank(),
+  axis.ticks = element_blank(),
+  panel.grid = element_blank()
+)
 ```
 
 ## 削除時
 
 一辺削除時の二つのアルゴリズムの実行時間の100回の平均を示す．結果から，最初から計算する方が有効であると言える．
 ```{r fig2}
-ggplot(data %>% filter(query == 'delete'), aes(`calc-type`, time, fill = `calc-type`)) +
-  geom_bar(stat = 'identity', width = 0.2) +
-  ylab('平均実行時間(s)') +
-  scale_x_discrete(
-    '計算方法',
-    labels = c('time-noupdate' = '再計算', 'time-update' = '更新')
-  ) +
-  scale_fill_discrete(
-    '計算方法',
-    labels = c('time-noupdate' = '再計算', 'time-update' = '更新')
-  )
+ggplot() + annotate(
+  'text',
+  x = 0,
+  y = 0,
+  label = '古いデータです．新しい結果を参照してください．'
+) + theme(
+  axis.title = element_blank(),
+  axis.text = element_blank(),
+  axis.ticks = element_blank(),
+  panel.grid = element_blank()
+)
 ```
