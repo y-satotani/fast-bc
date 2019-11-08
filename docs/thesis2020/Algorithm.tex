@@ -193,16 +193,21 @@ $G=(V,E)$に辺$e=\{v,w\} \not\in E$を挿入して得られるグラフを$G'=(
   \end{equation}
 \end{lemma}
 \begin{proof}
+  $x=v$の場合と$x\neq v$の場合に分けて考える．
   \begin{enumerate}
   \item $x=v$のとき
     \par $(v,w)$が挿入されたので，$E'_{vz}\neq E_{vz}$ならば$(v,w)\notin E_{vxz}$かつ$(v,w)\in E'_{vz}$である．
-    つまり，$(v,w)$が新たに$E'_{vz}$に追加されたので，$E'_{vz}$のうち少なくともひとつは$v,(v,w),w,\ldots,z$である．
+    つまり，$(v,w)$が新たに$E'_{vz}$に追加されたので，$E'_{vz}$のうち少なくともひとつは
+    \[ v,(v,w),w,\ldots,z \]
+    である．
     したがって，$E_{vz}'\neq E_{vz}$ならば$d_{vz}\geq l_{vw}+d_{wz}$である．
     \par 逆に，$d_{vz}\geq l_{vw}+d_{wz}$ならば，$(v,w)\notin E_{vz}$が新たに$E'_{vz}$に追加される．
     よって，$E'_{vz}\neq E_{vz}$である．
   \item $x\neq v$のとき
     \par $E'_{xz}\neq E_{xz}$ならば，$(v,w)\notin E_{xz}$である．このとき，$E'_{xz}$のうち
-    ひとつは$x,(x,y),y,\ldots,v,(v,w),w,\ldots,z$の形で，$(v,w)\in E'_{yz}$である．
+    ひとつは
+    \[ x,(x,y),y,\ldots,v,(v,w),w,\ldots,z \]
+    の形で，$(v,w)\in E'_{yz}$である．
     よって$E'_{yz}\neq E_{yz}$かつ$d_{xz}\geq l_{xy}+d'_{yz}$を満たす$y\in\mathcal{N}_{G'}(x)$が存在する．
     \par 逆を証明するため，式中の$d'_{yz}$を展開する．
     \begin{equation*}
@@ -323,13 +328,15 @@ $d'_{xz}$の降順となるように次式を計算しながら走査する．
   である．
 \end{lemma}
 \begin{proof}
-  $d_{xv}+l_{vw}+d_{wz}=d_{vz}$ならば，$x,\ldots,v,(v,w),\ldots,w,\ldots,z$は
-  $E_{xz}$に含まれる．よって，$(v,w)\in E_{xz}$かつ$(v,w)\notin E'_{xz}$が成り立ち
+  $d_{xv}+l_{vw}+d_{wz}=d_{vz}$ならば，道グラフ
+  \[ x,\ldots,v,(v,w),\ldots,w,\ldots,z \]
+  は$E_{xz}$に含まれる．よって，$(v,w)\in E_{xz}$かつ$(v,w)\notin E'_{xz}$が成り立ち
   $E'_{xz}\neq E_{xz}$である．
 
-  $E'_{xz}\neq E_{xz}$ならば，$(v,w)\in E_{xz}$かつ$(v,w)\neq E_{xz}$である．
-  よって，$E_{xz}$には道グラフ$x,\ldots,v,(v,w),\ldots,w,\ldots,z$が含まれる．
-  したがって$d_{xv}+l_{vw}+d_{wz}$が成り立つ．
+  逆に$E'_{xz}\neq E_{xz}$ならば，$(v,w)\in E_{xz}$かつ$(v,w)\neq E_{xz}$である．
+  よって，$E_{xz}$には道グラフ
+  \[ x,\ldots,v,(v,w),\ldots,w,\ldots,z \]
+  が含まれる．したがって$d_{xv}+l_{vw}+d_{wz}$が成り立つ．
 \end{proof}
 
 \ref{lemma:update-augdist-on-delete}を満たす$x$について，補題\ref{lemma:distance-and-geodesics}に
@@ -344,7 +351,8 @@ $d'_{xz}$の降順となるように次式を計算しながら走査する．
     l_{xv}=&l_{vw}=l_{wz}=1,\,l_{xz}=100
   \end{aligned}
 \end{equation*}
-において，$\{v,w\}$が削除されたとき，$d'_{sz}$が最小となる$s$は$v$ではなく$x$である．
+において，$\{v,w\}$が削除されたとき，削除の影響を受ける頂点のうち$d'_{sz}$が最小となる
+$s$は$v$ではなく$x$である．
 
 正しい順序で$d'_{xz}$および$\sigma'_{xz}$を計算するため，次の手順で計算を行う．
 \begin{enumerate}

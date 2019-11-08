@@ -19,13 +19,17 @@ data_time <- read_csv('../../res/data/misc.csv') %>%
   gather(Var, val, `mean`, `max`) %>%
   unite(Var1, method, Var, sep = '-') %>%
   spread(Var1, val) %>%
-  ungroup()
+  ungroup() %>%
+  mutate(`order` = as.integer(`order`), `size` = as.integer(`size`))
+names(data_time) <- c('ネットワーク名', '頂点数', '辺数', '再計算-最大(s)', '再計算-平均(s)', '更新-最大(s)', '更新-平均(s)')
 
 print(
   xtable(data_time,
          caption = '実ネットワークでの実行時間',
-         label = 'tab:exp-real'
+         label = 'tab:exp-real',
+         format.args = list(digits = 2, format = c('d', 'd', 'd', 'f', 'f', 'f', 'f'))
          ),
+  size="\\fontsize{9pt}{10pt}\\selectfont",
   table.placement = 'tb',
   caption.placement = 'top',
   include.rownames = FALSE,
