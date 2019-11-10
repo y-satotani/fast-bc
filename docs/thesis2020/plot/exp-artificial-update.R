@@ -34,19 +34,17 @@ data_time <- read_csv('../../res/data/artificial.csv') %>%
 
 gp <- ggplot(
     data_time %>% filter(n == 1000, k %in% c(4, 64)),
-    aes(`update-number`, `time-proposed`, colour = mode, shape = k)
+    aes(`update-number`, `time-proposed`, colour = k)
   ) +
   geom_point(alpha = 0.2) +
-  guides(colour = guide_legend(title = '操作', override.aes = list(alpha = 1))) +
-  guides(shape = guide_legend(title = '次数', override.aes = list(alpha = 1))) +
-  #facet_grid(rows = vars(`update-index`), cols = vars(name)) +
-  facet_grid(cols = vars(name)) +
-  xlab('更新数') + ylab('実行時間(s)') +
-  scale_colour_viridis(discrete = TRUE, begin = 0.8, end = 0.2) +
+  guides(colour = guide_legend(title = '次数', override.aes = list(alpha = 1))) +
+  facet_grid(cols = vars(name), rows = vars(mode)) +
+  xlab('更新した頂点ペア数') + ylab('実行時間(s)') +
+  scale_colour_viridis(discrete = TRUE, begin = 0.7, end = 0.3) +
   theme(
     legend.position = 'top',
     strip.text = element_text(colour = 'black'),
     strip.background = element_blank()
   )
 
-ggsave(out_file, gp, cairo_pdf, width = 12, height = 8, units = 'cm')
+ggsave(out_file, gp, cairo_pdf, width = 12, height = 10, units = 'cm')

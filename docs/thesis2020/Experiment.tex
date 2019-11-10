@@ -4,43 +4,46 @@
 本章では，提案したアルゴリズムの有効性を検証するための実験を行う．
 実験で比較するアルゴリズムは次の通り．
 \begin{enumerate}
-\item 再計算（Brandesのアルゴリズム）
+\item Brandesのアルゴリズム（再計算）
   \par 辺が挿入または削除される度にBrandesのアルゴリズム(アルゴリズム\ref{algo:brandes})で媒介中心性を再計算する
-\item 更新（提案手法）
+\item 提案手法（更新）
   \par 辺が挿入された場合アルゴリズム\ref{algo:incremental-algorithm}で，削除された場合アルゴリズム\ref{algo:decremental-algorithm}で媒介中心性を更新する
 \end{enumerate}
 
-まず，人工ネットワークに対する実験を行う．ここでは，Brandesのアルゴリズムとの
-比較や，更新したペア依存度の数と実行時間の関係，媒介中心性を更新した頂点数と
-実際に媒介中心性が変化した頂点の関係を明らかにし，
+まず，人工ネットワークに対する実験を行う．具体的には，両アルゴリズムの実行時間の
+比較を行う．また，提案手法について，更新したペア依存度の数と実行時間の関係および
+媒介中心性を更新した頂点数と実際に媒介中心性が変化した頂点数の関係を明らかにすることで，
 \ref{subsect:computational-complexity-of-incremental-algorithm}と
 \ref{subsect:computational-complexity-of-decremental-algorithm}で
-行った理論的な解析結果との関連を示す．
+行った理論的な解析にさらなる根拠を与える．
 
-次に，実ネットワークに対する実験を行う．この実験では，実ネットワークでの性能の比較および，
-頑健な道路ネットワークの構築と，媒介中心性のリアルタイム計算への応用を想定した実験を行う．
+次に，実ネットワークに対する実験を行う．実ネットワークに対する両アルゴリズムの実行時間の
+比較を行う．さらに，実用上の観点から，頑健な道路ネットワークの構築と，
+媒介中心性のリアルタイム計算への応用を想定した実験を行う．
 
 なお，すべての実験は Intel (R) Xeon (R) CPU E-2620 v4 , 64GB RAM 上で行われた．
 実験に用いたプログラムは gcc 7.2.0 によって, -O3 最適化フラグを付与してコンパイルされた．
-プログラムのソースコードは\verb|github.com/y-satotani/dynamic-betweenness|で入手できる．
+プログラムのソースコードは\url{https://github.com/y-satotani/dynamic-betweenness}
+にて入手可能である．
 
 \section{人工ネットワークに対する実験}
 \label{sect:exp-artificial}
 
 本節では，以下の項目について実験を行い，その結果について考察する．
 \begin{enumerate}
-\item Brandesのアルゴリズムとの比較
+\item 両アルゴリズムの実行時間の比較
 \item ペア依存度を更新した頂点ペアの数と実行時間の関係
 \item 媒介中心性が実際に変化した頂点の数と更新した頂点の数の関係
 \end{enumerate}
 
-この実験では，次の二種類の人工ネットワークを対象とする．
+この実験では，次の二種類のネットワークモデルを対象とする．
 \begin{enumerate}
 \item Erd\H{o}s--R\'{e}nyiモデル\cite{Erdos1959}
 \item Barab\'{a}si--Albertモデル\cite{Barabasi1999}
 \end{enumerate}
 
-\subsection{Brandesのアルゴリズムとの比較}
+\subsection{両アルゴリズムの実行時間の比較}
+\textcolor{red}{実験内容の説明}
 
 図\ref{fig:exp-artificial-order}は各アルゴリズムの実行時間を比較したものである．
 各ネットワークの平均次数はおよそ$4$である．それぞれの頂点数について，
@@ -55,20 +58,19 @@
 
 図\ref{fig:exp-artificial-order}より，二種類のネットワーク全てに対して，
 頂点数が増加するとともに更新の平均実行時間が再計算のものと比べて短くなっていることが分かる．
-ペア依存度を再計算する必要がある頂点が頂点数の増加とともに比較的少なくなることが理由と考えられる．
+依存度を再計算する必要がある頂点が頂点数の増加とともに比較的少なくなることが理由と考えられる．
 
 \subsection{更新の量と実行時間の関係}
 
 提案したアルゴリズムのようなオンラインアルゴリズムの性能を評価するためには，
-アルゴリズムによって更新した要素の数を考慮する必要がある．
-\cite{Ramalingam1996,Lee2012,Pontecorvi2014}
-ここでは，ペア依存度を更新した頂点ペア数と実行時間の関係を実験によって
-明らかにする．さらに，
+アルゴリズムによって更新した要素の数を考慮する必要がある
+\cite{Ramalingam1996,Lee2012,Pontecorvi2014}．
+この実験によって，依存度を更新した頂点ペア数と実行時間の関係を明らかにする．さらに，
 \ref{subsect:computational-complexity-of-incremental-algorithm}と
 \ref{subsect:computational-complexity-of-decremental-algorithm}で
-行った理論的な解析結果と，実験データの挙動が一致するかを検証する．
+行った理論的な解析結果と，実験データが矛盾しないかを検証する．
 
-図\ref{fig:exp-artificial-update}はペア依存度を更新した頂点ペア数と実行時間の関係を表す．
+\textcolor{red}{実験内容の説明}
 頂点数を$1000$,平均次数は$4$または$64$とし，$100$個のネットワークに対してそれぞれ$1$回の更新を行った．
 
 \begin{figure}[tb]
@@ -78,19 +80,19 @@
   \label{fig:exp-artificial-update}
 \end{figure}
 
+図\ref{fig:exp-artificial-update}はペア依存度を更新した頂点ペア数と実行時間の関係を表す．
 図\ref{fig:exp-artificial-update}より，更新した頂点ペア数が少ないと，実行時間が短くなることが分かる．
-さらに，次数が大きいと実行時間が長くなる．この性質は辺の数が増加すると実行時間も
-増加することを示し，理論的な解析結果と一致する．
+さらに，次数が大きいと実行時間が長くなる．つまり，この性質は辺の数が増加すると実行時間も
+増加することを示している．
+また，この結果は理論的な解析結果と矛盾しない．
 
 \subsection{媒介中心性を更新した頂点の数と変化した頂点の数の関係}
-
 \ref{subsect:computational-complexity-of-incremental-algorithm}と
 \ref{subsect:computational-complexity-of-decremental-algorithm}で
 行った理論解析では，媒介中心性を更新した頂点の数と実際に媒介中心性が変化した頂点の数との
-間の関係が不明なままであった．ここでは，その関係を実験的に明らかにする．
+具体的な関係が不明なままであった．この実験によって，その関係を明らかにする．
 
-図\ref{fig:exp-artificial-phony}に，媒介中心性を更新した頂点の数と
-実際に媒介中心性が変化した頂点の数の関係を示す．
+\textcolor{red}{実験の説明}
 
 \begin{figure}[tb]
   \centering
@@ -99,26 +101,27 @@
   \label{fig:exp-artificial-phony}
 \end{figure}
 
-結果より，トポロジによって必要でない更新の数が変化することがわかる．
+図\ref{fig:exp-artificial-phony}に，媒介中心性を更新した頂点の数と
+実際に媒介中心性が変化した頂点の数の関係を示す．
+結果より，トポロジによって不要な更新の数が変化することがわかる．
+特に，そのような更新はBarab\'{a}si--Albertモデルで顕著である．
 
 \section{実ネットワークに対する実験}
 \label{sect:exp-realnet}
-
-本節では，実ネットワークに対する実験を行う．
-SNAPデータセット\cite{Leskovec2016}から取得した実ネットワークでの性能評価および，
-頑健な道路ネットワークの構築と，媒介中心性のリアルタイム計算への応用を想定した実験を行う．
+前節の実験は人工的なネットワークの上のものであったが，
+応用の観点から，実ネットワークに対するアルゴリズムの性能を知ることも重要である．
+そこで，本節では実ネットワークに対する実験を行う．
+まず，SNAPデータセット\cite{Leskovec2016}から取得した実ネットワークでの性能評価を行い，
+次に頑健な道路ネットワークの構築と，媒介中心性のリアルタイム計算への応用を想定した実験を行う．
 
 \subsection{SNAPデータセットでの比較}
 \label{subsect:exp-real}
 
-SNAPデータセットのいくつかの実ネットワークに対して，
-提案手法とBrandesのアルゴリズムの比較実験を行った．
+SNAPデータセットのいくつかの実ネットワークに対して両アルゴリズムの性能比較を行った．
 両アルゴリズムを各ネットワークに対して10回実行し，その実行時間の平均値および最大値を求めた．
 実験結果を表\ref{tab:exp-real}に示す．
 
-{scriptsize
-  \input{exp-misc.tex}
-  }
+\input{exp-misc.tex}
 
 表\ref{tab:exp-real}より，提案手法は実ネットワークでも効率よく計算できることが確認できる．
 

@@ -26,17 +26,23 @@ data_time <- read_csv('../../res/data/artificial.csv') %>%
 
 gp <- ggplot(
     data_time %>% filter(n == 1000, k %in% c(4)),
-    aes(`changed-bc-verts`, `updated-bc-verts`, colour = mode)
+    aes(`changed-bc-verts`, `updated-bc-verts`)
   ) +
-  geom_point(alpha = 0.2) +
+  geom_point(colour = 'royalblue', alpha = 0.2) +
+  geom_abline(slope = 1, intercept = 1, size = 0.2) +
+  annotate(
+      #'text', x = 600, y = 500, label = paste('|', 'italic(V)', '|', 'italic(x)'),
+      'text', x = 600, y = 500, label = expression('|'*italic(V)[italic(delta)]*'|'=='|'*italic(V)[italic(delta)]^{'*'}*'|'),
+      parse = TRUE, family = 'Times New Roman', size = 3, hjust = 0.3
+  ) +
   guides(colour = guide_legend(title = '操作', override.aes = list(alpha = 1))) +
-  facet_grid(cols = vars(name)) +
-  xlab('媒介中心性が変化した頂点数') + ylab('媒介中心性を更新した頂点数') +
-  scale_colour_viridis(discrete = TRUE, begin = 0.8, end = 0.2) +
+  facet_grid(cols = vars(name), rows = vars(mode)) +
+  xlab(expression('媒介中心性が変化した頂点数'~'|'*V[delta]^{'*'}*'|')) +
+  ylab(expression('媒介中心性を更新した頂点数'~'|'*V[delta]*'|')) +
   theme(
     legend.position = 'top',
     strip.text = element_text(colour = 'black'),
     strip.background = element_blank()
   )
 
-ggsave(out_file, gp, cairo_pdf, width = 12, height = 8, units = 'cm')
+ggsave(out_file, gp, cairo_pdf, width = 12, height = 10, units = 'cm')
