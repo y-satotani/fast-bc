@@ -22,6 +22,7 @@ data_dynamic <- read_csv(
   select(c(vert1, vert2, query, `max-bc`))
 
 data <- data_dynamic %>%
+  filter(!is.nan(`max-bc`)) %>%
   inner_join(data_static, by = c('vert1' = 'vert')) %>%
   rename('bc1' = 'bc') %>%
   inner_join(data_static, by = c('vert2' = 'vert')) %>%
@@ -32,15 +33,16 @@ data <- data_dynamic %>%
   )) %>%
   arrange(`min-bc-on-pair`)
 
-gp <- ggplot(data, aes(`min-bc-on-pair`, `max-bc`, colour = `query`)) +
-  geom_point(alpha = 0.2) +
-  guides(colour = guide_legend(title = '操作', override.aes = list(alpha = 1))) +
+gp <- ggplot(data, aes(`min-bc-on-pair`, `max-bc`)) +
+  facet_grid(cols = vars(`query`)) +
+  geom_point(alpha = 0.2, colour = 'royalblue') +
   xlab('操作辺と接続する頂点の媒介中心性の最小値') +
   ylab('操作後の全体の媒介中心性の最大値') +
-  scale_colour_viridis(discrete = TRUE, begin = 0.8, end = 0.2) +
   theme(
     legend.title = element_blank(),
-    legend.position = 'top'
+    legend.position = 'none',
+    strip.text = element_text(colour = 'black'),
+    strip.background = element_blank()
   )
 
-ggsave(out_file, gp, cairo_pdf, width = 9, height = 7, units = 'cm')
+ggsave(out_file, gp, cairo_pdf, width = 12, height = 7, units = 'cm')

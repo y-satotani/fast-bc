@@ -66,6 +66,20 @@
 
 \include{Abstract}
 
+\makeatletter
+\def\thebibliography#1{
+  \chapter*{\@referencename\@mkboth{\refname}{\refname}}
+  \typeout{\@referencename}\addcontentsline{toc}{chapter}{\@referencename}
+  \@chaptermark{\@referencename}
+  \list
+      {[\arabic{enumi}]}{\settowidth\labelwidth{[#1]}\leftmargin\labelwidth
+        \advance\leftmargin\labelsep
+        \usecounter{enumi}}
+      \def\newblock{\hskip .11em plus .33em minus .07em}
+      \sloppy\clubpenalty4000\widowpenalty4000
+      \sfcode`\.=1000\relax}
+\let\endthebibliography=\endlist
+\makeatother
 %
 \begin{document}
 \maketitle
@@ -85,8 +99,11 @@
 産業創成工学専攻○○○○教授に深謝の意を表する．また，○○研究室の皆様には，
 日常の議論を通して多くの知識や示唆を頂いた．ここに謝意を表する．
 
-\appendix
-
-\printbibliography[title=参考文献]
+\chapter*{参考文献}
+\typeout{参考文献}\addcontentsline{toc}{chapter}{参考文献}
+\makeatletter
+\@chaptermark{参考文献}
+\makeatother
+\printbibliography[heading=none]
 
 \end{document}
