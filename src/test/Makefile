@@ -11,6 +11,9 @@ EXE := $(patsubst %.c,%.out,$(shell ls | egrep ".\c$$"))
 
 all: $(EXE)
 
+debug: CFLAGS += -DDEBUG -g
+debug: $(EXE)
+
 %.out: %.c
 	$(CC) $(CFLAGS) -o $@ $< $(LIBS)
 

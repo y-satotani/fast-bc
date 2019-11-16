@@ -11,6 +11,9 @@ OBJ := $(patsubst %.c,%.o,$(shell ls | egrep ".\c$$"))
 
 all: libdybc.so
 
+debug: CFLAGS += -DDEBUG -g
+debug: libdybc.so
+
 libdybc.so: $(OBJ)
 	$(CC) $(CFLAGS) -shared -o $@ $^ $(LIBS)
 
