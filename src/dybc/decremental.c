@@ -222,7 +222,10 @@ void decremental_part(igraph_t*            G,
   igraph_2wheap_init(&delta_queue, igraph_vcount(G));
   for(int i = 0; i < igraph_vector_long_size(&delta_set); i++) {
     igraph_integer_t x = VECTOR(delta_set)[i];
-    igraph_2wheap_update(&delta_queue, x, MATRIX(*D, x, z));
+    if(MATRIX(*Sigma, x, z) > 0)
+      igraph_2wheap_update(&delta_queue, x, MATRIX(*D, x, z));
+    else
+      MATRIX(*Delta, z, x) = 0;
   }
 
 #ifdef DEBUG
