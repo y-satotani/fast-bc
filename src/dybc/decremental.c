@@ -17,6 +17,9 @@ void decremental(igraph_t*            G,
                  igraph_integer_t*    n_update_path_pairs,
                  igraph_integer_t*    n_update_dep_pairs,
                  igraph_integer_t*    n_update_dep_verts) {
+#ifdef DEBUG
+  printf("DEBUG: decremental of %d and %d begin\n", v, w);
+#endif
   // add edge and set weight
   igraph_integer_t eid;
   igraph_get_eid(G, &eid, v, w, 0, 0);
@@ -52,6 +55,9 @@ void decremental(igraph_t*            G,
 
   igraph_inclist_destroy(&inclist);
   igraph_vector_bool_destroy(&update_dep_verts);
+#ifdef DEBUG
+  printf("DEBUG: decremental of %d and %d end\n", v, w);
+#endif
 }
 
 void decremental_part(igraph_t*            G,
@@ -67,6 +73,9 @@ void decremental_part(igraph_t*            G,
                       igraph_integer_t*     n_update_path_pairs,
                       igraph_integer_t*     n_update_dep_pairs,
                       igraph_vector_bool_t* update_dep_verts) {
+#ifdef DEBUG
+  printf("DEBUG: decremental_part of %d begin\n", z);
+#endif
   if(igraph_cmp_epsilon(MATRIX(*D, v, z), c + MATRIX(*D, w, z)) < 0
      || MATRIX(*Sigma, w, z) == 0)
     return;
@@ -77,8 +86,10 @@ void decremental_part(igraph_t*            G,
   igraph_vector_int_init(&sp_z, igraph_vcount(G));
   igraph_matrix_int_get_col(Sigma, &sp_z, z);
 
-  //printf("%d %d %d:\n", v, w, z);
   // find affected vertices
+#ifdef DEBUG
+  printf("DEBUG: phase 1 finding affected vertices\n");
+#endif
   igraph_vector_long_t work_set;
   igraph_vector_long_t affected;
   igraph_vector_bool_t is_affected;
@@ -91,6 +102,9 @@ void decremental_part(igraph_t*            G,
   while(igraph_vector_long_size(&work_set) > 0) {
     igraph_integer_t x = igraph_vector_long_pop_back(&work_set);
     igraph_real_t d_xz = MATRIX(*D, x, z);
+#ifdef DEBUG
+    printf("DEBUG: deque %d (d=%f)\n", x, d_xz);
+#endif
 
     igraph_vector_t* neis = igraph_inclist_get(inclist, x);
     igraph_integer_t ni;
@@ -100,7 +114,11 @@ void decremental_part(igraph_t*            G,
       igraph_real_t d_yz = MATRIX(*D, y, z);
       igraph_real_t l_yx = EAN(G, weight, eid);
 
+      // XXX: this compares real values in hard style
       if(d_yz == l_yx + d_xz && !VECTOR(is_affected)[y]) {
+#ifdef DEBUG
+        printf("DEBUG: %d is affected (%f=%f+%f)\n", y, d_yz, l_yx, d_xz);
+#endif
         igraph_vector_long_push_back(&work_set, y);
         igraph_vector_long_push_back(&affected, y);
         igraph_vector_bool_set(&is_affected, y, 1);
@@ -111,6 +129,9 @@ void decremental_part(igraph_t*            G,
     *n_update_path_pairs = igraph_vector_long_size(&affected);
 
   // update distance of vertices which have unaffected neighbor
+#ifdef DEBUG
+  printf("DEBUG: phase 2 update distance and sigma\n");
+#endif
   igraph_2wheap_t queue;
   igraph_2wheap_init(&queue, igraph_vcount(G));
   for(igraph_integer_t ai = 0; ai < igraph_vector_long_size(&affected); ai++) {
@@ -128,6 +149,12 @@ void decremental_part(igraph_t*            G,
       if(d_xz_d < 0 || igraph_cmp_epsilon(d_xz_d, l_yx + d_yz) > 0)
         d_xz_d = l_yx + d_yz;
     }
+#ifdef DEBUG
+    if(d_xz_d > 0)
+      printf("DEBUG: distance of %d found (%f)\n", x, d_xz_d);
+    else
+      printf("DEBUG: distance of %d found (inf)\n", x);
+#endif
 
     if(d_xz_d < 0) {
       MATRIX(*D, x, z) = IGRAPH_INFINITY;
@@ -148,7 +175,6 @@ void decremental_part(igraph_t*            G,
     igraph_real_t d_xz = -igraph_2wheap_delete_max(&queue);
     igraph_real_t dp_xz = VECTOR(dp_z)[x];
     igraph_integer_t sp_xz = MATRIX(*Sigma, x, z);
-    //printf("--debug1-- %d %f pop\n", x, d_xz);
 
     MATRIX(*D, x, z) = d_xz;
     MATRIX(*Sigma, x, z) = 0;
@@ -163,28 +189,27 @@ void decremental_part(igraph_t*            G,
       igraph_real_t dp_yz = VECTOR(dp_z)[y];
       igraph_real_t l_yx = EAN(G, weight, eid);
 
-      //printf("--debug1-- %d %d %f %f %f %f %f\n", x, y, l_yx, dp_xz, dp_yz, d_xz, d_yz);
       if(igraph_vector_bool_e(&is_affected, y)) {
         igraph_2wheap_update(&queue, y, -(l_yx+d_xz));
-        //printf("--debug1-- %d %f added to queue\n", y, -(l_yx+d_xz));
       }
       else if(igraph_cmp_epsilon(d_xz, l_yx + d_yz) == 0)
         MATRIX(*Sigma, x, z) += MATRIX(*Sigma, y, z);
       if((igraph_cmp_epsilon(dp_yz, l_yx + dp_xz) == 0)
          != (igraph_cmp_epsilon(d_yz, l_yx + d_xz) == 0)) {
         igraph_vector_long_push_back(&delta_set, x);
-        //printf("--debug1-- %d added\n", x);
       }
       if((igraph_cmp_epsilon(dp_xz, l_yx + dp_yz) == 0)
          != (igraph_cmp_epsilon(d_xz, l_yx + d_yz) == 0)) {
         igraph_vector_long_push_back(&delta_set, y);
-        //printf("--debug1-- %d added\n", y);
       }
     } /* for ni < nnei */
     if(MATRIX(*Sigma, x, z) != sp_xz) {
       igraph_vector_long_push_back(&delta_set, x);
-      //printf("--debug1-- %d added\n", x);
     }
+#ifdef DEBUG
+    printf("DEBUG: udpate d and s of %d (to %f and %d)\n",
+           x, MATRIX(*D, x, z), MATRIX(*Sigma, x, z));
+#endif
   }
   // remainings are not checked in previous loop
   while(!igraph_2wheap_empty(&queue)) {
@@ -197,16 +222,24 @@ void decremental_part(igraph_t*            G,
   igraph_2wheap_init(&delta_queue, igraph_vcount(G));
   for(int i = 0; i < igraph_vector_long_size(&delta_set); i++) {
     igraph_integer_t x = VECTOR(delta_set)[i];
-    igraph_2wheap_update(&delta_queue, x, MATRIX(*D, x, z));
+    if(MATRIX(*Sigma, x, z) > 0)
+      igraph_2wheap_update(&delta_queue, x, MATRIX(*D, x, z));
+    else
+      MATRIX(*Delta, z, x) = 0;
   }
 
+#ifdef DEBUG
+  printf("DEBUG: accumulating delta\n");
+#endif
   if(n_update_dep_pairs)
     *n_update_dep_pairs = 0;
   while(Delta && !igraph_2wheap_empty(&delta_queue)) {
     igraph_integer_t x = igraph_2wheap_max_index(&delta_queue);
     igraph_real_t d_xz = igraph_2wheap_delete_max(&delta_queue);
     igraph_integer_t s_xz = MATRIX(*Sigma, x, z);
-    //printf("--debug2-- %d %d %f\n", z, x, d_xz);
+#ifdef DEBUG
+    printf("DEBUG: deque %d (d=%f,s=%d)\n", x, d_xz, s_xz);
+#endif
 
     MATRIX(*Delta, z, x) = 0;
     if(x == z) continue;
@@ -221,7 +254,15 @@ void decremental_part(igraph_t*            G,
       igraph_real_t l_yx = EAN(G, weight, eid);
 
       if(igraph_cmp_epsilon(d_yz, l_yx + d_xz) == 0) {
+#ifdef DEBUG
+        printf("DEBUG: update delta_%d(%d) = %.3f+(1+%.3f)*%d/%d",
+               z, x, MATRIX(*Delta, z, x),
+               MATRIX(*Delta, z, y), s_xz, s_yz);
+#endif
         MATRIX(*Delta, z, x) += (1 + MATRIX(*Delta, z, y)) * s_xz / s_yz;
+#ifdef DEBUG
+        printf(" = %.3f\n", MATRIX(*Delta, z, x));
+#endif
       } else if(igraph_cmp_epsilon(d_xz, l_yx + d_yz) == 0) {
         igraph_2wheap_update(&delta_queue, y, d_yz);
       }
@@ -240,5 +281,8 @@ void decremental_part(igraph_t*            G,
   igraph_2wheap_destroy(&queue);
   igraph_vector_long_destroy(&delta_set);
   igraph_2wheap_destroy(&delta_queue);
+#ifdef DEBUG
+  printf("DEBUG: decremental_part of %d end\n", z);
+#endif
 }
 
