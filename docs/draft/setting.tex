@@ -1,7 +1,5 @@
 \usepackage{amsmath,amsthm,amssymb}
-\usepackage{thmtools}
-\usepackage[dvipdfmx]{graphicx}
-\usepackage{color}
+\usepackage[dvipdfmx]{xcolor,graphicx}
 \usepackage{geometry}
 \usepackage{algorithm,algpseudocode}
 \usepackage{float}
@@ -19,7 +17,6 @@
 %\renewrobustcmd*{\bibinitdelim}{}
 \usepackage{verbatim}
 \usepackage{enumitem}
-\usepackage{mwe}
 
 % setting title
 \makeatletter
@@ -43,63 +40,16 @@
 % setting margin
 \newgeometry{tmargin=2cm,lmargin=2cm,rmargin=2cm,bmargin=2cm}
 
-% adding new symbol (vrectangle and vrectangleblack)
-\DeclareFontEncoding{LS1}{}{}
-\DeclareFontSubstitution{LS1}{stix}{m}{n}
-\DeclareSymbolFont{symbolsstix}{LS1}{stixscr}{m}{n}
-\DeclareMathSymbol{\vrectangleblack}{\mathord}{symbolsstix}{"C5}
-\DeclareMathSymbol{\vrectangle}{\mathord}{symbolsstix}{"C6}
-
-% declare some dummy font shape to suppress warnings
-\DeclareFontShape{JT1}{mc}{m}{it}{<->ssub*mc/m/n}{}
-\DeclareFontShape{JY1}{mc}{m}{it}{<->ssub*mc/m/n}{}
-\DeclareFontShape{JT1}{mc}{m}{sc}{<->ssub*mc/m/n}{}
-\DeclareFontShape{JY1}{mc}{m}{sc}{<->ssub*mc/m/n}{}
-\DeclareFontShape{JT1}{gt}{m}{it}{<->ssub*gt/m/n}{}
-\DeclareFontShape{JY1}{gt}{m}{it}{<->ssub*gt/m/n}{}
-
-% add math operator
-\DeclareMathOperator*{\argmin}{\arg\!\min}
-\DeclareMathOperator*{\argmax}{\arg\!\max}
-
 % theorem preference
-\declaretheoremstyle[
-  spaceabove=1ex, 
-  numbered=yes,
-  headfont=\bfseries,
-  headpunct=,
-  bodyfont=\normalfont,
-  spacebelow=1ex,
-]{mythmstyle}
-\declaretheorem[
-  parent=chapter,style=mythmstyle,qed=$\vrectangle$,title=定義,
-]{definition}
-\declaretheorem[
-  style=mythmstyle,sibling=definition,qed=$\vrectangle$,title=例,
-]{example}
-\declaretheorem[
-  style=mythmstyle,sibling=definition,title=補題,
-]{lemma}
-\declaretheorem[
-  style=mythmstyle,sibling=definition,qed=$\vrectangle$,title=補題,
-]{lemma-without-proof}
-\declaretheorem[
-  style=mythmstyle,sibling=definition,title=定理,
-]{theorem}
-\declaretheorem[
-  style=mythmstyle,sibling=definition,qed=$\vrectangle$,title=定理,
-]{theorem-without-proof}
-\declaretheorem[
-  style=mythmstyle,sibling=definition,title=系,
-]{corollary}
-\declaretheorem[
-  style=mythmstyle,sibling=definition,qed=$\vrectangle$,title=系,
-]{corollary-without-proof}
-\declaretheorem[
-  style=mythmstyle,sibling=definition,qed=$\vrectangle$,title=予想,
-]{conjecture}
-\renewcommand{\proofname}{\normalfont{[\,証明\,]}\nopunct}
-\renewcommand{\qedsymbol}{$\vrectangleblack$}
+\newtheoremstyle{mythmstyle}{}{}{\rmfamily}{}{\bfseries}{}{5pt}{}
+\theoremstyle{mythmstyle}
+\newtheorem{definition}{定義}[chapter]
+\newtheorem{lemma}[definition]{補題}
+\newtheorem{theorem}[definition]{定理}
+\newtheorem{corollary}[definition]{系}
+\newtheorem{assumption}[definition]{仮定}
+\newtheorem{example}[definition]{例}
+\renewcommand*{\proofname}{\rm\bf{証明}}
 
 % algorithm preference
 \algnewcommand{\LeftComment}[1]{\(\triangleright\) #1}

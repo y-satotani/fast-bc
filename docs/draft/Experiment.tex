@@ -84,6 +84,21 @@
 
 \subsection{媒介中心性を更新した頂点の数と変化した頂点の数の関係}
 
+\begin{example}
+  \label{ex:counter-of-invariability-of-pairwise-dependency}
+  図\ref{fig:pd-invariability-counterexample}において$\delta_s(v_1)=\delta'_s(v_1)$であるが，
+  $\delta_s(w_1)\neq\delta'_s(w_1)$である．
+  同様に，$\delta_s(v_2)=\delta'_s(v_2)$であるが，$\sigma_{sv_2}\neq\sigma'_{sv_2}$である．
+
+  \begin{figure}[tb]
+    \centering
+    \def\svgwidth{.45\linewidth}
+    \input{pd-invariability-counterexample.pdf_tex}
+    \caption{補題\ref{lemma:condition-of-invariability-of-pairwise-dependency}の逆の反例}
+    \label{fig:pd-invariability-counterexample}
+  \end{figure}
+\end{example}
+
 \ref{subsect:computational-complexity-of-incremental-algorithm}と
 \ref{subsect:computational-complexity-of-decremental-algorithm}で
 行った理論解析では，媒介中心性を更新した頂点の数と実際に媒介中心性が変化した頂点の数との
@@ -148,7 +163,7 @@ SNAPデータセットのいくつかの実ネットワークに対して，
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=.9\textwidth]{road-oka.pdf}
+  \includegraphics[width=.9\textwidth]{road-oka.eps}
   \caption{実験で用いる道路ネットワーク}
   \label{fig:road-okayama}
 \end{figure}
@@ -172,21 +187,21 @@ $0.1379$まで減少させることに成功した．
 
 \begin{figure}[tb]
   \centering
-  \includegraphics{exp-road-oka-correlation-insert.pdf}
+  \includegraphics{exp-road-oka-correlation-insert.eps}
   \caption{辺挿入後の媒介中心性の最大値の分布}
   \label{fig:exp-road-oka-correlation-insert}
 \end{figure}
 
 \begin{figure}[tb]
   \centering
-  \includegraphics{exp-road-oka-correlation-delete.pdf}
+  \includegraphics{exp-road-oka-correlation-delete.eps}
   \caption{辺削除後の媒介中心性の最大値の分布}
   \label{fig:exp-road-oka-correlation-delete}
 \end{figure}
 
 \begin{figure}[tb]
   \centering
-  \includegraphics{road-oka-minmax.pdf}
+  \includegraphics{road-oka-minmax.eps}
   \caption{
     挿入すると媒介中心性の最大値を大きく変化させる辺 \\
     図\ref{fig:road-okayama}の拡大図である．
@@ -215,7 +230,7 @@ $0.1379$まで減少させることに成功した．
 
 \begin{figure}[tb]
   \centering
-  \includegraphics{exp-sfhh.pdf}
+  \includegraphics{exp-sfhh.eps}
   \caption{SFHHに対する実験結果}
   \label{fig:exp-sfhh}
 \end{figure}

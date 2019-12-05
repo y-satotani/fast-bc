@@ -4,22 +4,33 @@
 本章では，アルゴリズムを提案する．
 まず，挿入と削除に共通した部分を説明する．
 その後，挿入と削除それぞれのアルゴリズムを説明する．
+\textcolor{red}{前提条件}
 
 \section{最短経路とペア依存度の変化に関する条件}
 \label{sect:condition-of-variability}
 
 ここでは，一辺が挿入または削除されたあとの最短経路およびペア依存度が変化する条件について述べる．
 記号について，挿入または削除の操作後であることを明示するため，記号$'$をつける．例えば，操作後のグラフは$G'$と表す．
+また，頂点$t$に対して，辺操作によって$t$への最短経路が変化する頂点の集合を$S(t)$と表す．
+同様に，頂点$s$に対して，辺操作によって$s$からの最短経路が変化する頂点の集合を$T(s)$と表す．
+$S(t)$および$T(s)$に属する頂点は，それぞれ$t$および$s$について，辺更新の影響を受ける頂点集合と言える．
+後述するが，$S(t)$および$T(s)$具体的な式は，操作によって異なる．
+さらに，頂点$s,x\in V$に対して，$T(s)$に含まれる頂点$t$についてペア依存度$\delta_{st}(x)$の総和を
+$\Delta_{s\bullet}(x)$で表す\cite{Bergamini2017}．
+つまり，$\Delta_{s\bullet}=\sum_{t\in T(s)}\delta_{st}(x)$である．
+同様に，$\Delta'_{s\bullet}=\sum_{t\in T(s)}\delta'_{st}(x)$とする．
 
-\begin{lemma}
-  \label{lemma:condition-of-invariability-of-shortest-path}
+次の定理は，最短経路の変化が最短距離および最短経路数の変化につながることを示す．
+\begin{theorem}
+  \label{thm:condition-of-invariability-of-shortest-path}
   $E_{st}=E'_{st}$であることの必要十分条件は，$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$である．
-\end{lemma}
+\end{theorem}
 \begin{proof}
   $E_{st}=E'_{st}$ならば$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$であることは自明である．
 
   逆は，図\ref{fig:proof-invariability-of-paths}のような$E_{st}$を，
   $d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$を満たすように，$E_{st}\neq E'_{st}$にすることを考える．
+  図において，同じ$L_i$に含まれる頂点$v$について$d_{sv}$および$d_{vt}$は一定とする．
 
   挿入時，長さが$L_i$間の距離より長い辺を挿入すると，$E_{st}=E'_{st}$を満たす．
   また，長さが$L_i$間の距離と等しい辺を挿入すると，$\sigma_{st}\neq\sigma'_{st}$となる．
@@ -31,147 +42,99 @@
   したがって$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$を満たすように，
   $E_{st}\neq E'_{st}$とすることは不可能で，逆も成り立つ．
 
-  \begin{figure}
-    \centering
-    \def\svgwidth{.5\columnwidth}
-    \input{proof-invariability-of-paths.pdf_tex}
-    \caption{$s$と$t$の一般的な最短経路．同じ$L_i$に含まれる頂点$v$について$d_{sv}$および$d_{vt}$は一定とする．}
-    \label{fig:proof-invariability-of-paths}
-  \end{figure}
 \end{proof}
+\begin{figure}
+  \centering
+  \def\svgwidth{.5\columnwidth}
+  \input{proof-invariability-of-paths.pdf_tex}
+  \caption{$s$と$t$の一般的な最短経路}
+  \label{fig:proof-invariability-of-paths}
+\end{figure}
 
-\begin{lemma}
-  \label{lemma:condition-of-invariability-of-pairwise-dependency}
-  頂点$s,v$について，$E_{G_s}(v)=E_{G'_s}(v)$かつすべての$w\in V_{G_s}$に対して
-  $\sigma_{sw}=\sigma'_{sw}$ならば$\delta_s(v)=\delta'_s(v)$.
-\end{lemma}
+次の定理は，更新による依存度の変化量と$\Delta_{s\bullet}(x)$が一致することを示す．
+\begin{theorem}
+  任意の$s,x\in V$に対して，式\eqref{eq:change-amount-dependency}が成り立つ．
+  \begin{equation}
+    \delta'_{s\bullet}(x)-\delta_{s\bullet}(x)=\Delta'_{s\bullet}(x)-\Delta_{s\bullet}(x)
+    \label{eq:change-amount-dependency}
+  \end{equation}
+\end{theorem}
 \begin{proof}
+  定理\ref{thm:condition-of-invariability-of-shortest-path}により，任意の$t\notin T(s)$に対して，
+  $\sigma_{st}=\sigma'_{st}$である．さらに，$t\notin T(s)$の条件下で，任意の$x\in V$について
+  $\sigma_{st}(x)=\sigma'_{st}(x)$が成り立つ．したがって，次が成り立つ．
   \begin{equation*}
     \begin{aligned}
-      \delta_s(v)
-      &=\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_s(w)) \\
-      &=\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+
-      \sum_{w\in\mathcal{S}_{G_s}(w)}\cfrac{\sigma_{sw}}{\sigma_{sw}}(1+\delta_s(w))
-      \right) \\
-      &\vdots \\
-      &=\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+\cdots
-      \sum_{w\in\mathcal{S}_{G_s}(w)}\cfrac{\sigma_{sw}}{\sigma_{sw}}(1+\delta_s(w))
-      \cdots\right)
-      \label{eq:condition-of-invariability-of-pairwise-dependency}
-    \end{aligned}
-  \end{equation*}
-  式\eqref{eq:condition-of-invariability-of-pairwise-dependency}について，
-  $G_s$は有限で閉路を含まないので，$\delta_s(v)$が無限に展開されることはない．
-  また，$E_{G_s}(v)=E_{G'_s}(v)$ならば，$V_{G_s}(v)=V_{G'_s}(v)$かつ
-  すべての$w\in V_s(v)$に対して$\mathcal{S}_{G_s}(v)=\mathcal{S}_{G'_s}(v)$である．
-  よって，$E_{G_s}(v)=E_{G'_s}(v)$かつすべての$w\in V_{G_s}$に対して
-  $\sigma_{sw}=\sigma'_{sw}$ならば，
-  \begin{equation*}
-    \begin{aligned}
-      \delta_s(v)
-      &=\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+\cdots
-      \sum_{w\in\mathcal{S}_{G_s}(w)}\cfrac{\sigma_{sw}}{\sigma_{sw}}(1+\delta_s(w))
-      \cdots\right) \\
-      &=\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+\cdots
-      \sum_{w\in\mathcal{S}_{G_s}(w)}\cfrac{\sigma_{sw}}{\sigma_{sw}}
-      \cdots\right) \\
-      &=\sum_{w\in\mathcal{S}_{G'_s}(v)}\cfrac{\sigma'_{sv}}{\sigma'_{sw}}\left(1+\cdots
-      \sum_{w\in\mathcal{S}_{G'_s}(w)}\cfrac{\sigma'_{sw}}{\sigma'_{sw}}
-      \cdots\right) \\
-      &=\delta'_s(v).
+      \delta'_{s\bullet}(x)-\delta_{s\bullet}(x)
+      &=\sum_{t\neq x}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right) \\
+      &=\sum_{t\in T(s)}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right)
+      +\sum_{t\notin T(s)}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right) \\
+      &=\sum_{t\in T(s)}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right) \\
+      &=\Delta'_{s\bullet}(x)-\Delta_{s\bullet}(x)
     \end{aligned}
   \end{equation*}
 \end{proof}
 
-補題\ref{lemma:condition-of-invariability-of-pairwise-dependency}の逆は成り立たない．
-
-\begin{example}
-  \label{ex:counter-of-invariability-of-pairwise-dependency}
-  図\ref{fig:pd-invariability-counterexample}において$\delta_s(v_1)=\delta'_s(v_1)$であるが，
-  $\delta_s(w_1)\neq\delta'_s(w_1)$である．
-  同様に，$\delta_s(v_2)=\delta'_s(v_2)$であるが，$\sigma_{sv_2}\neq\sigma'_{sv_2}$である．
-
-  \begin{figure}[tb]
-    \centering
-    \def\svgwidth{.45\linewidth}
-    \input{pd-invariability-counterexample.pdf_tex}
-    \caption{補題\ref{lemma:condition-of-invariability-of-pairwise-dependency}の逆の反例}
-    \label{fig:pd-invariability-counterexample}
-  \end{figure}
-\end{example}
-
-\begin{lemma}
-  \label{lemma:transformation-of-invariability-of-pairwise-dependency}
-  頂点$s,v$に関して，次の\ref{item:explicit-invariability-of-pairwise-dependency}と
-  \ref{item:implicit-invariability-of-pairwise-dependency-1}と
-  \ref{item:implicit-invariability-of-pairwise-dependency-2}は同値である．
-  \begin{enumerate}[label=(\alph*)]
-  \item $E_{G_s}(v)=E_{G'_s}(v)$かつすべての$w\in V_{G_s}(v)$に対して$\sigma_{sw}=\sigma'_{sw}$.
-    \label{item:explicit-invariability-of-pairwise-dependency}
-  \item $V_{G_s}(v)=V_{G'_s}(v)$かつすべての$w\in V_{G_s}(v)$に対して
-    $\sigma_{sw}=\sigma'_{sw}\land\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)$.
-    \label{item:implicit-invariability-of-pairwise-dependency-1}
-  \item すべての$w\in V_s(v)$と$x\in\mathcal{N}_G(w)$に対して
-    $x\in\mathcal{S}_{G_s}(w)\land x\in\mathcal{S}_{G'_s}$
-    $\lor x\notin\mathcal{S}_{G_s}(w)\land x\notin\mathcal{S}_{G'_s}$.
-    \label{item:implicit-invariability-of-pairwise-dependency-2}
-  \end{enumerate}
-\end{lemma}
+次の定理は，$\Delta_{s\bullet}$および$\Delta'_{s\bullet}$を効率的に計算する指針を与える．
+\begin{theorem}[Bergamini et.al.\cite{Bergamini2017}]
+  任意の$s\in T(v)$と$x\in V$について，次式が成り立つ．
+  \begin{align}
+    \Delta_{s\bullet}(x)
+    &=\sum_{y|y\in\mathcal{S}_G(x)\land y\in T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}(1+\Delta_{s\bullet}(y))
+    +\sum_{y|y\in\mathcal{S}_G(x)\land y\notin T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\Delta_{s\bullet}(y)
+    \label{label:delta-dependency-1} \\
+    \Delta'_{s\bullet}(x)
+    &=\sum_{y|y\in\mathcal{S}_G(x)\land y\in T(s)}\frac{\sigma'_{sx}}{\sigma'_{sy}}(1+\Delta'_{s\bullet}(y))
+    +\sum_{y|y\in\mathcal{S}_G(x)\land y\notin T(s)}\frac{\sigma'_{sx}}{\sigma'_{sy}}\Delta'_{s\bullet}(y)
+    \label{label:delta-dependency-2}
+  \end{align}
+\end{theorem}
 \begin{proof}
-  まず，\ref{item:explicit-invariability-of-pairwise-dependency}$\iff$
-  \ref{item:implicit-invariability-of-pairwise-dependency-1}を証明する.
-  $\bigcup_{(w,x)\in E_s(v)}\{w,x\}=V_s(v)$なので，$E_{G_s}(v)=E_{G'_s}(v)$ならば$V_{G_s}(v)=V_{G'_s}(v)$．
-  また，$E_{G_s}(v)=E_{G'_s}(v)$ならばすべての$w\in V_{G_s}(v)$に対して
-  $\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)$である．よって
-  \ref{item:explicit-invariability-of-pairwise-dependency}$\implies$
-  \ref{item:implicit-invariability-of-pairwise-dependency-1}.
-  逆に，$V_{G_s}(v)=V_{G'_s}(v)$かつすべての$w\in V_{G_s}(v)$に対して
-  $\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)$ならば，$E_{G_s}(v)=E_{G'_s}(v)$なので
-  \ref{item:implicit-invariability-of-pairwise-dependency-1}$\implies$
-  \ref{item:explicit-invariability-of-pairwise-dependency}.
-  よって\ref{item:explicit-invariability-of-pairwise-dependency}$\iff$
-  \ref{item:implicit-invariability-of-pairwise-dependency-1}.
-
-  次に\ref{item:implicit-invariability-of-pairwise-dependency-1}$\iff$
-  \ref{item:implicit-invariability-of-pairwise-dependency-2}を証明する.
+  $t\in T(s)$とする．ただし，$t\neq x$とする．すると，$\sigma_{st}(x)/\sigma_{st}=\sum_{y\in\mathcal{S}_{G_s}(x)}\sigma_{st}(x,y)/\sigma_{st}$が成り立つ．
   \begin{equation*}
     \begin{aligned}
-      &\forall w\in V_s(v),\,\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)\\
-      \iff&\forall w\in V_s(v),\,\mathcal{S}_{G_s}(w)\subset\mathcal{S}_{G'_s}(w)
-      \land\mathcal{S}_{G_s}(w)\supset\mathcal{S}_{G'_s}(w)\\
-      \iff&\forall w\in V_s(v),\,\left(\forall x\in\mathcal{S}_{G_s}(w),\,x\in\mathcal{S}_{G'_s}(w)\right)
-      \land\left(\forall x\in\mathcal{S}_{G'_s}(w),\,x\in\mathcal{S}_{G_s}(w)\right)\\
-      \iff&\forall w\in V_s(v),\,\left(\forall x\in\mathcal{N}_{G_s}(w),\,
-      x\in\mathcal{S}_{G_s}(w),x\in\mathcal{S}_{G'_s}(w)
-      \lor x\notin\mathcal{S}_{G_s}(w),x\notin\mathcal{S}_{G'_s}(w)\right)\\
-      &\land\left(\forall x\in\mathcal{N}_{G_s}(w),\,
-      x\in\mathcal{S}_{G'_s}(w),x\in\mathcal{S}_{G_s}(w)
-      \lor x\notin\mathcal{S}_{G'_s}(w),x\notin\mathcal{S}_{G_s}(w)\right)\\
-      \iff&\forall w\in V_s(v),\,\left(\forall x\in\mathcal{N}_{G_s}(w),\,
-      x\in\mathcal{S}_{G_s}(w),x\in\mathcal{S}_{G'_s}(w)
-      \lor x\notin\mathcal{S}_{G_s}(w),x\notin\mathcal{S}_{G'_s}(w)\right)\\
-      \iff&\forall w\in V_s(v),\,\left(\forall x\in\mathcal{N}_{G_s}(w),\,
-      x\in\mathcal{S}_{G_s}(w)\land x\in\mathcal{S}_{G'_s}(w)
-      \lor x\notin\mathcal{S}_{G_s}(w)\land x\notin\mathcal{S}_{G'_s}(w)\right)
+      \Delta_{s\bullet}(x)=\sum_{t\in T(s)}\frac{\sigma_{st}(x)}{\sigma_{st}}
+      &=\sum_{t\in T(s)}\sum_{y\in\mathcal{S}_{G_s}}\frac{\sigma_{st}(x,y)}{\sigma_{st}}\\
+      &=\sum_{y\in\mathcal{S}_{G_s}}\sum_{t\in T(s)}\frac{\sigma_{st}(x,y)}{\sigma_{st}}
     \end{aligned}
   \end{equation*}
+  ここで，$\sigma_{sy}$個の$s-y$間の最短経路の中に，$\sigma_{sx}$個は$x$を通る．
+  したがって，$t\neq x$に対して，$s-t$間の最短経路の内，$\sigma_{sx}/\sigma_{sy}\cdot\sigma_{st}(y)$個は
+  $x$と$y$を通る．つまり，$\sigma_{st}(x,y)=\sigma_{sx}/\sigma_{sy}\cdot\sigma_{st}(y)$である．
+
+  一方，$t=x$に対して，$\sigma_{st}(x,y)$は単に$\sigma_{st}$である．
+  したがって，次が成り立つ．
+  \begin{equation*}
+    \begin{aligned}
+      &\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\in T(s)}\left(\frac{\sigma_{sx}}{\sigma_{sy}}+\sum_{t\in T(s)-\{y\}}\frac{\sigma_{st}(y,x)}{\sigma_{st}}\right)
+      +\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\notin T(s)}\sum_{t\in T(s)-\{y\}}\frac{\sigma_{st}(y,x)}{\sigma_{st}} \\
+      &\quad=\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\in T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\left(1+\sum_{t\in T(s)-\{y\}}\frac{\sigma_{st}(y)}{\sigma_{st}}\right)
+      +\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\notin T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\sum_{t\in T(s)-\{y\}}\frac{\sigma_{st}(y)}{\sigma_{st}} \\
+      &\quad=\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\in T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\left(1+\Delta_{s\bullet}(y)\right)
+      +\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\notin T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\Delta_{s\bullet}(y) \\
+    \end{aligned}
+  \end{equation*}
+  $\Delta'_{s\bullet}(x)$に対しても同様に証明できる．
 \end{proof}
 
-裏をとると，補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}の
-\ref{item:implicit-invariability-of-pairwise-dependency-2}が成り立たないような
-$(s,v)\in V\times V$を見つけてペア依存度$\delta_s(v)$を更新することによって，
-空振りがあり得るが見逃しなく更新することが可能である．
-以降，本章では挿入時と削除時それぞれに対する媒介中心性更新法を説明する．
+挿入と削除共通のアルゴリズムの流れは以下である．
+まず，$T(u)$および$S(v)$を計算する．
+次に計算した$S(v)$および式\eqref{label:delta-dependency-1}を用いて，上書きされる最短経路の上にあるペア依存度
+の分だけ媒介中心性から減算する．つまり，$B''(x):=B(x)-\sum_{s\in S(v)}\Delta_{s\bullet}(x)$とする．
+次に，操作に応じたアルゴリズムによって最短距離および最短経路長を更新する．
+最後に，式\eqref{label:delta-dependency-2}を用いて，新しい最短経路の上にあるペア依存度
+の分だけ媒介中心性に加算する．つまり，$B'(x):=B''(x)+\sum_{s\in S(v)}\Delta'_{s\bullet}(x)$とする．
 
-\section{一辺挿入時の媒介中心性更新法}
-\label{sect:update-bc-on-insert}
-本節では，グラフに辺が挿入されたときの媒介中心性を更新するアルゴリズムを提案する．
+アルゴリズムの詳細を\textcolor{red}{あとで作る}に示す．
+
+以降，挿入時と削除時それぞれに対する最短経路更新法を説明する．
+
+\section{一辺挿入時の最短経路更新法}
+\label{sect:update-apsp-on-insert}
+本節では，グラフに辺が挿入されたときの最短経路更新法を提案する．
 $G=(V,E)$に辺$e=\{v,w\} \not\in E$を挿入して得られるグラフを$G'=(V,E')$とする．
 アルゴリズムをアルゴリズム\ref{algo:incremental-algorithm}に示す．
 以下，アルゴリズムの構成について説明する．
-
-\subsection{最短経路の更新}
-\label{subsect:update-augdist-on-insert}
 
 \begin{lemma}
   \label{lemma:update-augdist-on-insert}
@@ -196,14 +159,6 @@ $G=(V,E)$に辺$e=\{v,w\} \not\in E$を挿入して得られるグラフを$G'=(
 $E'_{xz}\neq E_{xz}$を満たす$x$のうち，最小の$d'_{xz}$である$x$は$x=v$である．
 そのため，$v$から計算を開始し，補題\ref{lemma:update-augdist-on-insert}を満たすような
 近傍を順次順位キューに追加する．
-
-\subsection{ペア依存度の更新}
-\label{subsect:update-delta-on-insert}
-
-挿入後のペア依存度$\delta'_z(x)$をBrandesのアルゴリズムによって求める．
-具体的には，補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}の
-\ref{item:implicit-invariability-of-pairwise-dependency-2}を満たさない頂点から，
-$d'_{xz}$の降順となるように次式を計算しながら走査する．
 
 \begin{algorithm}[tbp]
   \caption{一辺挿入時のペア依存度を更新するアルゴリズム}
@@ -277,14 +232,11 @@ $d'_{xz}$の降順となるように次式を計算しながら走査する．
   \end{multicols}
 \end{algorithm}
 
-\section{一辺削除時の媒介中心性更新法}
-\label{sect:update-bc-on-delete}
+\section{一辺削除時の最短経路更新法}
+\label{sect:update-apsp-on-delete}
 本節では，$G=(V,E)$に辺$e=\{v,w\}\in E$を削除して得られるグラフを$G'=(V,E')$とする．
 アルゴリズムをアルゴリズム\ref{algo:decremental-algorithm}に示す．
 以下，アルゴリズムの構成について説明する．
-
-\subsection{最短経路の更新}
-\label{subsect:update-augdist-on-delete}
 
 \begin{lemma}
   \label{lemma:update-augdist-on-delete}
@@ -310,14 +262,6 @@ $d'_{xz}$の降順となるように次式を計算しながら走査する．
 挿入時と同様に，$d'_{xz}$を計算するには$d'_{xz}>d'_{yz}$であるすべての$y$について$d'_{yz}$を
 計算する必要がある．したがって$d'_{xz}$の昇順に計算することとなる．
 一方，挿入時と違い，$d'_{xz}$が最小となる$x$は直ちに求めることはできない．
-例えば，
-\begin{equation*}
-  \begin{aligned}
-    G=&(\{v,w,x,z\},\{\{x,v\},\{v,w\},\{w,z\},\{x,z\}\})\\
-    l_{xv}=&l_{vw}=l_{wz}=1,\,l_{xz}=100
-  \end{aligned}
-\end{equation*}
-において，$\{v,w\}$が削除されたとき，$d'_{sz}$が最小となる$s$は$v$ではなく$x$である．
 
 正しい順序で$d'_{xz}$および$\sigma'_{xz}$を計算するため，次の手順で計算を行う．
 \begin{enumerate}
@@ -327,14 +271,6 @@ $d'_{xz}$の降順となるように次式を計算しながら走査する．
 \item $d'_{xz}$と$\sigma'_{xz}$を計算した頂点を始点として，更新対象となる頂点のみを対象として，
   Dijkstra法の要領で探索を進める
 \end{enumerate}
-
-\subsection{ペア依存度の更新}
-\label{subsect:update-delta-on-delete}
-
-削除後のペア依存度$\delta'_z(x)$をBrandesのアルゴリズムによって求める．
-具体的には，補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}の
-\ref{item:implicit-invariability-of-pairwise-dependency-2}を満たさない頂点から，
-$d'_{xz}$の降順となるように次式を計算しながら走査する．
 
 \begin{algorithm}[tbp]
   \caption{一辺削除時のペア依存度を更新するアルゴリズム}
