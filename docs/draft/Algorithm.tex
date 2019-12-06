@@ -4,12 +4,12 @@
 本章では，アルゴリズムを提案する．
 まず，挿入と削除に共通した部分を説明する．
 その後，挿入と削除それぞれのアルゴリズムを説明する．
-\textcolor{red}{前提条件}
 
 \section{最短経路とペア依存度の変化に関する条件}
 \label{sect:condition-of-variability}
 
-ここでは，一辺が挿入または削除されたあとの最短経路およびペア依存度が変化する条件について述べる．
+ここでは，グラフ$G=(V,E)$に辺$(u,v)$が挿入または削除されたあとの最短経路および依存度が変化する条件について述べる．
+挿入操作について$(u,v)\notin E$が，削除操作については$(u,v)\in E$が成り立っていると仮定する．
 記号について，挿入または削除の操作後であることを明示するため，記号$'$をつける．例えば，操作後のグラフは$G'$と表す．
 また，頂点$t$に対して，辺操作によって$t$への最短経路が変化する頂点の集合を$S(t)$と表す．
 同様に，頂点$s$に対して，辺操作によって$s$からの最短経路が変化する頂点の集合を$T(s)$と表す．
@@ -17,8 +17,8 @@ $S(t)$および$T(s)$に属する頂点は，それぞれ$t$および$s$につ�
 後述するが，$S(t)$および$T(s)$具体的な式は，操作によって異なる．
 さらに，頂点$s,x\in V$に対して，$T(s)$に含まれる頂点$t$についてペア依存度$\delta_{st}(x)$の総和を
 $\Delta_{s\bullet}(x)$で表す\cite{Bergamini2017}．
-つまり，$\Delta_{s\bullet}=\sum_{t\in T(s)}\delta_{st}(x)$である．
-同様に，$\Delta'_{s\bullet}=\sum_{t\in T(s)}\delta'_{st}(x)$とする．
+つまり，$\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x)$である．
+同様に，$\Delta'_{s\bullet}(x)=\sum_{t\in T(s)}\delta'_{st}(x)$とする．
 
 次の定理は，最短経路の変化が最短距離および最短経路数の変化につながることを示す．
 \begin{theorem}
@@ -77,25 +77,25 @@ $\Delta_{s\bullet}(x)$で表す\cite{Bergamini2017}．
 
 次の定理は，$\Delta_{s\bullet}$および$\Delta'_{s\bullet}$を効率的に計算する指針を与える．
 \begin{theorem}[Bergamini et.al.\cite{Bergamini2017}]
-  任意の$s\in T(v)$と$x\in V$について，次式が成り立つ．
+  任意の$s\in S(v)$と$x\in V$について，次式が成り立つ．
   \begin{align}
     \Delta_{s\bullet}(x)
     &=\sum_{y|y\in\mathcal{S}_G(x)\land y\in T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}(1+\Delta_{s\bullet}(y))
     +\sum_{y|y\in\mathcal{S}_G(x)\land y\notin T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\Delta_{s\bullet}(y)
-    \label{label:delta-dependency-1} \\
+    \label{eq:delta-dependency-1} \\
     \Delta'_{s\bullet}(x)
     &=\sum_{y|y\in\mathcal{S}_G(x)\land y\in T(s)}\frac{\sigma'_{sx}}{\sigma'_{sy}}(1+\Delta'_{s\bullet}(y))
     +\sum_{y|y\in\mathcal{S}_G(x)\land y\notin T(s)}\frac{\sigma'_{sx}}{\sigma'_{sy}}\Delta'_{s\bullet}(y)
-    \label{label:delta-dependency-2}
+    \label{eq:delta-dependency-2}
   \end{align}
 \end{theorem}
 \begin{proof}
-  $t\in T(s)$とする．ただし，$t\neq x$とする．すると，$\sigma_{st}(x)/\sigma_{st}=\sum_{y\in\mathcal{S}_{G_s}(x)}\sigma_{st}(x,y)/\sigma_{st}$が成り立つ．
+  $t\in T(s)$とする．ただし，$t\neq x$とする．すると，$\sigma_{st}(x)/\sigma_{st}=\sum_{y\in\mathcal{S}_{G_s}(x)}\sigma_{st}(x,y)/\sigma_{st}$が成り立つ．したがって，式\ref{eq:delta-dependency-1}の左辺は，次のように書き換えられる．
   \begin{equation*}
     \begin{aligned}
       \Delta_{s\bullet}(x)=\sum_{t\in T(s)}\frac{\sigma_{st}(x)}{\sigma_{st}}
-      &=\sum_{t\in T(s)}\sum_{y\in\mathcal{S}_{G_s}}\frac{\sigma_{st}(x,y)}{\sigma_{st}}\\
-      &=\sum_{y\in\mathcal{S}_{G_s}}\sum_{t\in T(s)}\frac{\sigma_{st}(x,y)}{\sigma_{st}}
+      &=\sum_{t\in T(s)}\sum_{y\in\mathcal{S}_{G_s}(x)}\frac{\sigma_{st}(x,y)}{\sigma_{st}}\\
+      &=\sum_{y\in\mathcal{S}_{G_s}(x)}\sum_{t\in T(s)}\frac{\sigma_{st}(x,y)}{\sigma_{st}}
     \end{aligned}
   \end{equation*}
   ここで，$\sigma_{sy}$個の$s-y$間の最短経路の中に，$\sigma_{sx}$個は$x$を通る．
@@ -119,111 +119,179 @@ $\Delta_{s\bullet}(x)$で表す\cite{Bergamini2017}．
 
 挿入と削除共通のアルゴリズムの流れは以下である．
 まず，$T(u)$および$S(v)$を計算する．
-次に計算した$S(v)$および式\eqref{label:delta-dependency-1}を用いて，上書きされる最短経路の上にあるペア依存度
+次に計算した$S(v)$および式\eqref{eq:delta-dependency-1}を用いて，上書きされる最短経路の上にあるペア依存度
 の分だけ媒介中心性から減算する．つまり，$B''(x):=B(x)-\sum_{s\in S(v)}\Delta_{s\bullet}(x)$とする．
 次に，操作に応じたアルゴリズムによって最短距離および最短経路長を更新する．
-最後に，式\eqref{label:delta-dependency-2}を用いて，新しい最短経路の上にあるペア依存度
+最後に，式\eqref{eq:delta-dependency-2}を用いて，新しい最短経路の上にあるペア依存度
 の分だけ媒介中心性に加算する．つまり，$B'(x):=B''(x)+\sum_{s\in S(v)}\Delta'_{s\bullet}(x)$とする．
 
-アルゴリズムの詳細を\textcolor{red}{あとで作る}に示す．
-
-以降，挿入時と削除時それぞれに対する最短経路更新法を説明する．
-
-\section{一辺挿入時の最短経路更新法}
-\label{sect:update-apsp-on-insert}
-本節では，グラフに辺が挿入されたときの最短経路更新法を提案する．
-$G=(V,E)$に辺$e=\{v,w\} \not\in E$を挿入して得られるグラフを$G'=(V,E')$とする．
-アルゴリズムをアルゴリズム\ref{algo:incremental-algorithm}に示す．
-以下，アルゴリズムの構成について説明する．
-
-\begin{lemma}
-  \label{lemma:update-augdist-on-insert}
-  $x,z\in V$に対して，$E_{xz}'\neq E_{xz}$であるための必要十分条件は
-  \[ \exists y\in\mathcal{N}_{G'}(x),\,d_{xz}\geq l_{xy}+d'_{yz} \]
-  である．
-\end{lemma}
-\begin{proof}
-  \ref{lemma:condition-of-invariability-of-shortest-path}より，$E'_{xz}\neq E_{xz}$ならば
-  $d'_{yx}\neq d_{yx}$または$\sigma'_{yx}\neq\sigma_{yx}$である．
-  一辺が挿入されるので，すべての$s,t\in V$に対して，$d'_{st}\leq d_{st}$である．
-  そのため，$\min_y(l_{xy}+d'_{yz})\leq d_{xz}$で，$\exists y,\,l_{xy}+d'_{yz}\leq d_{xz}$である．
-  したがって，$E_{xz}'\neq E_{xz}$ならば$\exists y\in\mathcal{N}_{G'}(x),\,d_{xz}\geq l_{xy}+d'_{yz}$.
-
-  逆は，逆の手順を行うことによって成り立つ.
-\end{proof}
-
-\ref{lemma:update-augdist-on-insert}を満たす$x$について，
-補題\ref{lemma:distance-and-geodesics}の通りに計算する．
-計算式より，$d'_{xz}$を計算するには，$d'_{xz}>d'_{yz}$であるすべての$y$について$d'_{yz}$を
-計算する必要がある．したがって$d'_{xz}$の昇順に計算することとなる．
-$E'_{xz}\neq E_{xz}$を満たす$x$のうち，最小の$d'_{xz}$である$x$は$x=v$である．
-そのため，$v$から計算を開始し，補題\ref{lemma:update-augdist-on-insert}を満たすような
-近傍を順次順位キューに追加する．
+最後に，辺操作に固有の部分を除いた，全体的なアルゴリズムの詳細を
+アルゴリズム\ref{algo:update-betweenness}に示す．
+以降，挿入時と削除時それぞれに対して固有の部分である，最短経路更新法について説明する．
 
 \begin{algorithm}[tbp]
-  \caption{一辺挿入時のペア依存度を更新するアルゴリズム}
-  \label{algo:incremental-algorithm}
+  \caption{辺操作時の媒介中心性および最短経路を更新するアルゴリズム（一部）}
+  \label{algo:update-betweenness}
   \begin{algorithmic}[1]\small
-    \Procedure{Incremental}{$G,(v,w),c$}
-    \State $d'_{xz}\gets d_{xz},\:\sigma'_{xz}\gets \sigma_{xz},\:\delta'_z(x)\gets \delta_z(x)\quad\forall x,z\in V(G)$
-    \State $G'\gets(V(G),E(G)\cup\{(v,w)\}),\quad l_{vw}\gets c$
-    \ForAll{$z\in V(G)$}
-    \If{$l_{vz}>l_{wz}$}
-    \State $\textsc{IncrementalPart}(G',(v,w),z)$
-    \Else
-    \State $\textsc{IncrementalPart}(G',(w,v),z)$
-    \EndIf
-    \EndFor
+    \Procedure{UpdateBetweenness}{}
+    \State $\textproc{DecreaseBetweenness}$
+    \State $\textproc{UpdateShortestPath}$
+    \hspace{.3cm}$\triangleright$操作によって内容が異なる
+    \State $\textproc{IncreaseBetweenness}$
     \EndProcedure
   \end{algorithmic}
   \vspace{-.5cm}
   \begin{multicols}{2}
     \begin{algorithmic}[1]\small
       \makeatletter
-      \setcounter{ALG@line}{11}
+      \setcounter{ALG@line}{5}
       \makeatother
-      \Procedure{IncrementalPart}{$G',(v,w),z$}
-      \If{$d_{wz}=\infty\lor d_{vz}<l_{vw}+d_{wz}$}
-      \State \textbf{return}
-      \EndIf
-      \State \LeftComment 最短経路長および最短経路数の更新
-      \State \LeftComment 第二要素をキーとする順位キュー
-      \State $Q\gets((v,l_{vw}+d_{wz}))$
-      \State \LeftComment $\delta_z(x)$を更新する頂点集合
-      \State $S\gets\{\}$
-      \While{$\lvert Q\rvert>0$}
-      \State $x,\hat{d}_{xz}\gets\mathrm{popmin}(Q)$
-      \State $d'_{xz}\gets\hat{d}_{xz},\:\sigma'_{xz}\gets 0$
-      \ForAll{$y\in\mathcal{N}_{G'}(x)$}
-      \If{$d'_{yz}\geq l_{yx}+d'_{xz}$}
-      \State $\mathrm{updatekey}(Q,y,l_{yx}+d_{xz})$
-      \EndIf
-      \If{$d'_{xz}=l_{xy}+d'_{yz}$}
-      \State $\sigma'_{xz}\gets\sigma'_{xz}+\sigma'_{yz}$
-      \EndIf
-      \If{$(d_{xz}=l_{xy}+d_{yz})\veebar(d'_{xz}=l_{xy}+d'_{yz})$}
-      \State $S\gets S\cup\{y\}$
-      \EndIf
-      \EndFor
-      \If{$\sigma'_{xz}\neq\sigma_{xz}$}
-      \State $S\gets S\cup\{x\}$
-      \EndIf
-      \EndWhile
-      \State \LeftComment ペア依存度の更新
-      \State \LeftComment 第二要素をキーとする順位キュー
-      \State $R\gets((x,d'_{xz})\vert x\in S)$
-      \While{$\lvert R\rvert>0$}
-      \State $x,\_\gets\mathrm{popmax}(R)$
-      \State $\delta'_z(x)\gets 0$
-      \If{$x=z$}
+      \Procedure{DecreaseBetweenness}{}
+      \ForAll{$s\in S(v)$}
+      \State $\Delta_{s\bullet}(x)\gets0,\:\forall x\in V$
+      \State $\texttt{PQ}\gets\varnothing$
+      \State $\forall x\in T(s)$を，優先度を$d_{sx}$として\texttt{PQ}に挿入
+      \While{$|\texttt{PQ}|>0$}
+      \State \texttt{PQ}の優先度最大の要素を取り出し$x$とする
+      \State $B(x)\gets B(x)-\Delta_{s\bullet}(x)$
+      \ForAll{$y\in\mathcal{P}(x)$}
+      \If{$y=s\lor d_{sx}<d_{sy}+l_{yx}$}
       \State \textbf{continue}
       \EndIf
-      \ForAll{$y\in\mathcal{N}_G(x)$}
-      \If{$d'_{yz}=l_{yx}+d'_{xz}$}
-      \State $\delta'_z(x)\gets\delta'_z(x)$
-      $+\frac{\sigma'_{xz}}{\sigma'_{yz}}(1+\delta'_z(y)$
-      \ElsIf{$d_{zx}=l_{xy}+d_{yz}$}
-      \State $\mathrm{updatekey}(R, y, d'_{yz})$
+      \If{$x\in T(s)$}
+      \State $\Delta_{s\bullet}(y)\gets\Delta_{s\bullet}(y)+\sigma_{sy}/\sigma_{sx}\cdot(1+\Delta_{s\bullet}(x))$
+      \Else
+      \State $\Delta_{s\bullet}(y)\gets\Delta_{s\bullet}(y)+\sigma_{sy}/\sigma_{sx}\cdot\Delta_{s\bullet}(x)$
+      \EndIf
+      \EndFor
+      \EndWhile
+      \EndFor
+      \EndProcedure
+      \vfill\null
+      \columnbreak
+      \Procedure{IncreaseBetweenness}{}
+      \ForAll{$s\in S(v)$}
+      \State $\Delta'_{s\bullet}(x)\gets0,\:\forall x\in V$
+      \State $\texttt{PQ}\gets\varnothing$
+      \State $\forall x\in T(s)$を，優先度を$d'_{sx}$として\texttt{PQ}に挿入
+      \While{$|\texttt{PQ}|>0$}
+      \State \texttt{PQ}の優先度最大の要素を取り出し$x$とする
+      \State $B(x)\gets B(x)+\Delta'_{s\bullet}(x)$
+      \ForAll{$y\in\mathcal{P}(x)$}
+      \If{$y=s\lor d'_{sx}<d'_{sy}+l'_{yx}$}
+      \State \textbf{continue}
+      \EndIf
+      \If{$x\in T(s)$}
+      \State $\Delta'_{s\bullet}(y)\gets\Delta'_{s\bullet}(y)+\sigma'_{sy}/\sigma'_{sx}\cdot(1+\Delta'_{s\bullet}(x))$
+      \Else
+      \State $\Delta'_{s\bullet}(y)\gets\Delta'_{s\bullet}(y)+\sigma'_{sy}/\sigma'_{sx}\cdot\Delta'_{s\bullet}(x)$
+      \EndIf
+      \EndFor
+      \EndWhile
+      \EndFor
+      \EndProcedure
+    \end{algorithmic}
+  \end{multicols}
+\end{algorithm}
+
+\section{一辺挿入時の最短経路更新法}
+\label{sect:update-apsp-on-insert}
+本節では，グラフに辺が挿入されたときの最短経路更新法を説明する．
+$G=(V,E)$に辺$e=\{v,w\} \not\in E$を挿入して得られるグラフを$G'=(V,E')$とする．
+まず，ある頂点ペア$x,t$の間の最短経路が削除によって変化するための条件を示す．
+
+\begin{lemma}
+  \label{lmm:update-augdist-on-insert}
+  $x,t\in V$が$E'_{xt}\neq E_{xt}$を満たすための必要十分条件は，次の式が成り立つことである．
+  \begin{equation}
+    d_{xt}\geq d_{xu}+l'_{uv}+d_{vt}
+    \label{eq:update-augdist-on-insert}
+  \end{equation}
+\end{lemma}
+\begin{proof}
+  $E_{xt}'\neq E_{xt}$が成り立つならば，定理
+  \ref{thm:condition-of-invariability-of-shortest-path}より，
+  $d'_{xt}\neq d_{xt}$または$\sigma'_{xt}\neq\sigma_{xt}$が成り立つ，
+  このとき，新たに挿入された辺は$(u,v)$のひとつで，これが新たな最短経路に含まれるので，
+  $d_{xt}\geq d'_{xt}=d_{xu}+l'_{uv}+d_{vt}$が成り立つ．
+
+  逆に，式\eqref{eq:update-augdist-on-insert}が成り立つならば，
+  辺$(u,v)\notin E_{xt}$が新たな最短経路に含まれることになるので，
+  $(u,v)\in E'_{xt}$が成り立つ．したがって，$E'_{xt}\neq E_{xt}$である．
+\end{proof}
+
+次の定理は，挿入時の$T(x)$および$S(x)$の具体的な内容を示している．
+\begin{theorem}
+  \label{thm:affected-vertices-on-insert}
+  挿入時の$T(x)$および$S(x)$はそれぞれ式\eqref{eq:affected-targets-on-insert}と
+  \eqref{eq:affected-sources-on-insert}で表される．
+  \begin{align}
+    T(x)&=\{t|t\in V\land d_{xt}\geq d_{xu}+l'_{uv}+d_{vt}\}
+    \label{eq:affected-targets-on-insert} \\
+    S(x)&=\{s|s\in V\land d_{sx}\geq d_{su}+l'_{uv}+d_{vx}\}
+    \label{eq:affected-sources-on-insert}
+  \end{align}
+\end{theorem}
+
+以下，終点$t$が与えられたときにすべての$x$に対して$d'_{xt}$および
+$\sigma'_{xt}$を計算する方法を説明する．
+この方法は，Dijkstra法に倣って優先度付きキューを用いることによって探索を行う．
+まず，優先度付きキューに$u$を挿入する．このとき，優先度は$l'_{uv}+d_{vt}$とする．
+キューに要素が存在する限り，以下を繰り返す．
+キューから優先度最小の要素を取り出し，これを$x$とする．このとき，
+優先度を$\hat{d}_{xt}$とする．
+次式にしたがって，$d_{xt}$および$\sigma_{xt}$を更新する．
+\begin{equation*}
+  \begin{aligned}
+    d'_{xt}&=\hat{d}_{xt},\\
+    \sigma'_{xt}&=\sum_{y|y\in\mathcal{S}(x)\land d'_{xt}=l'_{xy}+d'_{yt}}\sigma'_{yt}
+  \end{aligned}
+\end{equation*}
+さらに，$y\in\mathcal{P}(x)$のうち，式\eqref{eq:update-augdist-on-insert}を満たす，
+つまり，$d_{yt}\geq d_{yu}+l'_{uv}+d_{vt}=l_{yx}+d'_{xt}$を満たす$y$を，優先度付きキューに
+挿入する．このとき，その優先度を$l_{yx}+d'_{xt}$とする．
+以上の手順をキューに要素が存在する限り繰り返す．
+
+全頂点ペア$x,y\in V\times V$に対する$d'_{xy}$および$\sigma'_{xy}$を計算する方法は
+次のとおり．
+すべての$s\in S(v)$に対して，グラフ$\bar{G}$上で終点$s$に関する
+$d'_{xs}$と$\sigma'_{xs}$を計算する．
+同様に，グラフを$\bar{G}$として計算した$S(u)$の各要素$t$に対して，
+グラフ$G$上で終点$t$に関する$d'_{xt}$と$\sigma'_{xt}$を計算する．
+
+提案手法の具体的な手続きをアルゴリズム\ref{algo:incremental-algorithm}に示す．
+
+\begin{algorithm}[tbp]
+  \caption{一辺挿入時の最短経路を更新するアルゴリズム}
+  \label{algo:incremental-algorithm}
+  \begin{multicols}{2}
+    \begin{algorithmic}[1]\small
+      \Procedure{UpdateShortestPath}{}
+      \State $G'\gets (V,E\cup\{(u,v)\})$
+      \ForAll{$x\in S(v)$}
+      \State $\textproc{UpdatePart}(\bar{G},(v,u),x)$
+      \EndFor
+      \State\LeftComment この$S(u)$は$\bar{G}$の上で計算する
+      \ForAll{$x\in S(u)$}
+      \State $\textproc{UpdatePart}(G,(u,v),x)$
+      \EndFor
+      \EndProcedure
+      \vfill\null
+      \columnbreak
+      \Procedure{UpdtatePart}{$G,(u,v),t)$}
+      \If{$d_{u,t}<l_{u,v}+d_{v,t}$}
+      \State \textbf{return}
+      \EndIf
+      \State $\texttt{PQ}\gets\varnothing$
+      \State 優先度を$l_{uv}+d_{vt}$として$u$を$\texttt{PQ}$に挿入
+      \While{$|\texttt{PQ}|>0$}
+      \State $\texttt{PQ}$から優先度最小の要素を取り出し$x$とする
+      \State このときの優先度を$\hat{d}_{xt}$とする
+      \State $d_{xt}\gets\hat{d}_{xt}$
+      \State $\sigma_{xt}\gets\sum_{y|y\in\mathcal{S}(x)\land d_{xt}=l_{xy}+d_{yt}}\sigma_{yt}$
+      \ForAll{$y\in\mathcal{P}(x)$}
+      \If{$d_{yt}\geq l_{yx}+d_{xt}$}
+      \State \texttt{PQ}の$y$の優先度を$l_{yx}+d_{xt}$に設定
       \EndIf
       \EndFor
       \EndWhile
@@ -234,139 +302,117 @@ $E'_{xz}\neq E_{xz}$を満たす$x$のうち，最小の$d'_{xz}$である$x$は
 
 \section{一辺削除時の最短経路更新法}
 \label{sect:update-apsp-on-delete}
-本節では，$G=(V,E)$に辺$e=\{v,w\}\in E$を削除して得られるグラフを$G'=(V,E')$とする．
-アルゴリズムをアルゴリズム\ref{algo:decremental-algorithm}に示す．
-以下，アルゴリズムの構成について説明する．
+本節では，$G=(V,E)$に辺$(u,v)\in E$を削除して得られるグラフを$G'=(V,E')$とする．
+まず，ある頂点ペア$x,t$の間の最短経路が削除によって変化するための条件を示す．
 
 \begin{lemma}
-  \label{lemma:update-augdist-on-delete}
-  $x,z\in V$に対して，$E_{xz}'\neq E_{xz}$であるための必要十分条件は
-  \[ d_{xv}+l_{vw}+d_{wz}=d_{vz} \]
-  である．
+  \label{lmm:update-augdist-on-delete}
+  $x,t\in V$に対して，$E_{xt}'\neq E_{xt}$であるための必要十分条件は
+  $x,t$が式\eqref{eq:update-augdist-on-delete}を満たすことである．
+  \begin{equation}
+    d_{xv}+l_{vw}+d_{wt}=d_{vt}
+    \label{eq:update-augdist-on-delete}
+  \end{equation}
 \end{lemma}
 \begin{proof}
-  $d_{xv}+l_{vw}+d_{wz}=d_{vz}$ならば，$x\rightarrow\cdots v\rightarrow w\rightarrow\cdots z$
-  が成り立つ．このとき，次のいずれかが成り立つ．
-  \begin{enumerate}
-  \item $d'_{xz}>d_{xz}$
-  \item $d'_{xz}=d_{xz}$または$\sigma'_{xz}<\sigma_{xz}$
-  \end{enumerate}
-  いずれの場合も，$d'_{xz}\neq d_{xz}$または$\sigma'_{xz}\neq\sigma_{xz}$なので，
-  補題\ref{lemma:condition-of-invariability-of-shortest-path}より，$E_{xz}'\neq E_{xz}$である．
+  $E_{xt}'\neq E_{xt}$が成り立つならば，定理
+  \ref{thm:condition-of-invariability-of-shortest-path}より，
+  $d'_{xt}\neq d_{xt}$または$\sigma'_{xt}\neq\sigma_{xt}$が成り立つ，
+  このとき，削除された辺は$(u,v)$のひとつで，これが削除前の最短経路に含まれていたので，
+  $d_{xt}=d_{xu}+l_{uv}+d_{vt}$が成り立つ．
 
-  逆は，この手順を逆に行うことで証明できる．
+  逆に，式\eqref{eq:update-augdist-on-delete}が成り立つならば，
+  辺$(u,v)\in E_{xt}$が成り立つので，削除後の最短経路は
+  $(u,v)\notin E'_{xt}$を満たす．したがって，$E'_{xt}\neq E_{xt}$である．
 \end{proof}
 
-\ref{lemma:update-augdist-on-delete}を満たす$x$について，補題\ref{lemma:distance-and-geodesics}に
-示した計算式によって計算する．
-挿入時と同様に，$d'_{xz}$を計算するには$d'_{xz}>d'_{yz}$であるすべての$y$について$d'_{yz}$を
-計算する必要がある．したがって$d'_{xz}$の昇順に計算することとなる．
-一方，挿入時と違い，$d'_{xz}$が最小となる$x$は直ちに求めることはできない．
+次の定理は，削除時の$T(x)$および$S(x)$の具体的な内容を示している．
+\begin{theorem}
+  \label{thm:affected-vertices-on-delete}
+  削除時の$T(x)$および$S(x)$はそれぞれ式\eqref{eq:affected-targets-on-delete}と
+  \eqref{eq:affected-sources-on-delete}で表される．
+  \begin{align}
+    T(x)&=\{t|t\in V\land d_{xt}=d_{xu}+l_{uv}+d_{vt}\}
+    \label{eq:affected-targets-on-delete} \\
+    S(x)&=\{s|s\in V\land d_{sx}=d_{su}+l_{uv}+d_{vx}\}
+    \label{eq:affected-sources-on-delete}
+  \end{align}
+\end{theorem}
 
+この方法は，Dijkstra法に倣って優先度付きキューを用いることによって探索を行う．
+まず，優先度付きキューに$u$を挿入する．このとき，優先度は$l'_{uv}+d_{vt}$とする．
+キューに要素が存在する限り，以下を繰り返す．
+キューから優先度最小の要素を取り出し，これを$x$とする．このとき，
+優先度を$\hat{d}_{xt}$とする．
+次式にしたがって，$d_{xt}$および$\sigma_{xt}$を更新する．
+\begin{equation*}
+  \begin{aligned}
+    d'_{xt}&=\hat{d}_{xt},\\
+    \sigma'_{xt}&=\sum_{y|y\in\mathcal{S}(x)\land d'_{xt}=l'_{xy}+d'_{yt}}\sigma'_{yt}
+  \end{aligned}
+\end{equation*}
+さらに，$y\in\mathcal{P}(x)$のうち，式\eqref{eq:update-augdist-on-insert}を満たす，
+つまり，$d_{yt}\geq d_{yu}+l'_{uv}+d_{vt}=l_{yx}+d'_{xt}$を満たす$y$を，優先度付きキューに
+挿入する．このとき，その優先度を$l_{yx}+d'_{xt}$とする．
+以上の手順をキューに要素が存在する限り繰り返す．
+
+以後，終点$t$が与えられたときにすべての$x$に対して$d'_{xt}$および
+$\sigma'_{xt}$を計算する方法を説明する．
+挿入時と同様に，$\sigma'_{xt}$は$d'_{xt}$の昇順に計算する必要がある．
+しかし，挿入時と違い，$d'_{xt}$が最小となる$x$を直ちに求めることはできない．
 正しい順序で$d'_{xz}$および$\sigma'_{xz}$を計算するため，次の手順で計算を行う．
-\begin{enumerate}
-\item 補題\ref{lemma:update-augdist-on-delete}が成り立つ頂点を，$v$を始点として探索する
-\item その頂点の内，補題\ref{lemma:update-augdist-on-delete}を満たさない頂点と隣接する頂点について，
-  $d'_{xz}$と$\sigma'_{xz}$を計算する
-\item $d'_{xz}$と$\sigma'_{xz}$を計算した頂点を始点として，更新対象となる頂点のみを対象として，
-  Dijkstra法の要領で探索を進める
-\end{enumerate}
+まず，式\eqref{eq:update-augdist-on-delete}が成り立つ頂点を，$u$を始点として探索する．
+ただし，有向グラフについて，探索は後継$\mathcal{P}$を用いる．
+その頂点の内，式\eqref{eq:update-augdist-on-delete}を満たさない頂点と隣接する頂点について，
+$d'_{xt}$と$\sigma'_{xt}$を計算する．
+その後，$d'_{xt}$と$\sigma'_{xt}$を計算した頂点を始点として，更新対象となる頂点のみを対象として，
+Dijkstra法の要領で探索を進める．
+
+全頂点ペア$x,y\in V\times V$に対する$d'_{xy}$および$\sigma'_{xy}$を計算する方法は
+挿入時の更新方法と同じく次のとおり．
+すべての$s\in S(v)$に対して，グラフ$\bar{G}$上で終点$s$に関する
+$d'_{xs}$と$\sigma'_{xs}$を計算する．
+同様に，グラフを$\bar{G}$として計算した$S(u)$の各要素$t$に対して，
+グラフ$G$上で終点$t$に関する$d'_{xt}$と$\sigma'_{xt}$を計算する．
+
+提案手法の具体的な手続きをアルゴリズム\ref{algo:decremental-algorithm}に示す．
 
 \begin{algorithm}[tbp]
-  \caption{一辺削除時のペア依存度を更新するアルゴリズム}
+  \caption{一辺削除時の最短経路を更新するアルゴリズム}
   \label{algo:decremental-algorithm}
-  \begin{algorithmic}[1]\small
-    \Procedure{Decremental}{$G,(v,w),c$}
-    \State $d'_{xz}\gets d_{xz},\:\sigma'_{xz}\gets \sigma_{xz},\:\delta'_z(x)\gets \delta_z(x)\quad\forall x,z\in V(G)$
-    \State $G'\gets(V(G),E(G)\cup\{(v,w)\}),\quad l_{vw}\gets c$
-    \ForAll{$z\in V(G)$}
-    \If{$l_{vz}>l_{wz}$}
-    \State $\textsc{DecrementalPart}(G',(v,w),z)$
-    \Else
-    \State $\textsc{DecrementalPart}(G',(w,v),z)$
-    \EndIf
-    \EndFor
-    \EndProcedure
-  \end{algorithmic}
   \begin{multicols}{2}
     \begin{algorithmic}[1]\small
-      \makeatletter
-      \setcounter{ALG@line}{11}
-      \makeatother
-      \Procedure{DecrementalPart}{$G',(v,w),z$}
-      \If{$d_{wz}=\infty\lor d_{vz}<l_{vw}+d_{wz}$}
+      \Procedure{UpdateShortestPath}{}
+      \State $G'\gets (V,E\textbackslash\{(u,v)\})$
+      \ForAll{$x\in S(v)$}
+      \State $\textproc{UpdatePart}(\bar{G},(v,u),x)$
+      \EndFor
+      \State\LeftComment この$S(u)$は$\bar{G}$の上で計算する
+      \ForAll{$x\in S(u)$}
+      \State $\textproc{UpdatePart}(G,(u,v),x)$
+      \EndFor
+      \EndProcedure
+      \vfill\null
+      \columnbreak
+      \Procedure{UpdtatePart}{$G,(u,v),t)$}
+      \If{$d_{ut}<l_{uv}+d_{vt}$}
       \State \textbf{return}
       \EndIf
-      \State $\mathrm{WorkSet}\gets\{v\}$
-      \State $\mathrm{Affected}\gets\{v\}$
-      \State
-      \State \LeftComment 最短経路が変化する頂点の探索
-      \While{$\lvert\mathrm{WorkSet}\rvert>0$}
-      \State $x\gets\mathrm{pop}(\mathrm{WorkSet})$
-      \ForAll{$y\in\mathcal{N}_{G'}(x)$}
-      \If{$d_{yz}=l_{yx}+d_{xz}\land y\notin\mathrm{Affected}$}
-      \State $\mathrm{Affected}\gets\mathrm{Affected}\cup\{y\}$
-      \State $\mathrm{WorkSet}\gets\mathrm{WorkSet}\cup\{y\}$
+      \State $\texttt{PQ}\gets\varnothing$
+      \ForAll{$x\in S(t)$}
+      \If{$\exists y\in\mathcal{S}(x),\,y\notin S(t)$}
+      \State $\hat{d}\gets\min\{l_{xy}+d_{yt}|y\in\mathcal{S}(x)\land y\notin S(t)\}$
+      \State 優先度を$\hat{d}$として$x$を\texttt{PQ}に追加
       \EndIf
       \EndFor
-      \EndWhile
-      \State
-      \State \LeftComment 最短経路長，最短経路数の更新
-      \State $Q\gets()$ \Comment 第二要素をキーとする順位キュー
-      \ForAll{$x\in\mathrm{Affected}$}
-      \If{$\exists y\in\mathcal{N}_{G'}(x),\:y\notin\mathrm{Affected}$}
-      \State $\hat{d}_{xz}\gets\min(\{l_{xy}+d_{yz}\vert y\in\mathcal{N}_{G'}(x),y\notin\mathrm{Affected}\})$
-      \Else
-      \State $\hat{d}_{xz}\gets\infty$
-      \EndIf
-      \If{$\hat{d}_{xz}=\infty$}
-      \State $d'_{xz}\gets\infty,\quad\sigma'_{xz}\gets 0$
-      \Else
-      \State $\mathrm{updatekey}(Q, x, \hat{d}_{xz})$
-      \EndIf
-      \EndFor
-      \State
-      \State $S\gets\{w\}$ \Comment $\delta_z(x)$を更新する頂点集合
-      \While{$\lvert Q\rvert>0$}
-      \State $x,\hat{d}_{xz}\gets\mathrm{popmin}(Q)$
-      \State $\mathrm{Affected}\gets\mathrm{Affected}\setminus\{x\}$
-      \State $d'_{xz}\gets\hat{d}_{xz},\quad\sigma'_{xz}\gets 0$
-      \ForAll{$y\in\mathrm{Affected}$}
-      \If{$d'_{yz}\geq l_{yx}+d'_{xz}$}
-      \State $\mathrm{updatekey}(Q,y,l_{yx}+d_{xz})$
-      \EndIf
-      \If{$d'_{xz}=l_{xy}+d'_{yz}$}
-      \State $\sigma'_{xz}\gets\sigma'_{xz}+\sigma'_{yz}$
-      \EndIf
-      \If{$d_{xz}=l_{xy}+d_{yz}\veebar d'_{xz}=l_{xy}+d'_{yz}$}
-      \State $S\gets S\cup\{y\}$
-      \EndIf
-      \If{$d_{yz}=l_{yx}+d_{xz}\veebar d'_{yz}=l_{yx}+d'_{xz}$}
-      \State $S\gets S\cup\{x\}$
-      \EndIf
-      \EndFor
-      \If{$\sigma'_{xz}\neq\sigma_{xz}$}
-      \State $S\gets S\cup\{x\}$
-      \EndIf
-      \EndWhile
-      \State
-      \State \LeftComment ペア依存度の更新
-      \State $S\gets S\cup\mathrm{Affected}$
-      \State $\mathrm{Affected}\gets\varnothing$
-      \State \LeftComment 各要素の第二要素をキーとする順位キュー
-      \State $R\gets((x,d'_{xz})\vert x\in S)$
-      \While{$\lvert R\rvert>0$}
-      \State $x,\_\gets\mathrm{popmax}(R)$
-      \State $\delta'_z(x)\gets 0$
-      \If{$x=z$}
-      \State \textbf{continue}
-      \EndIf
-      \ForAll{$y\in\mathcal{N}_G(x)$}
-      \If{$d'_{yz}=l_{yx}+d'_{xz}$}
-      \State $\delta'_z(x)\gets\delta'_z(x)$
-      $+\frac{\sigma'_{xz}}{\sigma'_{yz}}(1+\delta'_z(y)$
-      \ElsIf{$d_{zx}=l_{xy}+d_{yz}$}
-      \State $\mathrm{updatekey}(R, y, d'_{yz})$
+      \While{$|\texttt{PQ}|>0$}
+      \State $\texttt{PQ}$から優先度最小の要素を取り出し$x$とする
+      \State このときの優先度を$\hat{d}_{xt}$とする
+      \State $d_{xt}\gets\hat{d}_{xt}$
+      \State $\sigma_{xt}\gets\sum_{y|y\in\mathcal{S}(x)\land d_{xt}=l_{xy}+d_{yt}}\sigma_{yt}$
+      \ForAll{$y\in\mathcal{P}(x)$}
+      \If{$y\in S(t)$}
+      \State \texttt{PQ}の$y$の優先度を$l_{yx}+d_{xt}$に設定
       \EndIf
       \EndFor
       \EndWhile
