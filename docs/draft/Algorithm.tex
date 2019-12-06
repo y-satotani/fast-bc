@@ -126,12 +126,12 @@ $\Delta_{s\bullet}(x)$で表す\cite{Bergamini2017}．
 の分だけ媒介中心性に加算する．つまり，$B'(x):=B''(x)+\sum_{s\in S(v)}\Delta'_{s\bullet}(x)$とする．
 
 最後に，辺操作に固有の部分を除いた，全体的なアルゴリズムの詳細を
-アルゴリズム\ref{algo:update-betweenness}に示す．
+アルゴリズム\ref{alg:update-betweenness}に示す．
 以降，挿入時と削除時それぞれに対して固有の部分である，最短経路更新法について説明する．
 
 \begin{algorithm}[tbp]
   \caption{辺操作時の媒介中心性および最短経路を更新するアルゴリズム（一部）}
-  \label{algo:update-betweenness}
+  \label{alg:update-betweenness}
   \begin{algorithmic}[1]\small
     \Procedure{UpdateBetweenness}{}
     \State $\textproc{DecreaseBetweenness}$
@@ -163,6 +163,9 @@ $\Delta_{s\bullet}(x)$で表す\cite{Bergamini2017}．
       \Else
       \State $\Delta_{s\bullet}(y)\gets\Delta_{s\bullet}(y)+\sigma_{sy}/\sigma_{sx}\cdot\Delta_{s\bullet}(x)$
       \EndIf
+      \If{$y\notin\texttt{PQ}$}
+      \State 優先度を$d_{sy}$として$y$を\texttt{PQ}に挿入
+      \EndIf
       \EndFor
       \EndWhile
       \EndFor
@@ -185,6 +188,9 @@ $\Delta_{s\bullet}(x)$で表す\cite{Bergamini2017}．
       \State $\Delta'_{s\bullet}(y)\gets\Delta'_{s\bullet}(y)+\sigma'_{sy}/\sigma'_{sx}\cdot(1+\Delta'_{s\bullet}(x))$
       \Else
       \State $\Delta'_{s\bullet}(y)\gets\Delta'_{s\bullet}(y)+\sigma'_{sy}/\sigma'_{sx}\cdot\Delta'_{s\bullet}(x)$
+      \EndIf
+      \If{$y\notin\texttt{PQ}$}
+      \State 優先度を$d'_{sy}$として$y$を\texttt{PQ}に挿入
       \EndIf
       \EndFor
       \EndWhile
@@ -256,14 +262,14 @@ $\sigma'_{xt}$を計算する方法を説明する．
 次のとおり．
 すべての$s\in S(v)$に対して，グラフ$\bar{G}$上で終点$s$に関する
 $d'_{xs}$と$\sigma'_{xs}$を計算する．
-同様に，グラフを$\bar{G}$として計算した$S(u)$の各要素$t$に対して，
+同様に，$T(u)$の各要素$t$に対して，
 グラフ$G$上で終点$t$に関する$d'_{xt}$と$\sigma'_{xt}$を計算する．
 
-提案手法の具体的な手続きをアルゴリズム\ref{algo:incremental-algorithm}に示す．
+提案手法の具体的な手続きをアルゴリズム\ref{alg:incremental-algorithm}に示す．
 
 \begin{algorithm}[tbp]
   \caption{一辺挿入時の最短経路を更新するアルゴリズム}
-  \label{algo:incremental-algorithm}
+  \label{alg:incremental-algorithm}
   \begin{multicols}{2}
     \begin{algorithmic}[1]\small
       \Procedure{UpdateShortestPath}{}
@@ -271,8 +277,7 @@ $d'_{xs}$と$\sigma'_{xs}$を計算する．
       \ForAll{$x\in S(v)$}
       \State $\textproc{UpdatePart}(\bar{G},(v,u),x)$
       \EndFor
-      \State\LeftComment この$S(u)$は$\bar{G}$の上で計算する
-      \ForAll{$x\in S(u)$}
+      \ForAll{$x\in T(u)$}
       \State $\textproc{UpdatePart}(G,(u,v),x)$
       \EndFor
       \EndProcedure
@@ -372,14 +377,14 @@ Dijkstra法の要領で探索を進める．
 挿入時の更新方法と同じく次のとおり．
 すべての$s\in S(v)$に対して，グラフ$\bar{G}$上で終点$s$に関する
 $d'_{xs}$と$\sigma'_{xs}$を計算する．
-同様に，グラフを$\bar{G}$として計算した$S(u)$の各要素$t$に対して，
+同様に，$T(u)$の各要素$t$に対して，
 グラフ$G$上で終点$t$に関する$d'_{xt}$と$\sigma'_{xt}$を計算する．
 
-提案手法の具体的な手続きをアルゴリズム\ref{algo:decremental-algorithm}に示す．
+提案手法の具体的な手続きをアルゴリズム\ref{alg:decremental-algorithm}に示す．
 
 \begin{algorithm}[tbp]
   \caption{一辺削除時の最短経路を更新するアルゴリズム}
-  \label{algo:decremental-algorithm}
+  \label{alg:decremental-algorithm}
   \begin{multicols}{2}
     \begin{algorithmic}[1]\small
       \Procedure{UpdateShortestPath}{}
@@ -387,8 +392,7 @@ $d'_{xs}$と$\sigma'_{xs}$を計算する．
       \ForAll{$x\in S(v)$}
       \State $\textproc{UpdatePart}(\bar{G},(v,u),x)$
       \EndFor
-      \State\LeftComment この$S(u)$は$\bar{G}$の上で計算する
-      \ForAll{$x\in S(u)$}
+      \ForAll{$x\in T(u)$}
       \State $\textproc{UpdatePart}(G,(u,v),x)$
       \EndFor
       \EndProcedure
