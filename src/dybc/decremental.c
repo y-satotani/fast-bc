@@ -165,7 +165,7 @@ void decremental_part(igraph_t*            G,
 
       //printf("--debug1-- %d %d %f %f %f %f %f\n", x, y, l_yx, dp_xz, dp_yz, d_xz, d_yz);
       if(igraph_vector_bool_e(&is_affected, y)) {
-        igraph_2wheap_update(&queue, y, -(l_yx+d_xz));
+        igraph_2wheap_modify(&queue, y, -(l_yx+d_xz));
         //printf("--debug1-- %d %f added to queue\n", y, -(l_yx+d_xz));
       }
       else if(igraph_cmp_epsilon(d_xz, l_yx + d_yz, IGRAPH_SHORTEST_PATH_EPSILON) == 0)
@@ -197,7 +197,7 @@ void decremental_part(igraph_t*            G,
   igraph_2wheap_init(&delta_queue, igraph_vcount(G));
   for(int i = 0; i < igraph_vector_long_size(&delta_set); i++) {
     igraph_integer_t x = VECTOR(delta_set)[i];
-    igraph_2wheap_update(&delta_queue, x, MATRIX(*D, x, z));
+    igraph_2wheap_modify(&delta_queue, x, MATRIX(*D, x, z));
   }
 
   if(n_update_dep_pairs)
@@ -223,7 +223,7 @@ void decremental_part(igraph_t*            G,
       if(igraph_cmp_epsilon(d_yz, l_yx + d_xz, IGRAPH_SHORTEST_PATH_EPSILON) == 0) {
         MATRIX(*Delta, z, x) += (1 + MATRIX(*Delta, z, y)) * s_xz / s_yz;
       } else if(igraph_cmp_epsilon(d_xz, l_yx + d_yz, IGRAPH_SHORTEST_PATH_EPSILON) == 0) {
-        igraph_2wheap_update(&delta_queue, y, d_yz);
+        igraph_2wheap_modify(&delta_queue, y, d_yz);
       }
     }
     if(n_update_dep_pairs)
