@@ -6,7 +6,6 @@
 #include <assert.h>
 #include <argp.h>
 #include <igraph/igraph.h>
-#include "dybc/custom_igraph.h"
 #include "dybc/aug_dist.h"
 #include "dybc/betweenness.h"
 #include "dybc/incremental.h"

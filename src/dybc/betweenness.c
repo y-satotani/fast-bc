@@ -1,6 +1,7 @@
 #include "betweenness.h"
 
-#include "custom_igraph.h"
+#include <igraph/igraph_types_internal.h>
+#include <igraph/igraph_math.h>
 
 void pairwise_dependency(igraph_t*        G,
                          igraph_matrix_t* Delta,
@@ -33,8 +34,8 @@ void pairwise_dependency(igraph_t*        G,
 
       igraph_stack_push(&stack, u);
 
-      igraph_vector_t* neis = igraph_inclist_get(&inclist, u);
-      long int nneis = igraph_vector_size(neis);
+      igraph_vector_int_t* neis = igraph_inclist_get(&inclist, u);
+      long int nneis = igraph_vector_int_size(neis);
       for(long int ni = 0; ni < nneis; ni++) {
         igraph_integer_t eid = VECTOR(*neis)[ni];
         igraph_integer_t v = IGRAPH_OTHER(G, eid, u);
@@ -50,7 +51,7 @@ void pairwise_dependency(igraph_t*        G,
 
           VECTOR(dist)[v] = d_vp;
           igraph_2wheap_push_with_index(&queue, v, -d_vp);
-        } else if(igraph_cmp_epsilon(d_vp, d_v) < 0) {
+        } else if(igraph_cmp_epsilon(d_vp, d_v, IGRAPH_SHORTEST_PATH_EPSILON) < 0) {
           // shorter path was found
           igraph_vector_int_t* pv = igraph_adjlist_get(&precedings, v);
           igraph_vector_int_resize(pv, 1);
@@ -60,7 +61,7 @@ void pairwise_dependency(igraph_t*        G,
           VECTOR(dist)[v] = d_vp;
           igraph_2wheap_modify(&queue, v, -d_vp);
 
-        } else if(igraph_cmp_epsilon(d_vp, d_v) == 0) {
+        } else if(igraph_cmp_epsilon(d_vp, d_v, IGRAPH_SHORTEST_PATH_EPSILON) == 0) {
           // new same-length path
           igraph_vector_int_t* pv = igraph_adjlist_get(&precedings, v);
           igraph_vector_int_push_back(pv, u);
