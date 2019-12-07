@@ -1,0 +1,9 @@
+Import('env')
+src = [
+    'test_aug_dist.c',
+    'test_decremental.c',
+    'test_incremental.c',
+    'test_pairwise_dependency.c'
+]
+prog = [env.Program(s) for s in src]
+Return('prog')

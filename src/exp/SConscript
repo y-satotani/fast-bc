@@ -1,0 +1,7 @@
+Import('env')
+src = [
+    'exp_bc.c',
+    'exp_seq_bc.c'
+]
+prog = [env.Program(s) for s in src]
+Return('prog')
