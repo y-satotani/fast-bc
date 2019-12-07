@@ -1,7 +1,7 @@
 #ifndef _CUSTOM_IGRAPH_H_
 #define _CUSTOM_IGRAPH_H_
 
-#include <igraph_types_internal.h>
+#include <igraph/igraph_types_internal.h>
 
 // took from igraph_math.h of igraph/igraph master
 

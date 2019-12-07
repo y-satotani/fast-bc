@@ -1,7 +1,7 @@
 
 #include "aug_dist.h"
 
-#include <igraph_types_internal.h>
+#include <igraph/igraph_types_internal.h>
 #include "custom_igraph.h"
 
 void aug_dist(igraph_t*            G,

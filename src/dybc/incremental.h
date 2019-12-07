@@ -2,7 +2,7 @@
 #ifndef _INCREMENTAL_H_
 #define _INCREMENTAL_H_
 
-#include <igraph.h>
+#include <igraph/igraph.h>
 #include "aug_dist.h"
 
 void incremental(igraph_t*            G,

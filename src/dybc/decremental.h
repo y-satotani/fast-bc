@@ -2,7 +2,7 @@
 #ifndef _DECREMENTAL_H_
 #define _DECREMENTAL_H_
 
-#include <igraph.h>
+#include <igraph/igraph.h>
 #include "aug_dist.h"
 
 void decremental(igraph_t*            G,

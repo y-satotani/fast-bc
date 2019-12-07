@@ -2,7 +2,7 @@
 #ifndef _MINIGRAPH_H_
 #define _MINIGRAPH_H_
 
-#include <igraph.h>
+#include <igraph/igraph.h>
 #include <assert.h>
 
 void make_test_graph(igraph_t* G, const char* weight) {

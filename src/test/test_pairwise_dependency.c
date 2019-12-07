@@ -1,7 +1,7 @@
 
 #include <math.h>
 #include <assert.h>
-#include <igraph.h>
+#include <igraph/igraph.h>
 
 #include "dybc/aug_dist.h"
 #include "dybc/betweenness.h"

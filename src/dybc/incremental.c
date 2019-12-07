@@ -1,7 +1,7 @@
 
 #include "incremental.h"
 
-#include <igraph_types_internal.h>
+#include <igraph/igraph_types_internal.h>
 #include "custom_igraph.h"
 #include "betweenness.h"
 

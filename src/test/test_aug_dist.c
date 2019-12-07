@@ -1,6 +1,6 @@
 
 #include <assert.h>
-#include <igraph.h>
+#include <igraph/igraph.h>
 #include <stdio.h>
 
 #include "dybc/aug_dist.h"
