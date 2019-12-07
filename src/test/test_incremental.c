@@ -5,7 +5,7 @@
 
 #include "dybc/aug_dist.h"
 #include "dybc/incremental.h"
-#include "dybc/betweenness.h"
+#include "dybc/static_betweenness.h"
 #include "minigraph.h"
 
 int main(int argc, char* argv[]) {
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
   igraph_vector_t B;
   igraph_vector_init(&B, igraph_vcount(&G));
   aug_dist(&G, &D, &Sigma, weight);
-  pairwise_dependency(&G, &Delta, weight);
+  //pairwise_dependency(&G, &Delta, weight); // TODO
   incremental(&G, v, w, c, &D, &Sigma, &Delta, weight, 0, 0, 0);
   igraph_matrix_colsum(&Delta, &B);
   igraph_vector_scale(&B, 0.5);
@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
   igraph_matrix_t Deltatrue;
   igraph_vector_init(&Btrue, igraph_vcount(&G));
   igraph_betweenness(&G, &Btrue, igraph_vss_all(), 0, &weights, 0);
-  pairwise_dependency(&G, &Deltatrue, weight);
+  //pairwise_dependency(&G, &Deltatrue, weight); // TODO
 
   // print result
   for(igraph_integer_t vid = 0; vid < igraph_vcount(&G); vid++) {

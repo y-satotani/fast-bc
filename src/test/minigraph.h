@@ -5,50 +5,51 @@
 #include <igraph/igraph.h>
 #include <assert.h>
 
-void make_test_graph(igraph_t* G, const char* weight) {
+void make_test_graph(igraph_t* G, igraph_vector_t* weight) {
   igraph_empty(G, 8, 0);
+  igraph_vector_init(weight, 10);
 
   igraph_integer_t eid;
 
   igraph_add_edge(G, 0, 1);
   igraph_get_eid(G, &eid, 0, 1, 0, 1);
-  SETEAN(G, weight, eid, 1);
+  igraph_vector_set(weight, eid, 1);
 
   igraph_add_edge(G, 0, 4);
   igraph_get_eid(G, &eid, 0, 4, 0, 1);
-  SETEAN(G, weight, eid, 4);
+  igraph_vector_set(weight, eid, 4);
 
   igraph_add_edge(G, 1, 2);
   igraph_get_eid(G, &eid, 1, 2, 0, 1);
-  SETEAN(G, weight, eid, 1);
+  igraph_vector_set(weight, eid, 1);
 
   igraph_add_edge(G, 1, 3);
   igraph_get_eid(G, &eid, 1, 3, 0, 1);
-  SETEAN(G, weight, eid, 2);
+  igraph_vector_set(weight, eid, 2);
 
   igraph_add_edge(G, 2, 4);
   igraph_get_eid(G, &eid, 2, 4, 0, 1);
-  SETEAN(G, weight, eid, 2);
+  igraph_vector_set(weight, eid, 2);
 
   igraph_add_edge(G, 3, 4);
   igraph_get_eid(G, &eid, 3, 4, 0, 1);
-  SETEAN(G, weight, eid, 1);
+  igraph_vector_set(weight, eid, 1);
 
   igraph_add_edge(G, 4, 5);
   igraph_get_eid(G, &eid, 4, 5, 0, 1);
-  SETEAN(G, weight, eid, 1);
+  igraph_vector_set(weight, eid, 1);
 
   igraph_add_edge(G, 4, 6);
   igraph_get_eid(G, &eid, 4, 6, 0, 1);
-  SETEAN(G, weight, eid, 2);
+  igraph_vector_set(weight, eid, 2);
 
   igraph_add_edge(G, 5, 7);
   igraph_get_eid(G, &eid, 5, 7, 0, 1);
-  SETEAN(G, weight, eid, 3);
+  igraph_vector_set(weight, eid, 3);
 
   igraph_add_edge(G, 6, 7);
   igraph_get_eid(G, &eid, 6, 7, 0, 1);
-  SETEAN(G, weight, eid, 2);
+  igraph_vector_set(weight, eid, 2);
 }
 
 void make_less_graph_and_edge(igraph_t* G,
@@ -282,72 +283,15 @@ int check_aug_dist_of_minigraph(igraph_matrix_t* D,
   return 1;
 }
 
-int check_pairwise_dependency_of_minigraph(igraph_matrix_t* mat) {
-
-  assert(fabs(MATRIX(*mat, 0, 0) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 0, 1) - 4.666666666666666) < 1e-9);
-  assert(fabs(MATRIX(*mat, 0, 2) - 1.3333333333333333) < 1e-9);
-  assert(fabs(MATRIX(*mat, 0, 3) - 1.3333333333333333) < 1e-9);
-  assert(fabs(MATRIX(*mat, 0, 4) - 3.0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 0, 5) - 0.5) < 1e-9);
-  assert(fabs(MATRIX(*mat, 0, 6) - 0.5) < 1e-9);
-  assert(fabs(MATRIX(*mat, 0, 7) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 1, 0) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 1, 1) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 1, 2) - 2.0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 1, 3) - 2.0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 1, 4) - 3.0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 1, 5) - 0.5) < 1e-9);
-  assert(fabs(MATRIX(*mat, 1, 6) - 0.5) < 1e-9);
-  assert(fabs(MATRIX(*mat, 1, 7) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 2, 0) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 2, 1) - 1.5) < 1e-9);
-  assert(fabs(MATRIX(*mat, 2, 2) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 2, 3) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 2, 4) - 3.5) < 1e-9);
-  assert(fabs(MATRIX(*mat, 2, 5) - 0.5) < 1e-9);
-  assert(fabs(MATRIX(*mat, 2, 6) - 0.5) < 1e-9);
-  assert(fabs(MATRIX(*mat, 2, 7) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 3, 0) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 3, 1) - 1.5) < 1e-9);
-  assert(fabs(MATRIX(*mat, 3, 2) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 3, 3) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 3, 4) - 3.5) < 1e-9);
-  assert(fabs(MATRIX(*mat, 3, 5) - 0.5) < 1e-9);
-  assert(fabs(MATRIX(*mat, 3, 6) - 0.5) < 1e-9);
-  assert(fabs(MATRIX(*mat, 3, 7) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 4, 0) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 4, 1) - 0.6666666666666666) < 1e-9);
-  assert(fabs(MATRIX(*mat, 4, 2) - 0.8333333333333333) < 1e-9);
-  assert(fabs(MATRIX(*mat, 4, 3) - 0.8333333333333333) < 1e-9);
-  assert(fabs(MATRIX(*mat, 4, 4) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 4, 5) - 0.5) < 1e-9);
-  assert(fabs(MATRIX(*mat, 4, 6) - 0.5) < 1e-9);
-  assert(fabs(MATRIX(*mat, 4, 7) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 5, 0) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 5, 1) - 0.6666666666666666) < 1e-9);
-  assert(fabs(MATRIX(*mat, 5, 2) - 0.8333333333333333) < 1e-9);
-  assert(fabs(MATRIX(*mat, 5, 3) - 0.8333333333333333) < 1e-9);
-  assert(fabs(MATRIX(*mat, 5, 4) - 5.0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 5, 5) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 5, 6) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 5, 7) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 6, 0) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 6, 1) - 0.6666666666666666) < 1e-9);
-  assert(fabs(MATRIX(*mat, 6, 2) - 0.8333333333333333) < 1e-9);
-  assert(fabs(MATRIX(*mat, 6, 3) - 0.8333333333333333) < 1e-9);
-  assert(fabs(MATRIX(*mat, 6, 4) - 5.0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 6, 5) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 6, 6) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 6, 7) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 7, 0) - 0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 7, 1) - 0.6666666666666666) < 1e-9);
-  assert(fabs(MATRIX(*mat, 7, 2) - 0.8333333333333333) < 1e-9);
-  assert(fabs(MATRIX(*mat, 7, 3) - 0.8333333333333333) < 1e-9);
-  assert(fabs(MATRIX(*mat, 7, 4) - 4.0) < 1e-9);
-  assert(fabs(MATRIX(*mat, 7, 5) - 2.5) < 1e-9);
-  assert(fabs(MATRIX(*mat, 7, 6) - 2.5) < 1e-9);
-  assert(fabs(MATRIX(*mat, 7, 7) - 0) < 1e-9);
+int check_betweenness_of_minigraph(igraph_vector_t* vec) {
+  assert(fabs(VECTOR(*vec)[0] - 0.000000) < 1e-3);
+  assert(fabs(VECTOR(*vec)[1] - 5.166667) < 1e-3);
+  assert(fabs(VECTOR(*vec)[2] - 3.333333) < 1e-3);
+  assert(fabs(VECTOR(*vec)[3] - 3.333333) < 1e-3);
+  assert(fabs(VECTOR(*vec)[4] - 13.500000) < 1e-3);
+  assert(fabs(VECTOR(*vec)[5] - 2.500000) < 1e-3);
+  assert(fabs(VECTOR(*vec)[6] - 2.500000) < 1e-3);
+  assert(fabs(VECTOR(*vec)[7] - 0.000000) < 1e-3);
 
   return 1;
 }
