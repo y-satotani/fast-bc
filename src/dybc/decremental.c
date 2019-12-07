@@ -3,7 +3,7 @@
 
 #include <igraph/igraph_types_internal.h>
 #include <igraph/igraph_math.h>
-#include "betweenness.h"
+//#include "static_betweenness.h"
 
 #include <stdio.h>
 
