@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
 
   igraph_matrix_t D;
   igraph_matrix_int_t S;
-  igraph_vector_t B, Bhalf;
+  igraph_vector_t B;
   igraph_matrix_init(&D, igraph_vcount(&G), igraph_vcount(&G));
   igraph_matrix_int_init(&S, igraph_vcount(&G), igraph_vcount(&G));
   igraph_vector_init(&B, igraph_vcount(&G));
