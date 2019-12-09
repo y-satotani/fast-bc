@@ -10,8 +10,4 @@ void betweenness_with_redundant_information(igraph_t* G,
                                             igraph_vector_t* B,
                                             igraph_vector_t* weight);
 
-void pairwise_dependency(igraph_t*        G,
-                         igraph_matrix_t* Delta,
-                         const char*      weight);
-
 #endif // _STATIC_BETWEENNESS_H_
