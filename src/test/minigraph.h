@@ -56,42 +56,51 @@ void make_less_graph_and_edge(igraph_t* G,
                               igraph_integer_t* v,
                               igraph_integer_t* w,
                               igraph_real_t* c,
-                              const char* weight) {
+                              igraph_vector_t* weight) {
   igraph_empty(G, 8, 0);
+  igraph_vector_init(weight, 0);
 
   igraph_integer_t eid;
 
   igraph_add_edge(G, 0, 3);
   igraph_get_eid(G, &eid, 0, 3, 0, 1);
-  SETEAN(G, weight, eid, 3);
+  igraph_vector_push_back(weight, 3);
+  //SETEAN/g(G, weight, eid, 3);
 
   igraph_add_edge(G, 1, 2);
   igraph_get_eid(G, &eid, 1, 2, 0, 1);
-  SETEAN(G, weight, eid, 1);
+  igraph_vector_push_back(weight, 1);
+  //SETEAN/g(G, weight, eid, 1);
 
   igraph_add_edge(G, 1, 6);
   igraph_get_eid(G, &eid, 1, 6, 0, 1);
-  SETEAN(G, weight, eid, 2);
+  igraph_vector_push_back(weight, 2);
+  //SETEAN/g(G, weight, eid, 2);
 
   igraph_add_edge(G, 2, 3);
   igraph_get_eid(G, &eid, 2, 3, 0, 1);
-  SETEAN(G, weight, eid, 3);
+  igraph_vector_push_back(weight, 3);
+  //SETEAN/g(G, weight, eid, 3);
 
   igraph_add_edge(G, 2, 5);
   igraph_get_eid(G, &eid, 2, 5, 0, 1);
-  SETEAN(G, weight, eid, 2);
+  igraph_vector_push_back(weight, 2);
+  //SETEAN/g(G, weight, eid, 2);
 
   igraph_add_edge(G, 4, 5);
   igraph_get_eid(G, &eid, 4, 5, 0, 1);
-  SETEAN(G, weight, eid, 1);
+  igraph_vector_push_back(weight, 1);
+  //SETEAN/g(G, weight, eid, 1);
 
   igraph_add_edge(G, 5, 6);
   igraph_get_eid(G, &eid, 5, 6, 0, 1);
-  SETEAN(G, weight, eid, 1);
+  igraph_vector_push_back(weight, 1);
+  //SETEAN/g(G, weight, eid, 1);
 
   igraph_add_edge(G, 6, 7);
   igraph_get_eid(G, &eid, 6, 7, 0, 1);
-  SETEAN(G, weight, eid, 3);
+  igraph_vector_push_back(weight, 3);
+  //SETEAN/g(G, weight, eid, 3);
 
   *v = 4;
   *w = 7;
@@ -102,46 +111,56 @@ void make_more_graph_and_edge(igraph_t* G,
                               igraph_integer_t* v,
                               igraph_integer_t* w,
                               igraph_real_t* c,
-                              const char* weight) {
+                              igraph_vector_t* weight) {
   igraph_empty(G, 8, 0);
+  igraph_vector_init(weight, 0);
 
   igraph_integer_t eid;
 
   igraph_add_edge(G, 0, 3);
   igraph_get_eid(G, &eid, 0, 3, 0, 1);
-  SETEAN(G, weight, eid, 3);
+  igraph_vector_push_back(weight, 3);
+  //SETEAN(G, weight, eid, 3);
 
   igraph_add_edge(G, 1, 2);
   igraph_get_eid(G, &eid, 1, 2, 0, 1);
-  SETEAN(G, weight, eid, 1);
+  igraph_vector_push_back(weight, 1);
+  //SETEAN(G, weight, eid, 1);
 
   igraph_add_edge(G, 1, 6);
   igraph_get_eid(G, &eid, 1, 6, 0, 1);
-  SETEAN(G, weight, eid, 2);
+  igraph_vector_push_back(weight, 2);
+  //SETEAN(G, weight, eid, 2);
 
   igraph_add_edge(G, 2, 3);
   igraph_get_eid(G, &eid, 2, 3, 0, 1);
-  SETEAN(G, weight, eid, 3);
+  igraph_vector_push_back(weight, 3);
+  //SETEAN(G, weight, eid, 3);
 
   igraph_add_edge(G, 2, 5);
   igraph_get_eid(G, &eid, 2, 5, 0, 1);
-  SETEAN(G, weight, eid, 2);
+  igraph_vector_push_back(weight, 2);
+  //SETEAN(G, weight, eid, 2);
 
   igraph_add_edge(G, 4, 5);
   igraph_get_eid(G, &eid, 4, 5, 0, 1);
-  SETEAN(G, weight, eid, 1);
+  igraph_vector_push_back(weight, 1);
+  //SETEAN(G, weight, eid, 1);
 
   igraph_add_edge(G, 5, 6);
   igraph_get_eid(G, &eid, 5, 6, 0, 1);
-  SETEAN(G, weight, eid, 1);
+  igraph_vector_push_back(weight, 1);
+  //SETEAN(G, weight, eid, 1);
 
   igraph_add_edge(G, 6, 7);
   igraph_get_eid(G, &eid, 6, 7, 0, 1);
-  SETEAN(G, weight, eid, 3);
+  igraph_vector_push_back(weight, 3);
+  //SETEAN(G, weight, eid, 3);
 
   igraph_add_edge(G, 4, 7);
   igraph_get_eid(G, &eid, 4, 7, 0, 1);
-  SETEAN(G, weight, eid, 2);
+  igraph_vector_push_back(weight, 2);
+  //SETEAN(G, weight, eid, 2);
 
   *v = 4;
   *w = 7;
