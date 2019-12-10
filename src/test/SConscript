@@ -2,7 +2,8 @@ Import('env')
 src = [
     'test_decremental.c',
     'test_incremental.c',
-    'test_static_betweenness.c'
+    'test_static_betweenness.c',
+    'test_dynamic_betweenness.c'
 ]
 prog = [env.Program(s) for s in src]
 Return('prog')
