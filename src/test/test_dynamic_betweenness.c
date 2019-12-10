@@ -14,22 +14,26 @@ int test_inc_mini(void);
 int test_dec_mini(void);
 int test_inc_random(unsigned long int seed);
 int test_dec_random(unsigned long int seed);
-int test_inc_components(void);
-int test_dec_bridge(void);
-int test_inc_repeat(void);
-int test_dec_repeat(void);
-int test_repeat(void);
+int test_inc_components(unsigned long int seed);
+int test_dec_bridge(unsigned long int seed);
+int test_inc_repeat(unsigned long int seed);
+int test_dec_repeat(unsigned long int seed);
+int test_repeat(unsigned long int seed);
 
 int main(int argc, char* argv[]) {
   test_inc_mini();
   test_dec_mini();
-  test_inc_random(42);
-  test_dec_random(42);
-  test_inc_components();
-  test_dec_bridge();
-  test_inc_repeat();
-  test_dec_repeat();
-  test_repeat();
+  // confirmed no error for -10k
+  for(unsigned int seed = 0; seed < 100; seed++)
+    test_inc_random(seed);
+  // confirmed no error for -10k
+  for(unsigned int seed = 0; seed < 100; seed++)
+    test_dec_random(seed);
+  test_inc_components(42);
+  test_dec_bridge(42);
+  test_inc_repeat(42);
+  test_dec_repeat(42);
+  test_repeat(42);
   return 0;
 }
 
@@ -58,86 +62,65 @@ void _decremental_update_weighted(igraph_t* G,
                                   igraph_vector_t* weights,
                                   igraph_real_t weight);
 
-int test_inc_mini() {
-  igraph_t G;
-  igraph_integer_t u, v;
-  igraph_real_t weight;
-  igraph_vector_t weights;
-  igraph_matrix_t D;
-  igraph_matrix_int_t S;
+#define _DYBC_TEST_DECL_                        \
+  igraph_t G;                                   \
+  igraph_integer_t u, v;                        \
+  igraph_real_t weight;                         \
+  igraph_vector_t weights;                      \
+  igraph_matrix_t D;                            \
+  igraph_matrix_int_t S;                        \
   igraph_vector_t B;
 
-  make_less_graph_and_edge(&G, &u, &v, &weight, &weights);
+// find distance and geodesics and betweenness
+#define _DYBC_TEST_INIT_                        \
+  igraph_matrix_init                            \
+  (&D, igraph_vcount(&G), igraph_vcount(&G));   \
+  igraph_matrix_int_init                        \
+  (&S, igraph_vcount(&G), igraph_vcount(&G));   \
+  igraph_vector_init                            \
+  (&B, igraph_vcount(&G));                      \
+  betweenness_with_redundant_information        \
+  (&G, &D, &S, &B, &weights);
 
-  // find distance and geodesics and betweenness
-  igraph_matrix_init(&D, igraph_vcount(&G), igraph_vcount(&G));
-  igraph_matrix_int_init(&S, igraph_vcount(&G), igraph_vcount(&G));
-  igraph_vector_init(&B, igraph_vcount(&G));
-  betweenness_with_redundant_information(&G, &D, &S, &B, &weights);
-
-  _incremental_update_weighted(&G, &D, &S, &B, u, v, &weights, weight);
-
-  int res = _check_quantities("test_inc_mini", &G, &D, &S, &B, &weights);
-
-  igraph_matrix_destroy(&D);
-  igraph_matrix_int_destroy(&S);
-  igraph_vector_destroy(&B);
-  igraph_vector_destroy(&weights);
+#define _DYBC_TEST_DEST_                        \
+  igraph_matrix_destroy(&D);                    \
+  igraph_matrix_int_destroy(&S);                \
+  igraph_vector_destroy(&B);                    \
+  igraph_vector_destroy(&weights);              \
   igraph_destroy(&G);
+
+int test_inc_mini() {
+  _DYBC_TEST_DECL_;
+  make_less_graph_and_edge(&G, &u, &v, &weight, &weights);
+  _DYBC_TEST_INIT_;
+  _incremental_update_weighted(&G, &D, &S, &B, u, v, &weights, weight);
+  int res = _check_quantities("test_inc_mini", &G, &D, &S, &B, &weights);
+  _DYBC_TEST_DEST_;
   return res;
 }
 
 int test_dec_mini() {
-  igraph_t G;
-  igraph_integer_t u, v;
-  igraph_real_t weight;
-  igraph_vector_t weights;
-  igraph_matrix_t D;
-  igraph_matrix_int_t S;
-  igraph_vector_t B;
-
+  _DYBC_TEST_DECL_;
   make_more_graph_and_edge(&G, &u, &v, &weight, &weights);
-
-  // find distance and geodesics and betweenness
-  igraph_matrix_init(&D, igraph_vcount(&G), igraph_vcount(&G));
-  igraph_matrix_int_init(&S, igraph_vcount(&G), igraph_vcount(&G));
-  igraph_vector_init(&B, igraph_vcount(&G));
-  betweenness_with_redundant_information(&G, &D, &S, &B, &weights);
-
+  _DYBC_TEST_INIT_;
   _decremental_update_weighted(&G, &D, &S, &B, u, v, &weights, weight);
-
   int res = _check_quantities("test_dec_mini", &G, &D, &S, &B, &weights);
-
-  igraph_matrix_destroy(&D);
-  igraph_matrix_int_destroy(&S);
-  igraph_vector_destroy(&B);
-  igraph_vector_destroy(&weights);
-  igraph_destroy(&G);
+  _DYBC_TEST_DEST_;
   return res;
 }
 
 int test_inc_random(unsigned long int seed) {
-  igraph_t G;
-  igraph_integer_t eid;
-  igraph_integer_t u, v;
-  igraph_real_t weight;
-  igraph_vector_t weights;
-  igraph_matrix_t D;
-  igraph_matrix_int_t S;
-  igraph_vector_t B;
-
+  _DYBC_TEST_DECL_;
   // initialize a graph
   igraph_rng_seed(igraph_rng_default(), seed);
   igraph_erdos_renyi_game(&G, IGRAPH_ERDOS_RENYI_GNM, 100, 400, 0, 0);
-
   // select endpoints to insert
   igraph_t C;
   igraph_complementer(&C, &G, 0);
-  eid = igraph_rng_get_integer
+  igraph_integer_t eid = igraph_rng_get_integer
     (igraph_rng_default(), 0, igraph_ecount(&C)-1);
   igraph_edge(&C, eid, &u, &v);
   igraph_destroy(&C);
-
   // set weights
   igraph_vector_init(&weights, igraph_ecount(&G));
   for(eid = 0; eid < igraph_ecount(&G); eid++) {
@@ -145,62 +128,68 @@ int test_inc_random(unsigned long int seed) {
     igraph_vector_set(&weights, eid, weight);
   }
   weight = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
-
-  // find distance and geodesics and betweenness
-  igraph_matrix_init(&D, igraph_vcount(&G), igraph_vcount(&G));
-  igraph_matrix_int_init(&S, igraph_vcount(&G), igraph_vcount(&G));
-  igraph_vector_init(&B, igraph_vcount(&G));
-  betweenness_with_redundant_information(&G, &D, &S, &B, &weights);
+  _DYBC_TEST_INIT_;
 
   _incremental_update_weighted(&G, &D, &S, &B, u, v, &weights, weight);
+  char test_name[1024];
+  sprintf(test_name, "test_inc_random (%lu)", seed);
+  int res = _check_quantities(test_name, &G, &D, &S, &B, &weights);
 
-  int res = _check_quantities("test_inc_random", &G, &D, &S, &B, &weights);
-
-  // cleanup
-  igraph_destroy(&G);
-  igraph_vector_destroy(&weights);
-  igraph_matrix_destroy(&D);
-  igraph_matrix_int_destroy(&S);
-  igraph_vector_destroy(&B);
-
+  _DYBC_TEST_DEST_;
   return res;
 }
 
 int test_dec_random(unsigned long int seed) {
+  _DYBC_TEST_DECL_;
+  // initialize a graph
+  igraph_rng_seed(igraph_rng_default(), seed);
+  igraph_erdos_renyi_game(&G, IGRAPH_ERDOS_RENYI_GNM, 100, 400, 0, 0);
+  // set weights
+  igraph_vector_init(&weights, igraph_ecount(&G));
+  for(igraph_integer_t eid = 0; eid < igraph_ecount(&G); eid++) {
+    weight = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
+    igraph_vector_set(&weights, eid, weight);
+  }
+  // select endpoints to delete
+  igraph_integer_t eid = igraph_rng_get_integer
+  (igraph_rng_default(), 0, igraph_ecount(&G)-1);
+  igraph_edge(&G, eid, &u, &v);
+  weight = igraph_vector_e(&weights, eid);
+  _DYBC_TEST_INIT_;
+
+  _decremental_update_weighted(&G, &D, &S, &B, u, v, &weights, weight);
+  char test_name[1024];
+  sprintf(test_name, "test_dec_random (%lu)", seed);
+  int res = _check_quantities(test_name, &G, &D, &S, &B, &weights);
+
+  _DYBC_TEST_DEST_;
+  return res;
+}
+
+int test_inc_components(unsigned long int seed) {
   igraph_rng_seed(igraph_rng_default(), seed);
   return 0;
 }
 
-int test_inc_components() {
-  unsigned long int seed = 42;
+int test_dec_bridge(unsigned long int seed) {
   igraph_rng_seed(igraph_rng_default(), seed);
   return 0;
 }
 
-int test_dec_bridge() {
-  unsigned long int seed = 42;
+int test_inc_repeat(unsigned long int seed) {
   igraph_rng_seed(igraph_rng_default(), seed);
   return 0;
 }
 
-int test_inc_repeat() {
-  unsigned long int seed = 42;
+int test_dec_repeat(unsigned long int seed) {
   igraph_rng_seed(igraph_rng_default(), seed);
   return 0;
 }
 
-int test_dec_repeat() {
-  unsigned long int seed = 42;
+int test_repeat(unsigned long int seed) {
   igraph_rng_seed(igraph_rng_default(), seed);
   return 0;
 }
-
-int test_repeat() {
-  unsigned long int seed = 42;
-  igraph_rng_seed(igraph_rng_default(), seed);
-  return 0;
-}
-
 
 int _check_quantities(const char* test_name,
                       igraph_t* G,
@@ -254,8 +243,8 @@ int _check_quantities(const char* test_name,
       }
   // check betweenness
   for(long int x = 0; x < igraph_vcount(G); x++) {
-    igraph_real_t diff1 = igraph_vector_maxdifference(B, &B_true);
-    igraph_real_t diff2 = igraph_vector_maxdifference(B, &B_grand);
+    igraph_real_t diff1 = fabs(B(x) - Bt(x));
+    igraph_real_t diff2 = fabs(B(x) - Bg(x));
     if(cmp(diff1, EPS) > 0 || cmp(diff2, EPS) > 0) {
       if(!bet_err) {
         printf("betweenness error on %s:\n", test_name);
@@ -299,53 +288,47 @@ void _incremental_update_weighted(igraph_t* G,
   igraph_inclist_init(G, &inclist, IGRAPH_ALL);
 
   igraph_vector_int_t sources, targets;
-  igraph_vector_ptr_t targets_of_s, sources_of_t;
   igraph_vector_int_init(&sources, 0);
   igraph_vector_int_init(&targets, 0);
   affected_sources_inc(G, &inclist, &sources, D, u, v, v, weights, weight);
-  affected_targets_inc(G, &inclist, &targets, D, u, v, u, weights, weight);
-  igraph_vector_ptr_init(&targets_of_s, igraph_vector_int_size(&sources));
-  igraph_vector_ptr_init(&sources_of_t, igraph_vector_int_size(&targets));
-  for(igraph_integer_t si = 0; si < igraph_vector_int_size(&sources); si++) {
-    igraph_integer_t s = igraph_vector_int_e(&sources, si);
-    igraph_vector_int_t *ts
-      = (igraph_vector_int_t*) malloc(sizeof(igraph_vector_int_t));
-    igraph_vector_int_init(ts, 0);
-    affected_targets_inc(G, &inclist, ts, D, u, v, s, weights, weight);
-    igraph_vector_ptr_set(&targets_of_s, si, ts);
-  }
-  for(igraph_integer_t ti = 0; ti < igraph_vector_int_size(&targets); ti++) {
-    igraph_integer_t t = igraph_vector_int_e(&targets, ti);
-    igraph_vector_int_t *ss
-      = (igraph_vector_int_t*) malloc(sizeof(igraph_vector_int_t));
-    igraph_vector_int_init(ss, 0);
-    affected_sources_inc(G, &inclist, ss, D, u, v, t, weights, weight);
-    igraph_vector_ptr_set(&sources_of_t, ti, ss);
-  }
 
-  // decrease betweenness
   for(igraph_integer_t si = 0; si < igraph_vector_int_size(&sources); si++) {
+    // decrease betweenness
     igraph_integer_t s = igraph_vector_int_e(&sources, si);
-    igraph_vector_int_t *ts
-      = (igraph_vector_int_t*) igraph_vector_ptr_e(&targets_of_s, si);
+    affected_targets_inc(G, &inclist, &targets, D, u, v, s, weights, weight);
     // factor is -2 for undirected and -1 for directed
-    igraph_real_t factor = igraph_is_directed(G) ? -1 : -2;
+    igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
     update_deps_inc_weighted(G, &inclist, D, S, B, u, v,
-                             s, ts, weights, weight, factor);
-  }
-  /*
-  for(igraph_integer_t ti = 0; ti < igraph_vector_int_size(&targets); ti++) {
-    igraph_integer_t t = igraph_vector_int_e(&targets, ti);
-    igraph_vector_int_t *ss
-      = (igraph_vector_int_t*) igraph_vector_ptr_e(&sources_of_t, ti);
-    update_deps_inc_weighted(G, &inclist, &D, &S, &B, u, v,
-                             t, ss, &weights, weight, -1);
-  }
-  */
+                             s, &targets, weights, weight, -factor);
 
+    // add edge
+    igraph_add_edge(G, u, v);
+    igraph_vector_push_back(weights, weight);
+    igraph_integer_t eid = igraph_ecount(G) - 1;
+    igraph_vector_int_push_back(igraph_inclist_get(&inclist, u), eid);
+    igraph_vector_int_push_back(igraph_inclist_get(&inclist, v), eid);
+
+    update_sssp_inc_weighted
+      (G, &inclist, &inclist, D, S, u, v, s, weights, weight);
+
+    // increase betweenness
+    // factor is 2 for undirected and 1 for directed
+    update_deps_inc_weighted(G, &inclist, D, S, B, u, v,
+                             s, &targets, weights, weight, factor);
+
+    // cleanup
+    igraph_delete_edges(G, igraph_ess_1(eid));
+    igraph_vector_remove(weights, eid);
+    igraph_vector_int_pop_back(igraph_inclist_get(&inclist, u));
+    igraph_vector_int_pop_back(igraph_inclist_get(&inclist, v));
+  }
+
+  affected_sources_inc(G, &inclist, &targets, D, v, u, u, weights, weight);
+
+  // add edge
+  igraph_integer_t eid = igraph_ecount(G);
   igraph_add_edge(G, u, v);
   igraph_vector_push_back(weights, weight);
-  igraph_integer_t eid = igraph_ecount(G) - 1;
   igraph_vector_int_push_back(igraph_inclist_get(&inclist, u), eid);
   igraph_vector_int_push_back(igraph_inclist_get(&inclist, v), eid);
 
@@ -354,29 +337,8 @@ void _incremental_update_weighted(igraph_t* G,
     update_sssp_inc_weighted
       (G, &inclist, &inclist, D, S, v, u, t, weights, weight);
   }
-  for(int si = 0; si < igraph_vector_int_size(&sources); si++) {
-    igraph_integer_t s = igraph_vector_int_e(&sources, si);
-    update_sssp_inc_weighted
-      (G, &inclist, &inclist, D, S, u, v, s, weights, weight);
-  }
-
-  // increase betweenness
-  for(igraph_integer_t si = 0; si < igraph_vector_int_size(&sources); si++) {
-    igraph_integer_t s = igraph_vector_int_e(&sources, si);
-    igraph_vector_int_t *ts
-      = (igraph_vector_int_t*) igraph_vector_ptr_e(&targets_of_s, si);
-    // factor is 2 for undirected and 1 for directed
-    igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
-    update_deps_inc_weighted(G, &inclist, D, S, B, u, v,
-                             s, ts, weights, weight, factor);
-  }
 
   // cleanup
-  for(igraph_integer_t ti = 0; ti < igraph_vector_ptr_size(&sources_of_t); ti++) {
-    igraph_vector_int_t *ss = igraph_vector_ptr_e(&sources_of_t, ti);
-    igraph_vector_int_destroy(ss);
-    free(ss);
-  }
   igraph_vector_int_destroy(&sources);
   igraph_vector_int_destroy(&targets);
   igraph_inclist_destroy(&succs);
@@ -392,6 +354,13 @@ void _decremental_update_weighted(igraph_t* G,
                                   igraph_integer_t v,
                                   igraph_vector_t* weights,
                                   igraph_real_t weight) {
+  // move the edge to be deleted to back of list
+  igraph_integer_t eid;
+  igraph_get_eid(G, &eid, u, v, 0, 1);
+  igraph_delete_edges(G, igraph_ess_1(eid));
+  weight = igraph_vector_e(weights, eid);
+  igraph_vector_remove(weights, eid);
+
   igraph_inclist_t inclist, succs, preds;
   if(igraph_is_directed(G)) {
     igraph_inclist_init(G, &succs, IGRAPH_OUT);
@@ -401,95 +370,63 @@ void _decremental_update_weighted(igraph_t* G,
   }
   igraph_inclist_init(G, &inclist, IGRAPH_ALL);
 
+  // then push the deleted edge
+  eid = igraph_ecount(G);
+  igraph_add_edge(G, u, v);
+  igraph_vector_push_back(weights, weight);
+  igraph_vector_int_push_back(igraph_inclist_get(&inclist, u), eid);
+  igraph_vector_int_push_back(igraph_inclist_get(&inclist, v), eid);
+
+  // finding affected sources
   igraph_vector_int_t sources, targets;
-  igraph_vector_ptr_t targets_of_s, sources_of_t;
   igraph_vector_int_init(&sources, 0);
   igraph_vector_int_init(&targets, 0);
   affected_sources_dec(G, &inclist, &sources, D, u, v, v, weights, weight);
-  affected_targets_dec(G, &inclist, &targets, D, u, v, u, weights, weight);
-  igraph_vector_ptr_init(&targets_of_s, igraph_vector_int_size(&sources));
-  igraph_vector_ptr_init(&sources_of_t, igraph_vector_int_size(&targets));
-  for(igraph_integer_t si = 0; si < igraph_vector_int_size(&sources); si++) {
-    igraph_integer_t s = igraph_vector_int_e(&sources, si);
-    igraph_vector_int_t *ts
-      = (igraph_vector_int_t*) malloc(sizeof(igraph_vector_int_t));
-    igraph_vector_int_init(ts, 0);
-    affected_targets_dec(G, &inclist, ts, D, u, v, s, weights, weight);
-    igraph_vector_ptr_set(&targets_of_s, si, ts);
-  }
-  for(igraph_integer_t ti = 0; ti < igraph_vector_int_size(&targets); ti++) {
-    igraph_integer_t t = igraph_vector_int_e(&targets, ti);
-    igraph_vector_int_t *ss
-      = (igraph_vector_int_t*) malloc(sizeof(igraph_vector_int_t));
-    igraph_vector_int_init(ss, 0);
-    affected_sources_dec(G, &inclist, ss, D, u, v, t, weights, weight);
-    igraph_vector_ptr_set(&sources_of_t, ti, ss);
-  }
 
-  // decrease betweenness
   for(igraph_integer_t si = 0; si < igraph_vector_int_size(&sources); si++) {
     igraph_integer_t s = igraph_vector_int_e(&sources, si);
-    igraph_vector_int_t *ts
-      = (igraph_vector_int_t*) igraph_vector_ptr_e(&targets_of_s, si);
+    affected_targets_dec(G, &inclist, &targets, D, u, v, s, weights, weight);
+    // decrease betweenness
     // factor is -2 for undirected and -1 for directed
-    igraph_real_t factor = igraph_is_directed(G) ? -1 : -2;
+    igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
     update_deps_dec_weighted(G, &inclist, D, S, B, u, v,
-                             s, ts, weights, weight, factor);
-  }
-  /*
-  for(igraph_integer_t ti = 0; ti < igraph_vector_int_size(&targets); ti++) {
-    igraph_integer_t t = igraph_vector_int_e(&targets, ti);
-    igraph_vector_int_t *ss
-      = (igraph_vector_int_t*) igraph_vector_ptr_e(&sources_of_t, ti);
-    update_deps_dec_weighted(G, &inclist, &D, &S, &B, u, v,
-                             t, ss, weights, weight, -1);
-  }
-  */
+                             s, &targets, weights, weight, -factor);
 
-  // modify
-  igraph_integer_t eid;
-  igraph_get_eid(G, &eid, u, v, 0, 1);
+    // modify
+    igraph_delete_edges(G, igraph_ess_1(eid));
+    igraph_vector_pop_back(weights);
+    igraph_vector_int_pop_back(igraph_inclist_get(&inclist, u));
+    igraph_vector_int_pop_back(igraph_inclist_get(&inclist, v));
+
+    // update sssp
+    update_sssp_dec_weighted
+      (G, &inclist, &inclist, D, S, u, v, s, weights, weight);
+
+    // increase betweenness
+    // factor is 2 for undirected and 1 for directed
+    update_deps_dec_weighted(G, &inclist, D, S, B, u, v,
+                             s, &targets, weights, weight, factor);
+
+    // cleanup for next round
+    igraph_add_edge(G, u, v);
+    igraph_vector_push_back(weights, weight);
+    igraph_vector_int_push_back(igraph_inclist_get(&inclist, u), eid);
+    igraph_vector_int_push_back(igraph_inclist_get(&inclist, v), eid);
+  }
+
+  affected_sources_dec(G, &inclist, &targets, D, v, u, u, weights, weight);
+  // delete an edge
   igraph_delete_edges(G, igraph_ess_1(eid));
-  igraph_vector_remove(weights, eid);
-  for(long int vid = 0; vid < igraph_vcount(G); vid++) {
-    igraph_vector_int_t* neis = igraph_inclist_get(&inclist, vid);
-    for(long int ni = igraph_vector_int_size(neis)-1; ni >= 0; ni--) {
-      if(igraph_vector_int_e(neis, ni) == eid) {
-        igraph_vector_int_remove(neis, ni);
-      } else if(igraph_vector_int_e(neis, ni) > eid) {
-        VECTOR(*neis)[ni]--;
-      }
-    }
-  }
-
+  igraph_vector_pop_back(weights);
+  igraph_vector_int_pop_back(igraph_inclist_get(&inclist, u));
+  igraph_vector_int_pop_back(igraph_inclist_get(&inclist, v));
+  // update stsp
   for(int ti = 0; ti < igraph_vector_int_size(&targets); ti++) {
     igraph_integer_t t = igraph_vector_int_e(&targets, ti);
     update_sssp_dec_weighted
       (G, &inclist, &inclist, D, S, v, u, t, weights, weight);
   }
-  for(int si = 0; si < igraph_vector_int_size(&sources); si++) {
-    igraph_integer_t s = igraph_vector_int_e(&sources, si);
-    update_sssp_dec_weighted
-      (G, &inclist, &inclist, D, S, u, v, s, weights, weight);
-  }
-
-  // increase betweenness
-  for(igraph_integer_t si = 0; si < igraph_vector_int_size(&sources); si++) {
-    igraph_integer_t s = igraph_vector_int_e(&sources, si);
-    igraph_vector_int_t *ts
-      = (igraph_vector_int_t*) igraph_vector_ptr_e(&targets_of_s, si);
-    // factor is 2 for undirected and 1 for directed
-    igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
-    update_deps_dec_weighted(G, &inclist, D, S, B, u, v,
-                             s, ts, weights, weight, factor);
-  }
-
   // cleanup
-  for(igraph_integer_t ti = 0; ti < igraph_vector_ptr_size(&sources_of_t); ti++) {
-    igraph_vector_int_t *ss = igraph_vector_ptr_e(&sources_of_t, ti);
-    igraph_vector_int_destroy(ss);
-    free(ss);
-  }
   igraph_vector_int_destroy(&sources);
   igraph_vector_int_destroy(&targets);
   igraph_inclist_destroy(&succs);
