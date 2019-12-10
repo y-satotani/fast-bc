@@ -16,24 +16,26 @@ int test_inc_random(unsigned long int seed);
 int test_dec_random(unsigned long int seed);
 int test_inc_components(unsigned long int seed);
 int test_dec_bridge(unsigned long int seed);
-int test_inc_repeat(unsigned long int seed);
-int test_dec_repeat(unsigned long int seed);
-int test_repeat(unsigned long int seed);
+int test_repeat(unsigned long int seed, int steps);
 
 int main(int argc, char* argv[]) {
   test_inc_mini();
   test_dec_mini();
   // confirmed no error for -10k
-  for(unsigned int seed = 0; seed < 100; seed++)
-    test_inc_random(seed);
+  //for(unsigned int seed = 0; seed < 100; seed++)
+  //  test_inc_random(seed);
   // confirmed no error for -10k
+  //for(unsigned int seed = 0; seed < 100; seed++)
+  //  test_dec_random(seed);
+  // confirmed no error for -10k
+  //for(unsigned int seed = 0; seed < 100; seed++)
+  //  test_inc_components(seed);
+  // confirmed no error for -10k
+  //for(unsigned int seed = 0; seed < 10000; seed++)
+  //  test_dec_bridge(seed);
+  // confirmed no error for -100 seeds and -1000 steps
   for(unsigned int seed = 0; seed < 100; seed++)
-    test_dec_random(seed);
-  test_inc_components(42);
-  test_dec_bridge(42);
-  test_inc_repeat(42);
-  test_dec_repeat(42);
-  test_repeat(42);
+    test_repeat(seed, 1000);
   return 0;
 }
 
@@ -42,7 +44,8 @@ int _check_quantities(const char* test_name,
                       igraph_matrix_t* D,
                       igraph_matrix_int_t* S,
                       igraph_vector_t* B,
-                      igraph_vector_t* weights);
+                      igraph_vector_t* weights,
+                      igraph_bool_t force_print);
 
 void _incremental_update_weighted(igraph_t* G,
                                   igraph_matrix_t* D,
@@ -94,7 +97,7 @@ int test_inc_mini() {
   make_less_graph_and_edge(&G, &u, &v, &weight, &weights);
   _DYBC_TEST_INIT_;
   _incremental_update_weighted(&G, &D, &S, &B, u, v, &weights, weight);
-  int res = _check_quantities("test_inc_mini", &G, &D, &S, &B, &weights);
+  int res = _check_quantities("test_inc_mini", &G, &D, &S, &B, &weights, 0);
   _DYBC_TEST_DEST_;
   return res;
 }
@@ -104,7 +107,7 @@ int test_dec_mini() {
   make_more_graph_and_edge(&G, &u, &v, &weight, &weights);
   _DYBC_TEST_INIT_;
   _decremental_update_weighted(&G, &D, &S, &B, u, v, &weights, weight);
-  int res = _check_quantities("test_dec_mini", &G, &D, &S, &B, &weights);
+  int res = _check_quantities("test_dec_mini", &G, &D, &S, &B, &weights, 0);
   _DYBC_TEST_DEST_;
   return res;
 }
@@ -133,7 +136,7 @@ int test_inc_random(unsigned long int seed) {
   _incremental_update_weighted(&G, &D, &S, &B, u, v, &weights, weight);
   char test_name[1024];
   sprintf(test_name, "test_inc_random (%lu)", seed);
-  int res = _check_quantities(test_name, &G, &D, &S, &B, &weights);
+  int res = _check_quantities(test_name, &G, &D, &S, &B, &weights, 0);
 
   _DYBC_TEST_DEST_;
   return res;
@@ -160,35 +163,159 @@ int test_dec_random(unsigned long int seed) {
   _decremental_update_weighted(&G, &D, &S, &B, u, v, &weights, weight);
   char test_name[1024];
   sprintf(test_name, "test_dec_random (%lu)", seed);
-  int res = _check_quantities(test_name, &G, &D, &S, &B, &weights);
+  int res = _check_quantities(test_name, &G, &D, &S, &B, &weights, 0);
 
   _DYBC_TEST_DEST_;
   return res;
 }
 
 int test_inc_components(unsigned long int seed) {
+  _DYBC_TEST_DECL_;
+  // initialize a graph
   igraph_rng_seed(igraph_rng_default(), seed);
-  return 0;
+  igraph_integer_t n1 = 20, n2 = 20, n3 = 20;
+  igraph_integer_t m1 = 40, m2 = 50, m3 = 60;
+  igraph_t G1, G2, G3;
+  igraph_erdos_renyi_game(&G1, IGRAPH_ERDOS_RENYI_GNM, n1, m1, 0, 0);
+  igraph_erdos_renyi_game(&G2, IGRAPH_ERDOS_RENYI_GNM, n2, m2, 0, 0);
+  igraph_erdos_renyi_game(&G3, IGRAPH_ERDOS_RENYI_GNM, n3, m3, 0, 0);
+  igraph_empty(&G, n1+n2+n3, 0);
+  for(igraph_integer_t eid = 0; eid < m1; eid++) {
+    igraph_edge(&G1, eid, &u, &v);
+    igraph_add_edge(&G, u, v);
+  }
+  for(igraph_integer_t eid = 0; eid < m2; eid++) {
+    igraph_edge(&G2, eid, &u, &v);
+    igraph_add_edge(&G, u + n1, v + n1);
+  }
+  for(igraph_integer_t eid = 0; eid < m3; eid++) {
+    igraph_edge(&G3, eid, &u, &v);
+    igraph_add_edge(&G, u + n1 + n2, v + n1 + n2);
+  }
+
+  // select endpoints to insert
+  u = igraph_rng_get_integer
+    (igraph_rng_default(), 0, n1-1);
+  v = igraph_rng_get_integer
+    (igraph_rng_default(), n1, n1+n2-1);
+
+  // set weights
+  igraph_vector_init(&weights, igraph_ecount(&G));
+  for(igraph_integer_t eid = 0; eid < igraph_ecount(&G); eid++) {
+    weight = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
+    igraph_vector_set(&weights, eid, weight);
+  }
+  weight = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
+  _DYBC_TEST_INIT_;
+
+  _incremental_update_weighted(&G, &D, &S, &B, u, v, &weights, weight);
+  char test_name[1024];
+  sprintf(test_name, "test_inc_components (%lu)", seed);
+  int res = _check_quantities(test_name, &G, &D, &S, &B, &weights, 0);
+
+  igraph_destroy(&G1);
+  igraph_destroy(&G2);
+  igraph_destroy(&G3);
+  _DYBC_TEST_DEST_;
+  return res;
 }
 
 int test_dec_bridge(unsigned long int seed) {
+  _DYBC_TEST_DECL_;
+  // initialize a graph
   igraph_rng_seed(igraph_rng_default(), seed);
-  return 0;
+  igraph_integer_t n1 = 20, n2 = 20, n3 = 20;
+  igraph_integer_t m1 = 40, m2 = 50, m3 = 60;
+  igraph_t G1, G2, G3;
+  igraph_erdos_renyi_game(&G1, IGRAPH_ERDOS_RENYI_GNM, n1, m1, 0, 0);
+  igraph_erdos_renyi_game(&G2, IGRAPH_ERDOS_RENYI_GNM, n2, m2, 0, 0);
+  igraph_erdos_renyi_game(&G3, IGRAPH_ERDOS_RENYI_GNM, n3, m3, 0, 0);
+  igraph_empty(&G, n1+n2+n3, 0);
+  for(igraph_integer_t eid = 0; eid < m1; eid++) {
+    igraph_edge(&G1, eid, &u, &v);
+    igraph_add_edge(&G, u, v);
+  }
+  for(igraph_integer_t eid = 0; eid < m2; eid++) {
+    igraph_edge(&G2, eid, &u, &v);
+    igraph_add_edge(&G, u + n1, v + n1);
+  }
+  for(igraph_integer_t eid = 0; eid < m3; eid++) {
+    igraph_edge(&G3, eid, &u, &v);
+    igraph_add_edge(&G, u + n1 + n2, v + n1 + n2);
+  }
+
+  // select endpoints to delete
+  u = igraph_rng_get_integer
+    (igraph_rng_default(), 0, n1-1);
+  v = igraph_rng_get_integer
+    (igraph_rng_default(), n1, n1+n2-1);
+  igraph_add_edge(&G, u, v);
+
+  // set weights
+  igraph_vector_init(&weights, igraph_ecount(&G));
+  for(igraph_integer_t eid = 0; eid < igraph_ecount(&G); eid++) {
+    weight = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
+    igraph_vector_set(&weights, eid, weight);
+  }
+  weight = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
+  _DYBC_TEST_INIT_;
+
+  _decremental_update_weighted(&G, &D, &S, &B, u, v, &weights, weight);
+  char test_name[1024];
+  sprintf(test_name, "test_inc_components (%lu)", seed);
+  int res = _check_quantities(test_name, &G, &D, &S, &B, &weights, 0);
+
+  igraph_destroy(&G1);
+  igraph_destroy(&G2);
+  igraph_destroy(&G3);
+  _DYBC_TEST_DEST_;
+  return res;
 }
 
-int test_inc_repeat(unsigned long int seed) {
+int test_repeat(unsigned long int seed, int steps) {
+  _DYBC_TEST_DECL_;
+  // initialize a graph
   igraph_rng_seed(igraph_rng_default(), seed);
-  return 0;
-}
+  igraph_erdos_renyi_game(&G, IGRAPH_ERDOS_RENYI_GNM, 20, 50, 0, 0);
+  // set weights
+  igraph_vector_init(&weights, igraph_ecount(&G));
+  for(igraph_integer_t eid = 0; eid < igraph_ecount(&G); eid++) {
+    weight = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
+    igraph_vector_set(&weights, eid, weight);
+  }
+  _DYBC_TEST_INIT_;
 
-int test_dec_repeat(unsigned long int seed) {
-  igraph_rng_seed(igraph_rng_default(), seed);
-  return 0;
-}
+  int res = 0;
 
-int test_repeat(unsigned long int seed) {
-  igraph_rng_seed(igraph_rng_default(), seed);
-  return 0;
+  for(int step = 0; step < steps; step++) {
+    igraph_integer_t eid;
+    char test_name[1024];
+    // select endpoints to insert
+    igraph_t C;
+    igraph_complementer(&C, &G, 0);
+    eid = igraph_rng_get_integer
+      (igraph_rng_default(), 0, igraph_ecount(&C)-1);
+    igraph_edge(&C, eid, &u, &v);
+    igraph_destroy(&C);
+    weight = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
+    _incremental_update_weighted(&G, &D, &S, &B, u, v, &weights, weight);
+
+    sprintf(test_name, "test_repeat (%lu) at inc step %d", seed, step);
+    res |= _check_quantities(test_name, &G, &D, &S, &B, &weights, 0);
+
+    // select endpoints to delete
+    eid = igraph_rng_get_integer
+      (igraph_rng_default(), 0, igraph_ecount(&G)-1);
+    igraph_edge(&G, eid, &u, &v);
+    weight = igraph_vector_e(&weights, eid);
+    _decremental_update_weighted(&G, &D, &S, &B, u, v, &weights, weight);
+
+    sprintf(test_name, "test_repeat (%lu) at dec step %d", seed, step);
+    int res = _check_quantities(test_name, &G, &D, &S, &B, &weights, 0);
+  }
+
+  _DYBC_TEST_DEST_;
+  return res;
 }
 
 int _check_quantities(const char* test_name,
@@ -196,7 +323,8 @@ int _check_quantities(const char* test_name,
                       igraph_matrix_t* D,
                       igraph_matrix_int_t* S,
                       igraph_vector_t* B,
-                      igraph_vector_t* weights) {
+                      igraph_vector_t* weights,
+                      igraph_bool_t force_print) {
 #define EPS IGRAPH_SHORTEST_PATH_EPSILON
 #define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
 #define d(a, b) (MATRIX(*D, (a), (b)))
@@ -222,25 +350,33 @@ int _check_quantities(const char* test_name,
 
   int dist_err = 0, sigma_err = 0, bet_err = 0;
   // check distance
-  for(long int s = 0; s < igraph_vcount(G); s++)
-    for(long int t = 0; t < igraph_vcount(G); t++)
+  for(long int s = 0; s < igraph_vcount(G); s++) {
+    for(long int t = 0; t < igraph_vcount(G); t++) {
       if(cmp(d(s, t), dt(s, t))) {
         if(!dist_err) {
           printf("distance error on %s:\n", test_name);
           dist_err = 1;
         }
         printf("%ld %ld (res:%f true:%f)\n", s, t, d(s, t), dt(s, t));
+      } else if(force_print) {
+        printf("%ld %ld (res:%f true:%f)\n", s, t, d(s, t), dt(s, t));
       }
+    }
+  }
   // check geodesics
-  for(long int s = 0; s < igraph_vcount(G); s++)
-    for(long int t = 0; t < igraph_vcount(G); t++)
+  for(long int s = 0; s < igraph_vcount(G); s++) {
+    for(long int t = 0; t < igraph_vcount(G); t++) {
       if(s(s, t) != st(s, t)) {
         if(!sigma_err) {
           printf("geodesics error on %s:\n", test_name);
           sigma_err = 1;
         }
         printf("%ld %ld (res:%d true:%d)\n", s, t, s(s, t), st(s, t));
+      } else if(force_print) {
+        printf("%ld %ld (res:%d true:%d)\n", s, t, s(s, t), st(s, t));
       }
+    }
+  }
   // check betweenness
   for(long int x = 0; x < igraph_vcount(G); x++) {
     igraph_real_t diff1 = fabs(B(x) - Bt(x));
@@ -250,6 +386,8 @@ int _check_quantities(const char* test_name,
         printf("betweenness error on %s:\n", test_name);
         bet_err = 1;
       }
+      printf("%ld (res:%g true:%g grand:%g)\n", x, B(x), Bt(x), Bg(x));
+    } else if(force_print) {
       printf("%ld (res:%g true:%g grand:%g)\n", x, B(x), Bt(x), Bg(x));
     }
   }
