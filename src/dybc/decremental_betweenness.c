@@ -140,11 +140,10 @@ void update_sssp_dec_weighted(igraph_t* G,
       igraph_integer_t eid = VECTOR(*ss)[si];
       igraph_integer_t s = IGRAPH_OTHER(G, eid, x);
       igraph_real_t d_s = d(source, x) + l(eid);
-      igraph_real_t d_s_q = -igraph_2wheap_get(&queue, s);
       if(VECTOR(is_affected)[s]) {
         if(!igraph_2wheap_has_elem(&queue, s))
           igraph_2wheap_push_with_index(&queue, s, -d_s);
-        else if(cmp(d_s, d_s_q) < 0)
+        else if(cmp(d_s, -igraph_2wheap_get(&queue, s)) < 0)
           igraph_2wheap_modify(&queue, s, -d_s);
       }
     } /* for succs */
@@ -279,12 +278,11 @@ void affected_targets_dec(igraph_t* G,
     igraph_integer_t x = igraph_stack_int_pop(&stack);
     igraph_vector_int_push_back(out, x);
     igraph_vector_int_t* neis = igraph_inclist_get(inclist, x);
-    igraph_integer_t ni;
-    for(ni = 0; ni < igraph_vector_int_size(neis); ni++) {
+    for(igraph_integer_t ni = 0; ni < igraph_vector_int_size(neis); ni++) {
       igraph_integer_t eid = VECTOR(*neis)[ni];
       igraph_integer_t y = IGRAPH_OTHER(G, eid, x);
       igraph_real_t d_sy = d(source, y);
-      igraph_real_t d_sy_p = d(source, u) + weight + d(v, x) + l(eid);
+      igraph_real_t d_sy_p = d(source, x) + l(eid);
       if(cmp(d_sy, d_sy_p) == 0 && !igraph_vector_bool_e(&visited, y)) {
         igraph_vector_bool_set(&visited, y, 1);
         igraph_stack_int_push(&stack, y);
@@ -334,12 +332,11 @@ void affected_sources_dec(igraph_t* G,
     igraph_integer_t x = igraph_stack_int_pop(&stack);
     igraph_vector_int_push_back(out, x);
     igraph_vector_int_t* neis = igraph_inclist_get(inclist, x);
-    igraph_integer_t ni;
-    for(ni = 0; ni < igraph_vector_int_size(neis); ni++) {
+    for(igraph_integer_t ni = 0; ni < igraph_vector_int_size(neis); ni++) {
       igraph_integer_t eid = VECTOR(*neis)[ni];
       igraph_integer_t y = IGRAPH_OTHER(G, eid, x);
       igraph_real_t d_sy = d(y, target);
-      igraph_real_t d_sy_p = l(eid) + d(x, u) + weight + d(v, target);
+      igraph_real_t d_sy_p = l(eid) + d(x, target);
       if(cmp(d_sy, d_sy_p) == 0 && !igraph_vector_bool_e(&visited, y)) {
         igraph_vector_bool_set(&visited, y, 1);
         igraph_stack_int_push(&stack, y);

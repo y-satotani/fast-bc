@@ -115,13 +115,11 @@ void update_sssp_inc_weighted(igraph_t* G,
       igraph_integer_t eid = VECTOR(*ss)[si];
       igraph_integer_t s = IGRAPH_OTHER(G, eid, x);
       igraph_real_t d_s = d(source, x) + l(eid);
-      int cmp_result = cmp(d(source, s), d_s);
-      if(cmp_result >= 0) {
-        if(igraph_2wheap_has_elem(&queue, s))
-          igraph_2wheap_modify(&queue, s, -d_s);
-        else
-          igraph_2wheap_push_with_index(&queue, s, -d_s);
-      }
+      if(cmp(d_s, d(source, s)) > 0) continue;
+      if(!igraph_2wheap_has_elem(&queue, s))
+        igraph_2wheap_push_with_index(&queue, s, -d_s);
+      else if(cmp(d_s, -igraph_2wheap_get(&queue, s)) < 0)
+        igraph_2wheap_modify(&queue, s, -d_s);
     } /* for succs */
   } /* !igraph_2wheap_empty(&Q) */
 

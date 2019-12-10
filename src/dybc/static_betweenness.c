@@ -46,6 +46,8 @@ void _betweenness_weighted(igraph_t* G,
   igraph_stack_init(&stack, n);
 
   for(igraph_integer_t source = 0; source < n; source++) {
+    for(igraph_integer_t target = 0; target < n; target++)
+      MATRIX(*D, source, target) = IGRAPH_INFINITY;
     igraph_2wheap_push_with_index(&queue, source, 0);
     MATRIX(*D, source, source) = 0;
     MATRIX(*S, source, source) = 1;
@@ -64,7 +66,7 @@ void _betweenness_weighted(igraph_t* G,
         igraph_real_t d_v = MATRIX(*D, source, v);
         igraph_real_t d_vp = d_u + VECTOR(*weight)[eid];
 
-        if(d_v == 0. && v != source) {
+        if(d_v == IGRAPH_INFINITY && v != source) {
           // first visit
           igraph_vector_int_t* pv = igraph_adjlist_get(&precedings, v);
           igraph_vector_int_resize(pv, 1);
