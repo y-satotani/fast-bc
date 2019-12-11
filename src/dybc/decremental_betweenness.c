@@ -225,12 +225,11 @@ void update_stsp_dec_weighted(igraph_t* G,
       igraph_integer_t eid = VECTOR(*ps)[pi];
       igraph_integer_t p = IGRAPH_OTHER(G, eid, x);
       igraph_real_t d_p = l(eid) + d(x, target);
-      igraph_real_t d_p_q = -igraph_2wheap_get(&queue, p);
       if(VECTOR(is_affected)[p]) {
-        if(igraph_2wheap_has_elem(&queue, p))
-          igraph_2wheap_modify(&queue, p, -d_p);
-        else if(cmp(d_p, d_p_q) < 0)
+        if(!igraph_2wheap_has_elem(&queue, p))
           igraph_2wheap_push_with_index(&queue, p, -d_p);
+        else if(cmp(d_p, -igraph_2wheap_get(&queue, p)) < 0)
+          igraph_2wheap_modify(&queue, p, -d_p);
       }
     } /* for preds */
   } /* !igraph_2wheap_empty(&Q) */
