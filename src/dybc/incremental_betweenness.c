@@ -173,13 +173,11 @@ void update_stsp_inc_weighted(igraph_t* G,
       igraph_integer_t eid = VECTOR(*ps)[pi];
       igraph_integer_t p = IGRAPH_OTHER(G, eid, x);
       igraph_real_t d_p = l(eid) + d(x, target);
-      int cmp_result = cmp(d(p, target), d_p);
-      if(cmp_result >= 0) {
-        if(igraph_2wheap_has_elem(&queue, p))
-          igraph_2wheap_modify(&queue, p, -d_p);
-        else
-          igraph_2wheap_push_with_index(&queue, p, -d_p);
-      }
+      if(cmp(d_p, d(p, target)) > 0) continue;
+      if(!igraph_2wheap_has_elem(&queue, p))
+        igraph_2wheap_push_with_index(&queue, p, -d_p);
+      else if(cmp(d_p, -igraph_2wheap_get(&queue, p)) < 0)
+        igraph_2wheap_modify(&queue, p, -d_p);
     } /* for preds */
   } /* !igraph_2wheap_empty(&Q) */
 

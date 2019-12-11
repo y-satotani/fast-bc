@@ -17,13 +17,15 @@ int test_dec_random(unsigned long int seed);
 int test_inc_components(unsigned long int seed);
 int test_dec_bridge(unsigned long int seed);
 int test_repeat(unsigned long int seed, int steps);
+int test_inc_directed(unsigned long int seed);
+int test_dec_directed(unsigned long int seed);
 
 int main(int argc, char* argv[]) {
   test_inc_mini();
   test_dec_mini();
   // confirmed no error for -10k
-  //for(unsigned int seed = 0; seed < 100; seed++)
-  //  test_inc_random(seed);
+  for(unsigned int seed = 0; seed < 100; seed++)
+    test_inc_random(seed);
   // confirmed no error for -10k
   //for(unsigned int seed = 0; seed < 100; seed++)
   //  test_dec_random(seed);
@@ -31,11 +33,14 @@ int main(int argc, char* argv[]) {
   //for(unsigned int seed = 0; seed < 100; seed++)
   //  test_inc_components(seed);
   // confirmed no error for -10k
-  //for(unsigned int seed = 0; seed < 10000; seed++)
+  //for(unsigned int seed = 0; seed < 100; seed++)
   //  test_dec_bridge(seed);
   // confirmed no error for -100 seeds and -1000 steps
+  //for(unsigned int seed = 0; seed < 10; seed++)
+  //  test_repeat(seed, 100);
+  // confirmed no error for -10k
   for(unsigned int seed = 0; seed < 100; seed++)
-    test_repeat(seed, 1000);
+    test_inc_directed(seed);
   return 0;
 }
 
@@ -318,6 +323,63 @@ int test_repeat(unsigned long int seed, int steps) {
   return res;
 }
 
+int test_inc_directed(unsigned long int seed) {
+  _DYBC_TEST_DECL_;
+  // initialize a graph
+  igraph_rng_seed(igraph_rng_default(), seed);
+  igraph_erdos_renyi_game(&G, IGRAPH_ERDOS_RENYI_GNM, 100, 400, 1, 0);
+  // select endpoints to insert
+  igraph_t C;
+  igraph_complementer(&C, &G, 0);
+  igraph_integer_t eid = igraph_rng_get_integer
+    (igraph_rng_default(), 0, igraph_ecount(&C)-1);
+  igraph_edge(&C, eid, &u, &v);
+  igraph_destroy(&C);
+  // set weights
+  igraph_vector_init(&weights, igraph_ecount(&G));
+  for(eid = 0; eid < igraph_ecount(&G); eid++) {
+    weight = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
+    igraph_vector_set(&weights, eid, weight);
+  }
+  weight = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
+  _DYBC_TEST_INIT_;
+
+  _incremental_update_weighted(&G, &D, &S, &B, u, v, &weights, weight);
+  char test_name[1024];
+  sprintf(test_name, "test_inc_directed (%lu)", seed);
+  int res = _check_quantities(test_name, &G, &D, &S, &B, &weights, 0);
+
+  _DYBC_TEST_DEST_;
+  return res;
+}
+
+int test_dec_directed(unsigned long int seed) {
+  _DYBC_TEST_DECL_;
+  // initialize a graph
+  igraph_rng_seed(igraph_rng_default(), seed);
+  igraph_erdos_renyi_game(&G, IGRAPH_ERDOS_RENYI_GNM, 100, 400, 1, 0);
+  // set weights
+  igraph_vector_init(&weights, igraph_ecount(&G));
+  for(igraph_integer_t eid = 0; eid < igraph_ecount(&G); eid++) {
+    weight = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
+    igraph_vector_set(&weights, eid, weight);
+  }
+  // select endpoints to delete
+  igraph_integer_t eid = igraph_rng_get_integer
+    (igraph_rng_default(), 0, igraph_ecount(&G)-1);
+  igraph_edge(&G, eid, &u, &v);
+  weight = igraph_vector_e(&weights, eid);
+  _DYBC_TEST_INIT_;
+
+  _decremental_update_weighted(&G, &D, &S, &B, u, v, &weights, weight);
+  char test_name[1024];
+  sprintf(test_name, "test_dec_directed (%lu)", seed);
+  int res = _check_quantities(test_name, &G, &D, &S, &B, &weights, 0);
+
+  _DYBC_TEST_DEST_;
+  return res;
+}
+
 int _check_quantities(const char* test_name,
                       igraph_t* G,
                       igraph_matrix_t* D,
@@ -345,8 +407,10 @@ int _check_quantities(const char* test_name,
   igraph_vector_init(&B_true, igraph_vcount(G));
   igraph_vector_init(&B_grand, igraph_vcount(G));
   betweenness_with_redundant_information(G, &D_true, &S_true, &B_true, weights);
-  igraph_betweenness(G, &B_grand, igraph_vss_all(), 0, weights, 0);
-  igraph_vector_scale(&B_grand, 2);
+  igraph_betweenness
+    (G, &B_grand, igraph_vss_all(), igraph_is_directed(G), weights, 0);
+  if(!igraph_is_directed(G))
+    igraph_vector_scale(&B_grand, 2);
 
   int dist_err = 0, sigma_err = 0, bet_err = 0;
   // check distance
@@ -416,69 +480,79 @@ void _incremental_update_weighted(igraph_t* G,
                                   igraph_integer_t v,
                                   igraph_vector_t* weights,
                                   igraph_real_t weight) {
-  igraph_inclist_t inclist, succs, preds;
+  igraph_inclist_t succs, preds;
   if(igraph_is_directed(G)) {
     igraph_inclist_init(G, &succs, IGRAPH_OUT);
     igraph_inclist_init(G, &preds, IGRAPH_IN);
   } else {
     igraph_inclist_init(G, &succs, IGRAPH_ALL);
+    preds = succs;
   }
-  igraph_inclist_init(G, &inclist, IGRAPH_ALL);
 
+  igraph_vector_int_t targets_;
   igraph_vector_int_t sources, targets;
   igraph_vector_int_init(&sources, 0);
   igraph_vector_int_init(&targets, 0);
-  affected_sources_inc(G, &inclist, &sources, D, u, v, v, weights, weight);
+  igraph_vector_int_init(&targets_, 0);
+  if(!igraph_is_directed(G))
+    affected_sources_inc(G, &preds, &targets_, D, v, u, u, weights, weight);
+  else
+    affected_targets_inc(G, &succs, &targets_, D, u, v, u, weights, weight);
+  affected_sources_inc(G, &preds, &sources, D, u, v, v, weights, weight);
 
   for(igraph_integer_t si = 0; si < igraph_vector_int_size(&sources); si++) {
     // decrease betweenness
     igraph_integer_t s = igraph_vector_int_e(&sources, si);
-    affected_targets_inc(G, &inclist, &targets, D, u, v, s, weights, weight);
+    affected_targets_inc(G, &succs, &targets, D, u, v, s, weights, weight);
+
     // factor is -2 for undirected and -1 for directed
     igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
-    update_deps_inc_weighted(G, &inclist, D, S, B, u, v,
+    update_deps_inc_weighted(G, &preds, D, S, B, u, v,
                              s, &targets, weights, weight, -factor);
 
     // add edge
     igraph_add_edge(G, u, v);
     igraph_vector_push_back(weights, weight);
     igraph_integer_t eid = igraph_ecount(G) - 1;
-    igraph_vector_int_push_back(igraph_inclist_get(&inclist, u), eid);
-    igraph_vector_int_push_back(igraph_inclist_get(&inclist, v), eid);
+    igraph_vector_int_push_back(igraph_inclist_get(&succs, u), eid);
+    igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
 
     update_sssp_inc_weighted
-      (G, &inclist, &inclist, D, S, u, v, s, weights, weight);
+      (G, &preds, &succs, D, S, u, v, s, weights, weight);
 
     // increase betweenness
     // factor is 2 for undirected and 1 for directed
-    update_deps_inc_weighted(G, &inclist, D, S, B, u, v,
+    update_deps_inc_weighted(G, &preds, D, S, B, u, v,
                              s, &targets, weights, weight, factor);
 
     // cleanup
     igraph_delete_edges(G, igraph_ess_1(eid));
     igraph_vector_remove(weights, eid);
-    igraph_vector_int_pop_back(igraph_inclist_get(&inclist, u));
-    igraph_vector_int_pop_back(igraph_inclist_get(&inclist, v));
+    igraph_vector_int_pop_back(igraph_inclist_get(&succs, u));
+    igraph_vector_int_pop_back(igraph_inclist_get(&preds, v));
   }
-
-  affected_sources_inc(G, &inclist, &targets, D, v, u, u, weights, weight);
 
   // add edge
   igraph_integer_t eid = igraph_ecount(G);
   igraph_add_edge(G, u, v);
   igraph_vector_push_back(weights, weight);
-  igraph_vector_int_push_back(igraph_inclist_get(&inclist, u), eid);
-  igraph_vector_int_push_back(igraph_inclist_get(&inclist, v), eid);
+  igraph_vector_int_push_back(igraph_inclist_get(&succs, u), eid);
+  igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
 
-  for(int ti = 0; ti < igraph_vector_int_size(&targets); ti++) {
-    igraph_integer_t t = igraph_vector_int_e(&targets, ti);
-    update_sssp_inc_weighted
-      (G, &inclist, &inclist, D, S, v, u, t, weights, weight);
+  for(int ti = 0; ti < igraph_vector_int_size(&targets_); ti++) {
+    igraph_integer_t t = igraph_vector_int_e(&targets_, ti);
+    if(!igraph_is_directed(G))
+      update_sssp_inc_weighted
+        (G, &succs, &preds, D, S, v, u, t, weights, weight);
+    else
+      update_stsp_inc_weighted
+        (G, &preds, &succs, D, S, u, v, t, weights, IGRAPH_INFINITY);
   }
 
   // cleanup
   igraph_vector_int_destroy(&sources);
   igraph_vector_int_destroy(&targets);
+  igraph_vector_int_destroy(&targets_);
   igraph_inclist_destroy(&succs);
   if(igraph_is_directed(G))
     igraph_inclist_destroy(&preds);
