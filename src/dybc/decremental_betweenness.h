@@ -5,19 +5,6 @@
 #include <igraph/igraph.h>
 #include <igraph/igraph_types_internal.h>
 
-void update_deps_dec_weighted(igraph_t* G,                  // graph
-                              igraph_inclist_t* preds,      // predecessors
-                              igraph_matrix_t* D,           // distance
-                              igraph_matrix_int_t* S,       // geodesics
-                              igraph_vector_t* B,           // betweenness
-                              igraph_integer_t u,           // endpoint
-                              igraph_integer_t v,           // endpoint
-                              igraph_integer_t source,      // source
-                              igraph_vector_int_t* targets, // targets
-                              igraph_vector_t* weights,     // weights
-                              igraph_real_t weight,         // weight of u-v
-                              igraph_real_t factor);        // multiplier
-
 void update_sssp_dec_weighted(igraph_t* G,               // graph
                               igraph_inclist_t* preds,   // predecessors list
                               igraph_inclist_t* succs,   // successors list

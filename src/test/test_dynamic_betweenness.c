@@ -5,6 +5,7 @@
 #include <igraph/igraph_math.h>
 #include <math.h>
 
+#include "dybc/dynamic_betweenness.h"
 #include "dybc/incremental_betweenness.h"
 #include "dybc/decremental_betweenness.h"
 #include "dybc/static_betweenness.h"
@@ -560,7 +561,7 @@ void _incremental_update_weighted(igraph_t* G,
 
     // factor is -2 for undirected and -1 for directed
     igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
-    update_deps_inc_weighted(G, &preds, D, S, B, u, v,
+    update_deps_weighted(G, &preds, D, S, B, u, v,
                              s, &targets, weights, weight, -factor);
 
     // add edge
@@ -575,7 +576,7 @@ void _incremental_update_weighted(igraph_t* G,
 
     // increase betweenness
     // factor is 2 for undirected and 1 for directed
-    update_deps_inc_weighted(G, &preds, D, S, B, u, v,
+    update_deps_weighted(G, &preds, D, S, B, u, v,
                              s, &targets, weights, weight, factor);
 
     // cleanup
@@ -660,7 +661,7 @@ void _decremental_update_weighted(igraph_t* G,
     // decrease betweenness
     // factor is -2 for undirected and -1 for directed
     igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
-    update_deps_dec_weighted(G, &preds, D, S, B, u, v,
+    update_deps_weighted(G, &preds, D, S, B, u, v,
                              s, &targets, weights, weight, -factor);
 
     // modify
@@ -675,7 +676,7 @@ void _decremental_update_weighted(igraph_t* G,
 
     // increase betweenness
     // factor is 2 for undirected and 1 for directed
-    update_deps_dec_weighted(G, &preds, D, S, B, u, v,
+    update_deps_weighted(G, &preds, D, S, B, u, v,
                              s, &targets, weights, weight, factor);
 
     // cleanup for next round

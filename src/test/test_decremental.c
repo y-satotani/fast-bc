@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
     igraph_vector_int_t *ts
       = (igraph_vector_int_t*) igraph_vector_ptr_e(&targets_of_s, si);
     // factor is -2 for undirected and -1 for directed
-    update_deps_dec_weighted(&G, &inclist, &D, &S, &B, u, v,
+    update_deps_weighted(&G, &inclist, &D, &S, &B, u, v,
                              s, ts, &weights, weight, -2);
   }
   /*
@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
     igraph_integer_t t = igraph_vector_int_e(&targets, ti);
     igraph_vector_int_t *ss
       = (igraph_vector_int_t*) igraph_vector_ptr_e(&sources_of_t, ti);
-    update_deps_dec_weighted(&G, &inclist, &D, &S, &B, u, v,
+    update_deps_weighted(&G, &inclist, &D, &S, &B, u, v,
                              t, ss, &weights, weight, -1);
   }
   */
@@ -141,7 +141,7 @@ int main(int argc, char* argv[]) {
     igraph_vector_int_t *ts
       = (igraph_vector_int_t*) igraph_vector_ptr_e(&targets_of_s, si);
     // factor is 2 for undirected and 1 for directed
-    update_deps_dec_weighted(&G, &inclist, &D, &S, &B, u, v,
+    update_deps_weighted(&G, &inclist, &D, &S, &B, u, v,
                              s, ts, &weights, weight, 2);
   }
   /*
@@ -149,7 +149,7 @@ int main(int argc, char* argv[]) {
     igraph_integer_t t = igraph_vector_int_e(&targets, ti);
     igraph_vector_int_t *ss
       = (igraph_vector_int_t*) igraph_vector_ptr_e(&sources_of_t, ti);
-    update_deps_dec_weighted(&G, &inclist, &D, &S, &B, u, v,
+    update_deps_weighted(&G, &inclist, &D, &S, &B, u, v,
                              t, ss, &weights, weight, 1);
   }
   */
