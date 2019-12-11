@@ -121,6 +121,182 @@ void update_stsp_inc_weighted(igraph_t* G,
 #undef s
 }
 
+void update_sssp_inc_unweighted(igraph_t* G,
+                                igraph_inclist_t* preds,
+                                igraph_inclist_t* succs,
+                                igraph_matrix_t* D,
+                                igraph_matrix_int_t* S,
+                                igraph_integer_t u,
+                                igraph_integer_t v,
+                                igraph_integer_t source) {
+#define EPS IGRAPH_SHORTEST_PATH_EPSILON
+#define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
+#define d(a, b) (MATRIX(*D, (a), (b)))
+#define s(a, b) (MATRIX(*S, (a), (b)))
+
+  if(igraph_is_inf(d(source, u))
+     || cmp(d(source, v), d(source, u) + 1.0) < 0) {
+    return;
+  }
+
+  igraph_dqueue_t queue;
+  igraph_vector_t d_old;
+  igraph_vector_int_t s_old;
+  igraph_vector_bool_t pushed;
+  igraph_dqueue_init(&queue, igraph_vcount(G));
+  igraph_vector_init(&d_old, igraph_vcount(G));
+  igraph_vector_int_init(&s_old, igraph_vcount(G));
+  igraph_vector_bool_init(&pushed, igraph_vcount(G));
+  VECTOR(d_old)[u] = d(source, u);
+  VECTOR(s_old)[u] = s(source, u);
+  // not visited
+  VECTOR(d_old)[v] = d(source, v);
+  VECTOR(s_old)[v] = s(source, v);
+  if(cmp(d(source, u) + 1.0, d(source, v)) < 0) {
+    d(source, v) = d(source, u) + 1.0;
+    s(source, v) = s(source, u);
+    igraph_dqueue_push(&queue, v);
+    VECTOR(pushed)[v] = 1;
+  } else if(cmp(d(source, u) + 1.0, d(source, v)) == 0) {
+    s(source, v) += s(source, u);
+    igraph_dqueue_push(&queue, v);
+    VECTOR(pushed)[v] = 1;
+  }
+
+  while(!igraph_dqueue_empty(&queue)) {
+    long int x = igraph_dqueue_pop(&queue);
+
+    igraph_vector_int_t* neis = igraph_inclist_get(succs, x);
+    long int nneis = igraph_vector_int_size(neis);
+    for(long int ni = 0; ni < nneis; ni++) {
+      igraph_integer_t eid = VECTOR(*neis)[ni];
+      igraph_integer_t y = IGRAPH_OTHER(G, eid, x);
+
+      if(VECTOR(d_old)[y] == 0.) {
+        VECTOR(d_old)[y] = d(source, y);
+        VECTOR(s_old)[y] = s(source, y);
+      }
+      if(cmp(d(source, x) + 1.0, d(source, y)) < 0) {
+        d(source, y) = d(source, x) + 1.0;
+        s(source, y) = s(source, x);
+        if(!VECTOR(pushed)[y]) {
+          igraph_dqueue_push(&queue, y);
+          VECTOR(pushed)[y] = 1;
+        }
+      } else if(cmp(d(source, x) + 1.0, d(source, y)) == 0) {
+        if(cmp(VECTOR(d_old)[y], d(source, y)) == 0
+           && cmp(VECTOR(d_old)[x] + 1.0, VECTOR(d_old)[y]) == 0) {
+          s(source, y) += s(source, x) - VECTOR(s_old)[x];
+        } else {
+          s(source, y) += s(source, x);
+        }
+        if(!VECTOR(pushed)[y]) {
+          igraph_dqueue_push(&queue, y);
+          VECTOR(pushed)[y] = 1;
+        }
+      } // end if(d_sx+l_xy == d_sy)
+    } // end for all y in neighbors
+  } // end while queue is not empty
+
+  igraph_dqueue_destroy(&queue);
+  igraph_vector_destroy(&d_old);
+  igraph_vector_int_destroy(&s_old);
+  igraph_vector_bool_destroy(&pushed);
+
+#undef EPS
+#undef cmp
+#undef d
+#undef s
+}
+
+void update_stsp_inc_unweighted(igraph_t* G,
+                                igraph_inclist_t* preds,
+                                igraph_inclist_t* succs,
+                                igraph_matrix_t* D,
+                                igraph_matrix_int_t* S,
+                                igraph_integer_t u,
+                                igraph_integer_t v,
+                                igraph_integer_t target) {
+#define EPS IGRAPH_SHORTEST_PATH_EPSILON
+#define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
+#define d(a, b) (MATRIX(*D, (a), (b)))
+#define s(a, b) (MATRIX(*S, (a), (b)))
+
+  if(igraph_is_inf(d(v, target))
+     || cmp(d(v, target), 1.0 + d(u, target)) < 0) {
+    return;
+  }
+
+  igraph_dqueue_t queue;
+  igraph_vector_t d_old;
+  igraph_vector_int_t s_old;
+  igraph_vector_bool_t pushed;
+  igraph_dqueue_init(&queue, igraph_vcount(G));
+  igraph_vector_init(&d_old, igraph_vcount(G));
+  igraph_vector_int_init(&s_old, igraph_vcount(G));
+  igraph_vector_bool_init(&pushed, igraph_vcount(G));
+  VECTOR(d_old)[u] = d(u, target);
+  VECTOR(s_old)[u] = s(u, target);
+  // not visited
+  VECTOR(d_old)[v] = d(v, target);
+  VECTOR(s_old)[v] = s(v, target);
+  if(cmp(1.0 + d(u, target), d(v, target)) < 0) {
+    d(v, target) = 1.0 + d(u, target);
+    s(v, target) = s(u, target);
+    igraph_dqueue_push(&queue, v);
+    VECTOR(pushed)[v] = 1;
+  } else if(cmp(1.0 + d(u, target), d(v, target)) == 0) {
+    s(v, target) += s(u, target);
+    igraph_dqueue_push(&queue, v);
+    VECTOR(pushed)[v] = 1;
+  }
+
+  while(!igraph_dqueue_empty(&queue)) {
+    long int x = igraph_dqueue_pop(&queue);
+
+    igraph_vector_int_t* neis = igraph_inclist_get(succs, x);
+    long int nneis = igraph_vector_int_size(neis);
+    for(long int ni = 0; ni < nneis; ni++) {
+      igraph_integer_t eid = VECTOR(*neis)[ni];
+      igraph_integer_t y = IGRAPH_OTHER(G, eid, x);
+
+      if(VECTOR(d_old)[y] == 0.) {
+        VECTOR(d_old)[y] = d(y, target);
+        VECTOR(s_old)[y] = s(y, target);
+      }
+      if(cmp(1.0 + d(x, target), d(y, target)) < 0) {
+        d(y, target) = 1.0 + d(x, target);
+        s(y, target) = s(x, target);
+        if(!VECTOR(pushed)[y]) {
+          igraph_dqueue_push(&queue, y);
+          VECTOR(pushed)[y] = 1;
+        }
+      } else if(cmp(1.0 + d(x, target), d(y, target)) == 0) {
+        if(cmp(VECTOR(d_old)[y], d(y, target)) == 0
+           && cmp(1.0 + VECTOR(d_old)[x], VECTOR(d_old)[y]) == 0) {
+          s(y, target) += s(x, target) - VECTOR(s_old)[x];
+        } else {
+          s(y, target) += s(x, target);
+        }
+        if(!VECTOR(pushed)[y]) {
+          igraph_dqueue_push(&queue, y);
+          VECTOR(pushed)[y] = 1;
+        }
+      } // end if(d_sx+l_xy == d_sy)
+    } // end for all y in neighbors
+  } // end while queue is not empty
+
+  igraph_dqueue_destroy(&queue);
+  igraph_vector_destroy(&d_old);
+  igraph_vector_int_destroy(&s_old);
+  igraph_vector_bool_destroy(&pushed);
+
+#undef EPS
+#undef cmp
+#undef d
+#undef s
+}
+
 void affected_targets_inc(igraph_t* G,
                           igraph_inclist_t* inclist,
                           igraph_vector_int_t* out,
@@ -144,14 +320,14 @@ void affected_targets_inc(igraph_t* G,
     return;
   }
   igraph_vector_bool_t visited;
-  igraph_stack_int_t stack;
+  igraph_dqueue_int_t queue;
   igraph_vector_bool_init(&visited, igraph_vcount(G));
-  igraph_stack_int_init(&stack, 0);
+  igraph_dqueue_int_init(&queue, 0);
   igraph_vector_bool_set(&visited, v, 1);
-  igraph_stack_int_push(&stack, v);
+  igraph_dqueue_int_push(&queue, v);
 
-  while(!igraph_stack_int_empty(&stack)) {
-    igraph_integer_t x = igraph_stack_int_pop(&stack);
+  while(!igraph_dqueue_int_empty(&queue)) {
+    igraph_integer_t x = igraph_dqueue_int_pop(&queue);
     igraph_vector_int_push_back(out, x);
     igraph_vector_int_t* neis = igraph_inclist_get(inclist, x);
     igraph_integer_t ni;
@@ -162,13 +338,13 @@ void affected_targets_inc(igraph_t* G,
       igraph_real_t d_sy_p = d(source, u) + weight + d(v, x) + l(eid);
       if(cmp(d_sy, d_sy_p) >= 0 && !igraph_vector_bool_e(&visited, y)) {
         igraph_vector_bool_set(&visited, y, 1);
-        igraph_stack_int_push(&stack, y);
+        igraph_dqueue_int_push(&queue, y);
       }
     }
   }
 
   igraph_vector_bool_destroy(&visited);
-  igraph_stack_int_destroy(&stack);
+  igraph_dqueue_int_destroy(&queue);
 
 #undef EPS
 #undef cmp
@@ -198,14 +374,14 @@ void affected_sources_inc(igraph_t* G,
     return;
   }
   igraph_vector_bool_t visited;
-  igraph_stack_int_t stack;
+  igraph_dqueue_int_t queue;
   igraph_vector_bool_init(&visited, igraph_vcount(G));
-  igraph_stack_int_init(&stack, 0);
+  igraph_dqueue_int_init(&queue, 0);
   igraph_vector_bool_set(&visited, u, 1);
-  igraph_stack_int_push(&stack, u);
+  igraph_dqueue_int_push(&queue, u);
 
-  while(!igraph_stack_int_empty(&stack)) {
-    igraph_integer_t x = igraph_stack_int_pop(&stack);
+  while(!igraph_dqueue_int_empty(&queue)) {
+    igraph_integer_t x = igraph_dqueue_int_pop(&queue);
     igraph_vector_int_push_back(out, x);
     igraph_vector_int_t* neis = igraph_inclist_get(inclist, x);
     igraph_integer_t ni;
@@ -216,13 +392,13 @@ void affected_sources_inc(igraph_t* G,
       igraph_real_t d_sy_p = l(eid) + d(x, u) + weight + d(v, target);
       if(cmp(d_sy, d_sy_p) >= 0 && !igraph_vector_bool_e(&visited, y)) {
         igraph_vector_bool_set(&visited, y, 1);
-        igraph_stack_int_push(&stack, y);
+        igraph_dqueue_int_push(&queue, y);
       }
     }
   }
 
   igraph_vector_bool_destroy(&visited);
-  igraph_stack_int_destroy(&stack);
+  igraph_dqueue_int_destroy(&queue);
 
 #undef EPS
 #undef cmp
