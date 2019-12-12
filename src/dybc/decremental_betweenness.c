@@ -4,6 +4,7 @@
 #include <igraph/igraph.h>
 #include <igraph/igraph_math.h>
 #include <igraph/igraph_types_internal.h>
+#include "igraph_bheap.h"
 
 void update_sssp_dec_weighted(igraph_t* G,
                               igraph_inclist_t* preds,
@@ -177,6 +178,137 @@ void update_stsp_dec_weighted(igraph_t* G,
 #undef l
 }
 
+void update_sssp_dec_unweighted(igraph_t* G,
+                                igraph_inclist_t* preds,
+                                igraph_inclist_t* succs,
+                                igraph_matrix_t* D,
+                                igraph_matrix_int_t* S,
+                                igraph_integer_t u,
+                                igraph_integer_t v,
+                                igraph_integer_t source) {
+#define EPS IGRAPH_SHORTEST_PATH_EPSILON
+#define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
+#define d(a, b) (MATRIX(*D, (a), (b)))
+#define s(a, b) (MATRIX(*S, (a), (b)))
+
+  if(igraph_is_inf(d(source, u))
+     || cmp(d(source, v), d(source, u) + 1.0) < 0) {
+    return;
+  }
+
+  // find affected targets
+  igraph_vector_int_t targets;
+  igraph_vector_bool_t is_affected;
+  igraph_vector_int_init(&targets, 0);
+  igraph_vector_bool_init(&is_affected, igraph_vcount(G));
+  affected_targets_dec(G, succs, &targets, D, u, v, source, NULL, 0);
+  for(long int xi = 0; xi < igraph_vector_int_size(&targets); xi++)
+    VECTOR(is_affected)[VECTOR(targets)[xi]] = 1;
+
+  igraph_vector_t d_old;
+  igraph_vector_int_t s_old;
+  igraph_2wbheap_t queue;
+  igraph_vector_bool_t pushed;
+  igraph_vector_init(&d_old, igraph_vcount(G));
+  igraph_vector_int_init(&s_old, igraph_vcount(G));
+  igraph_2wbheap_init(&queue, igraph_vcount(G), igraph_vcount(G));
+  igraph_vector_bool_init(&pushed, igraph_vcount(G));
+  for(long int xi = 0; xi < igraph_vector_int_size(&targets); xi++) {
+    igraph_integer_t x = VECTOR(targets)[xi];
+    igraph_vector_int_t* ys = igraph_inclist_get(succs, x);
+    igraph_real_t d_hat = IGRAPH_INFINITY;
+    igraph_real_t s_hat = 0;
+    for(long int yi = 0; yi < igraph_vector_int_size(ys); yi++) {
+      igraph_integer_t eid = igraph_vector_int_e(ys, yi);
+      igraph_integer_t y = IGRAPH_OTHER(G, eid, x);
+      if(VECTOR(is_affected)[y]) continue;
+      if(cmp(d(source, y) + 1.0, d_hat) < 0) {
+        d_hat = d(source, y) + 1.0;
+        s_hat = 0;
+      }
+      if(cmp(d(source, y) + 1.0, d_hat) == 0)
+        s_hat += s(source, y);
+    } // end for each y in neighbor of x
+    VECTOR(d_old)[x] = d(source, x);
+    VECTOR(s_old)[x] = s(source, x);
+    d(source, x) = d_hat;
+    s(source, x) = s_hat;
+    if(!igraph_is_inf(d_hat)) {
+      igraph_2wbheap_push_with_index(&queue, x, (int)d(source, x));
+      VECTOR(pushed)[x] = 1;
+    }
+  } // end for each affected target x
+  for(long int xi = 0; xi < igraph_vector_int_size(&targets); xi++)
+    if(!igraph_is_inf(d(source, VECTOR(targets)[xi])))
+      VECTOR(is_affected)[VECTOR(targets)[xi]] = 0;
+
+  printf("--- %d --- pop order: ", source);
+  while(!igraph_2wbheap_empty(&queue)) {
+    long int x = igraph_2wbheap_min_index(&queue);
+    igraph_2wbheap_delete_min(&queue);
+    VECTOR(is_affected)[x] = 0;
+    printf("(%d, %d), ", x, (int)d(source, x));
+
+    igraph_vector_int_t* neis = igraph_inclist_get(succs, x);
+    long int nneis = igraph_vector_int_size(neis);
+    for(long int ni = 0; ni < nneis; ni++) {
+      igraph_integer_t eid = VECTOR(*neis)[ni];
+      igraph_integer_t y = IGRAPH_OTHER(G, eid, x);
+
+      if(VECTOR(d_old)[y] == 0.) {
+        VECTOR(d_old)[y] = d(source, y);
+        VECTOR(s_old)[y] = s(source, y);
+      }
+      if(cmp(d(source, x) + 1.0, d(source, y)) < 0) {
+        d(source, y) = d(source, x) + 1.0;
+        s(source, y) = s(source, x);
+        if(!igraph_2wbheap_has_elem(&queue, y)) {
+          igraph_2wbheap_push_with_index(&queue, y, (int)d(source, y));
+        } else if(cmp((int)d(source, y), igraph_2wbheap_get(&queue, y)) < 0) {
+          igraph_2wbheap_modify(&queue, y, (int)d(source, y));
+        }
+      } else if(cmp(d(source, x) + 1.0, d(source, y)) == 0) {
+        if(cmp(VECTOR(d_old)[y], d(source, y)) == 0
+           && cmp(VECTOR(d_old)[x] + 1.0, VECTOR(d_old)[y]) == 0) {
+          s(source, y) += s(source, x);
+        } else {
+          s(source, y) += s(source, x);
+        }
+        if(!igraph_2wbheap_has_elem(&queue, y)) {
+          igraph_2wbheap_push_with_index(&queue, y, (int)d(source, y));
+        } else if(cmp((int)d(source, y), igraph_2wbheap_get(&queue, y)) < 0) {
+          igraph_2wbheap_modify(&queue, y, (int)d(source, y));
+        }
+      } // end if(d_sx+l_xy == d_sy)
+    } // end for all y in neighbors
+  } /* !igraph_2wheap_empty(&Q) */
+  printf("\n");
+
+  igraph_vector_destroy(d_old);
+  igraph_vector_int_destroy(&s_old);
+  igraph_vector_bool_destroy(&pushed);
+
+  igraph_vector_int_destroy(&targets);
+  igraph_vector_bool_destroy(&is_affected);
+  igraph_2wbheap_destroy(&queue);
+
+#undef EPS
+#undef cmp
+#undef d
+#undef s
+}
+
+void update_stsp_dec_unweighted(igraph_t* G,
+                                igraph_inclist_t* preds,
+                                igraph_inclist_t* succs,
+                                igraph_matrix_t* D,
+                                igraph_matrix_int_t* S,
+                                igraph_integer_t u,
+                                igraph_integer_t v,
+                                igraph_integer_t target) {
+
+}
+
 void affected_targets_dec(igraph_t* G,
                           igraph_inclist_t* inclist,
                           igraph_vector_int_t* out,
@@ -200,14 +332,14 @@ void affected_targets_dec(igraph_t* G,
     return;
   }
   igraph_vector_bool_t visited;
-  igraph_stack_int_t stack;
+  igraph_dqueue_int_t queue;
   igraph_vector_bool_init(&visited, igraph_vcount(G));
-  igraph_stack_int_init(&stack, 0);
+  igraph_dqueue_int_init(&queue, 0);
   igraph_vector_bool_set(&visited, v, 1);
-  igraph_stack_int_push(&stack, v);
+  igraph_dqueue_int_push(&queue, v);
 
-  while(!igraph_stack_int_empty(&stack)) {
-    igraph_integer_t x = igraph_stack_int_pop(&stack);
+  while(!igraph_dqueue_int_empty(&queue)) {
+    igraph_integer_t x = igraph_dqueue_int_pop(&queue);
     igraph_vector_int_push_back(out, x);
     igraph_vector_int_t* neis = igraph_inclist_get(inclist, x);
     for(igraph_integer_t ni = 0; ni < igraph_vector_int_size(neis); ni++) {
@@ -217,13 +349,13 @@ void affected_targets_dec(igraph_t* G,
       igraph_real_t d_sy_p = d(source, x) + l(eid);
       if(cmp(d_sy, d_sy_p) == 0 && !igraph_vector_bool_e(&visited, y)) {
         igraph_vector_bool_set(&visited, y, 1);
-        igraph_stack_int_push(&stack, y);
+        igraph_dqueue_int_push(&queue, y);
       }
     }
   }
 
   igraph_vector_bool_destroy(&visited);
-  igraph_stack_int_destroy(&stack);
+  igraph_dqueue_int_destroy(&queue);
 
 #undef EPS
 #undef cmp
@@ -254,14 +386,14 @@ void affected_sources_dec(igraph_t* G,
     return;
   }
   igraph_vector_bool_t visited;
-  igraph_stack_int_t stack;
+  igraph_dqueue_int_t queue;
   igraph_vector_bool_init(&visited, igraph_vcount(G));
-  igraph_stack_int_init(&stack, 0);
+  igraph_dqueue_int_init(&queue, 0);
   igraph_vector_bool_set(&visited, u, 1);
-  igraph_stack_int_push(&stack, u);
+  igraph_dqueue_int_push(&queue, u);
 
-  while(!igraph_stack_int_empty(&stack)) {
-    igraph_integer_t x = igraph_stack_int_pop(&stack);
+  while(!igraph_dqueue_int_empty(&queue)) {
+    igraph_integer_t x = igraph_dqueue_int_pop(&queue);
     igraph_vector_int_push_back(out, x);
     igraph_vector_int_t* neis = igraph_inclist_get(inclist, x);
     for(igraph_integer_t ni = 0; ni < igraph_vector_int_size(neis); ni++) {
@@ -271,13 +403,13 @@ void affected_sources_dec(igraph_t* G,
       igraph_real_t d_sy_p = l(eid) + d(x, target);
       if(cmp(d_sy, d_sy_p) == 0 && !igraph_vector_bool_e(&visited, y)) {
         igraph_vector_bool_set(&visited, y, 1);
-        igraph_stack_int_push(&stack, y);
+        igraph_dqueue_int_push(&queue, y);
       }
     }
   }
 
   igraph_vector_bool_destroy(&visited);
-  igraph_stack_int_destroy(&stack);
+  igraph_dqueue_int_destroy(&queue);
 
 #undef EPS
 #undef cmp
