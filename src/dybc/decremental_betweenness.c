@@ -205,17 +205,11 @@ void update_sssp_dec_unweighted(igraph_t* G,
   for(long int xi = 0; xi < igraph_vector_int_size(&targets); xi++)
     VECTOR(is_affected)[VECTOR(targets)[xi]] = 1;
 
-  igraph_vector_t d_old;
-  igraph_vector_int_t s_old;
   igraph_2wbheap_t queue;
-  igraph_vector_bool_t pushed;
-  igraph_vector_init(&d_old, igraph_vcount(G));
-  igraph_vector_int_init(&s_old, igraph_vcount(G));
   igraph_2wbheap_init(&queue, igraph_vcount(G), igraph_vcount(G));
-  igraph_vector_bool_init(&pushed, igraph_vcount(G));
   for(long int xi = 0; xi < igraph_vector_int_size(&targets); xi++) {
     igraph_integer_t x = VECTOR(targets)[xi];
-    igraph_vector_int_t* ys = igraph_inclist_get(succs, x);
+    igraph_vector_int_t* ys = igraph_inclist_get(preds, x);
     igraph_real_t d_hat = IGRAPH_INFINITY;
     igraph_real_t s_hat = 0;
     for(long int yi = 0; yi < igraph_vector_int_size(ys); yi++) {
@@ -229,25 +223,19 @@ void update_sssp_dec_unweighted(igraph_t* G,
       if(cmp(d(source, y) + 1.0, d_hat) == 0)
         s_hat += s(source, y);
     } // end for each y in neighbor of x
-    VECTOR(d_old)[x] = d(source, x);
-    VECTOR(s_old)[x] = s(source, x);
     d(source, x) = d_hat;
     s(source, x) = s_hat;
-    if(!igraph_is_inf(d_hat)) {
+    if(!igraph_is_inf(d_hat))
       igraph_2wbheap_push_with_index(&queue, x, (int)d(source, x));
-      VECTOR(pushed)[x] = 1;
-    }
   } // end for each affected target x
   for(long int xi = 0; xi < igraph_vector_int_size(&targets); xi++)
     if(!igraph_is_inf(d(source, VECTOR(targets)[xi])))
       VECTOR(is_affected)[VECTOR(targets)[xi]] = 0;
 
-  printf("--- %d --- pop order: ", source);
   while(!igraph_2wbheap_empty(&queue)) {
     long int x = igraph_2wbheap_min_index(&queue);
     igraph_2wbheap_delete_min(&queue);
     VECTOR(is_affected)[x] = 0;
-    printf("(%d, %d), ", x, (int)d(source, x));
 
     igraph_vector_int_t* neis = igraph_inclist_get(succs, x);
     long int nneis = igraph_vector_int_size(neis);
@@ -255,10 +243,6 @@ void update_sssp_dec_unweighted(igraph_t* G,
       igraph_integer_t eid = VECTOR(*neis)[ni];
       igraph_integer_t y = IGRAPH_OTHER(G, eid, x);
 
-      if(VECTOR(d_old)[y] == 0.) {
-        VECTOR(d_old)[y] = d(source, y);
-        VECTOR(s_old)[y] = s(source, y);
-      }
       if(cmp(d(source, x) + 1.0, d(source, y)) < 0) {
         d(source, y) = d(source, x) + 1.0;
         s(source, y) = s(source, x);
@@ -268,25 +252,10 @@ void update_sssp_dec_unweighted(igraph_t* G,
           igraph_2wbheap_modify(&queue, y, (int)d(source, y));
         }
       } else if(cmp(d(source, x) + 1.0, d(source, y)) == 0) {
-        if(cmp(VECTOR(d_old)[y], d(source, y)) == 0
-           && cmp(VECTOR(d_old)[x] + 1.0, VECTOR(d_old)[y]) == 0) {
-          s(source, y) += s(source, x);
-        } else {
-          s(source, y) += s(source, x);
-        }
-        if(!igraph_2wbheap_has_elem(&queue, y)) {
-          igraph_2wbheap_push_with_index(&queue, y, (int)d(source, y));
-        } else if(cmp((int)d(source, y), igraph_2wbheap_get(&queue, y)) < 0) {
-          igraph_2wbheap_modify(&queue, y, (int)d(source, y));
-        }
+        s(source, y) += s(source, x);
       } // end if(d_sx+l_xy == d_sy)
     } // end for all y in neighbors
   } /* !igraph_2wheap_empty(&Q) */
-  printf("\n");
-
-  igraph_vector_destroy(d_old);
-  igraph_vector_int_destroy(&s_old);
-  igraph_vector_bool_destroy(&pushed);
 
   igraph_vector_int_destroy(&targets);
   igraph_vector_bool_destroy(&is_affected);
@@ -306,7 +275,85 @@ void update_stsp_dec_unweighted(igraph_t* G,
                                 igraph_integer_t u,
                                 igraph_integer_t v,
                                 igraph_integer_t target) {
+#define EPS IGRAPH_SHORTEST_PATH_EPSILON
+#define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
+#define d(a, b) (MATRIX(*D, (a), (b)))
+#define s(a, b) (MATRIX(*S, (a), (b)))
 
+  if(igraph_is_inf(d(u, target))
+     || cmp(d(v, target), d(u, target) + 1.0) < 0) {
+    return;
+  }
+
+  // find affected sources
+  igraph_vector_int_t sources;
+  igraph_vector_bool_t is_affected;
+  igraph_vector_int_init(&sources, 0);
+  igraph_vector_bool_init(&is_affected, igraph_vcount(G));
+  affected_sources_dec(G, preds, &sources, D, u, v, target, NULL, 0);
+  for(long int xi = 0; xi < igraph_vector_int_size(&sources); xi++)
+    VECTOR(is_affected)[VECTOR(sources)[xi]] = 1;
+
+  igraph_2wbheap_t queue;
+  igraph_2wbheap_init(&queue, igraph_vcount(G), igraph_vcount(G));
+  for(long int xi = 0; xi < igraph_vector_int_size(&sources); xi++) {
+    igraph_integer_t x = VECTOR(sources)[xi];
+    igraph_vector_int_t* ys = igraph_inclist_get(succs, x);
+    igraph_real_t d_hat = IGRAPH_INFINITY;
+    igraph_real_t s_hat = 0;
+    for(long int yi = 0; yi < igraph_vector_int_size(ys); yi++) {
+      igraph_integer_t eid = igraph_vector_int_e(ys, yi);
+      igraph_integer_t y = IGRAPH_OTHER(G, eid, x);
+      if(VECTOR(is_affected)[y]) continue;
+      if(cmp(1.0 + d(y, target), d_hat) < 0) {
+        d_hat = 1.0 + d(y, target);
+        s_hat = 0;
+      }
+      if(cmp(1.0 + d(y, target), d_hat) == 0)
+        s_hat += s(y, target);
+    } // end for each y in neighbor of x
+    d(x, target) = d_hat;
+    s(x, target) = s_hat;
+    if(!igraph_is_inf(d_hat))
+      igraph_2wbheap_push_with_index(&queue, x, (int)d(x, target));
+  } // end for each affected target x
+  for(long int xi = 0; xi < igraph_vector_int_size(&sources); xi++)
+    if(!igraph_is_inf(d(VECTOR(sources)[xi], target)))
+      VECTOR(is_affected)[VECTOR(sources)[xi]] = 0;
+
+  while(!igraph_2wbheap_empty(&queue)) {
+    long int x = igraph_2wbheap_min_index(&queue);
+    igraph_2wbheap_delete_min(&queue);
+    VECTOR(is_affected)[x] = 0;
+
+    igraph_vector_int_t* neis = igraph_inclist_get(preds, x);
+    long int nneis = igraph_vector_int_size(neis);
+    for(long int ni = 0; ni < nneis; ni++) {
+      igraph_integer_t eid = VECTOR(*neis)[ni];
+      igraph_integer_t y = IGRAPH_OTHER(G, eid, x);
+
+      if(cmp(1.0 + d(x, target), d(y, target)) < 0) {
+        d(y, target) = 1.0 + d(x, target);
+        s(y, target) = s(x, target);
+        if(!igraph_2wbheap_has_elem(&queue, y)) {
+          igraph_2wbheap_push_with_index(&queue, y, (int)d(y, target));
+        } else if(cmp((int)d(y, target), igraph_2wbheap_get(&queue, y)) < 0) {
+          igraph_2wbheap_modify(&queue, y, (int)d(y, target));
+        }
+      } else if(cmp(1.0 + d(x, target), d(y, target)) == 0) {
+        s(y, target) += s(x, target);
+      } // end if(d_sx+l_xy == d_sy)
+    } // end for all y in neighbors
+  } /* !igraph_2wheap_empty(&Q) */
+
+  igraph_vector_int_destroy(&sources);
+  igraph_vector_bool_destroy(&is_affected);
+  igraph_2wbheap_destroy(&queue);
+
+#undef EPS
+#undef cmp
+#undef d
+#undef s
 }
 
 void affected_targets_dec(igraph_t* G,

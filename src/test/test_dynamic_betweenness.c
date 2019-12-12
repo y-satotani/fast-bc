@@ -55,10 +55,10 @@ int main(int argc, char* argv[]) {
   //  test_repeat_directed(seed, 100);
   //for(unsigned int seed = 0; seed < 100; seed++)
   //  test_inc_unweighted(seed);
-  for(unsigned int seed = 0; seed < 10000; seed++)
-    test_dec_unweighted(seed);
   //for(unsigned int seed = 0; seed < 100; seed++)
-  //  test_inc_unweighted_directed(seed);
+  //  test_dec_unweighted(seed);
+  //for(unsigned int seed = 0; seed < 10000; seed++)
+  // test_dec_unweighted_directed(seed);
   return 0;
 }
 
@@ -531,13 +531,6 @@ int test_dec_unweighted(unsigned long int seed) {
   weight = igraph_vector_e(&weights, eid);
   _DYBC_TEST_INIT_;
 
-  for(int i = 0; i < igraph_ecount(&G); i++) {
-    int x, y;
-    igraph_edge(&G, i, &x, &y);
-    printf("%d %d\n", x, y);
-  }
-  printf("%d %d\n", u, v);
-
   _decremental_update_unweighted(&G, &D, &S, &B, u, v);
   igraph_vector_pop_back(&weights);
   char test_name[1024];
@@ -555,19 +548,24 @@ int test_dec_unweighted_directed(unsigned long int seed) {
   igraph_erdos_renyi_game(&G, IGRAPH_ERDOS_RENYI_GNM, 100, 400, 0, 0);
   // set weights
   igraph_vector_init(&weights, igraph_ecount(&G));
-  for(igraph_integer_t eid = 0; eid < igraph_ecount(&G); eid++) {
-    weight = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
-    igraph_vector_set(&weights, eid, weight);
-  }
+  igraph_vector_fill(&weights, 1.0);
   // select endpoints to delete
   igraph_integer_t eid = igraph_rng_get_integer
     (igraph_rng_default(), 0, igraph_ecount(&G)-1);
   igraph_edge(&G, eid, &u, &v);
   weight = igraph_vector_e(&weights, eid);
   _DYBC_TEST_INIT_;
+  /*
+    for(int i = 0; i < igraph_ecount(&G); i++) {
+    int x, y;
+    igraph_edge(&G, i, &x, &y);
+    printf("%d %d\n", x, y);
+    }
+    printf("%d %d\n", u, v);
+  */
 
   _decremental_update_unweighted(&G, &D, &S, &B, u, v);
-  igraph_vector_push_back(&weights, weight);
+  igraph_vector_pop_back(&weights);
   char test_name[1024];
   sprintf(test_name, "test_dec_unweighted_directed (%lu)", seed);
   int res = _check_quantities(test_name, &G, &D, &S, &B, &weights, 0);
