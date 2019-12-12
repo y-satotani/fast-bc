@@ -1,7 +1,16 @@
 Import('env')
-src = [
-    'test_static_betweenness.c',
-    'test_dynamic_betweenness.c'
+src_exe = [
+    'test_static.c',
+    'test_mini.c',
+    'test_unweighted.c',
+    'test_weighted.c',
+    'test_components.c',
+    'test_repeat.c',
 ]
-prog = [env.Program(s) for s in src]
+src_lib = [
+    'dybc_test_common.c',
+    'minigraph.c',
+]
+#print([str(s) for s in Glob('test_*.c')])
+prog = [env.Program([s]+src_lib) for s in src_exe]
 Return('prog')

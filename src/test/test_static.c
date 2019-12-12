@@ -4,15 +4,10 @@
 #include <assert.h>
 #include <igraph/igraph.h>
 
-#include "dybc/aug_dist.h"
 #include "dybc/static_betweenness.h"
 #include "minigraph.h"
 
-int check_pairwise_dependency_of_minigraph(igraph_matrix_t*);
-
 int main(int argc, char* argv[]) {
-  igraph_i_set_attribute_table(&igraph_cattribute_table);
-
   igraph_t G;
   igraph_vector_t weight;
   make_test_graph(&G, &weight);
