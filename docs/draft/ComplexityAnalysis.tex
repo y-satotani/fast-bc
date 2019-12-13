@@ -1,246 +1,200 @@
 \chapter{計算量の解析}
 \label{chap:complexity-analysis}
 
-以下の議論に必要な記号を定義する．
+本章では，前の章で示したアルゴリズムの計算量を与える．
+まず，以下の議論のためにいくつかの記号を導入しておく．
+$\tau(s)$および$\tau'(s)$は，それぞれ$T(s)$と$\Delta_{s\bullet}(x)>0$
+および$\Delta'_{s\bullet}(x)>0$を満たす頂点の和集合である．つまり，
+$\tau(s)=T(s)\cup\{x|\Delta_{s\bullet}(x)>0\}$,
+$\tau'(s)=T(s)\cup\{x|\Delta'_{s\bullet}(x)>0\}$とする．
+また，頂点集合$V$について$\left\vert V\right\vert$を$V$の要素数，
+$\left\Vert V\right\Vert$を$V$の各頂点と接続する辺の数とする．
 
-\begin{definition}
-  ある頂点$z$についてペア依存度$\delta_z(x)$を更新した頂点$x$の数，
-  すなわち，補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}の
-  \ref{item:implicit-invariability-of-pairwise-dependency-2}が成り立たない頂点の集合を
-  $V_\delta(z)$とする．また，$V_\delta(z)$に属する頂点と接する辺の集合を$E_\delta(z)$とする．
-  すなわち，
-  \begin{equation*}
-    \begin{aligned}
-      V_\delta(z)&=\{x|x\in V,\exists w\in\mathcal{N}_G(x),
-      x\in\mathcal{S}_{G_z}(w)\veebar x\in\mathcal{S}_{G'_z}(w)\}\\
-      E_\delta(z)&=\{(x,y)|(x,y)\in E,\,x\in V_\delta(z)\lor y\in V_\delta(z)\}.
-    \end{aligned}
-  \end{equation*}
+次の定理は，最短経路の更新の前後に行われる媒介中心性の更新の計算量を示す．
+まず，古い最短経路に関する依存度を減算するアルゴリズムの計算量を示す．
 
-  同様に，アルゴリズムによって距離または最短経路数を更新した頂点の集合を$V_{\delta'}(z)$，
-  $V_{\delta'}(z)$に属する頂点と接続する辺の集合を$E_{\delta'}(z)$とする．すなわち，
-  \begin{equation*}
-    \begin{aligned}
-      V_{\delta'}(z)&=\{x|\:E_{xz}\neq E'_{xz}\} \\
-      E_{\delta'}(z)&=\{\{x,y\}|x\in V_{\delta'}(z)\lor y\in V_{\delta'}(z)\}
-    \end{aligned}
-  \end{equation*}
-
-  最後に，媒介中心性を更新した頂点の集合およびその要素と接続する辺の集合を
-  \begin{equation*}
-    \begin{aligned}
-      V_\delta&=\{x|\exists z,\,x\in V_delta(z)\} \\
-      E_\delta&=\{\{x,y\}|x\in V_\delta\lor y\in V_\delta\}
-    \end{aligned}
-  \end{equation*}
-  とする．
-\end{definition}
-
-実際に媒介中心性が変化した頂点の数と$\lvert V_\delta\rvert$の関係について，一般的な議論は難しい．
-
-\begin{example}
-  図\ref{fig:bc-many-phony}のグラフにおいて，辺$\{V,W\}$を削除したときにアルゴリズムが
-  ペア依存度を更新する頂点の数は$\lvert V_\delta\rvert\sim \lvert V\rvert$であるが，
-  実際に媒介中心性が変化する頂点は$T,U,V,W$の$4$個である．
-
-  \begin{figure}[tb]
-    \centering
-    \def\svgwidth{.8\linewidth}
-    \input{bc-many-phony.pdf_tex}
-    \caption{媒介中心性が変化しない頂点を多く更新する例}
-    \label{fig:bc-many-phony}
-  \end{figure}
-\end{example}
-
-\section{挿入時の計算量の解析}
-\label{subsect:computational-complexity-of-incremental-algorithm}
-
-\begin{lemma}
-  アルゴリズム\ref{algo:incremental-algorithm}の\textproc{Incremental}の時間計算量は，
-  \[ \mathcal{O}(\lvert V_\delta\rvert\lvert E_\delta\rvert
-  +\lvert V_\delta\rvert^2\log \lvert V_\delta\rvert) \]
-  である．
-\end{lemma}
+\begin{theorem}[Bergamini et.al.\cite{Bergamini2017}]
+  \label{thm:decrease-betweenness-weight-complexity}
+  アルゴリズム\ref{alg:update-betweenness}の\textproc{DecreaseBetweenness}の，
+  重み付きグラフと重みなしグラフに対する計算量は，それぞれ次式で与えられる．
+  \begin{align}
+    &\mathcal{O}(\sum_{s\in S(v)}\left(\left\|\tau(s)\right\|+\left|\tau(s)\right|\log\left|\tau(s)\right|\right))
+    \label{eq:decrease-betweenness-weighted-complexity} \\
+    &\mathcal{O}(\sum_{s\in S(v)}\left\|\tau(s)\right\|)
+    \label{eq:decrease-betweenness-unweighted-complexity}
+  \end{align}
+\end{theorem}
 \begin{proof}
-  アルゴリズム\ref{algo:incremental-algorithm}の\textproc{IncrementalPart}は
-  以下の手順で構成される．
-  \begin{enumerate}[label=(\alph*)]
-  \item 距離と経路数の更新
-  \item ペア依存度の更新
-  \end{enumerate}
-  それぞれの手順について，時間計算量を求める．
-  その後，アルゴリズムの全体である\textproc{Incremental}の時間計算量を求める．
-  以下，\textproc{IncrementalPart}で注目している頂点を$z$とする．
+  まず，アルゴリズム\ref{alg:update-betweenness}の8行目から27行目の部分に相当する，
+  与えられた$s$に対する$\Delta_{s\bullet}(x)$を求めるアルゴリズムの計算量を示す．
+  優先度付きキューとして，重み付きグラフでは二分ヒープを，重みなしグラフでは
+  基数ヒープを用いると仮定する．
+  すると，12行目の取り出しの操作はそれぞれ対数時間と定数時間で実行でき，
+  14行目から26行目で取り出された要素の近傍を走査する．
+  残りは優先度付きキューから取り出された要素の数が$|\tau(s)|$と一致することを示す．
+  10行目で\texttt{PQ}には$|T(s)|$個の要素が入っている．
+  また，24行で\texttt{PQ}に追加される要素は，$s$と$T(s)$のひとつの頂点との間の最短経路の上にある．
+  これは，少なくとも一つの$t\in T(s)$が，$\sigma_{st}(y)>0$であることを示し，
+  $\Delta_{s\bullet}(y)>0$が成り立つ．したがって，\texttt{PQ}に追加される要素は
+  $T(s)\cup\{x|\Delta_{s\bullet}(x)>0\}=\tau(s)$である．
+  したがって，アルゴリズムの8行目から27行目の部分に相当する部分の計算量は，
+  重みグラフに対して$\mathcal{O}(\|\tau(s)\|+|\tau(s)|\log|\tau(s)|)$
+  で，重みなしグラフに対して$\mathcal{O}(\|\tau(s)\|)$である．
 
-  \begin{enumerate}[label=(\alph*)]
-  \item 距離と経路数の更新
-    \par $x\in V_{\delta'}(z)$について，
-    \begin{enumerate}[label=\arabic*.]
-    \item $y\in\mathcal{N}_{G'}(x)$を走査する
-    \item 順位キューに追加されている
-    \end{enumerate}
-    ので，$z$を固定したとき，距離と最短経路数の更新に必要な時間計算量は，
-    \begin{equation}
-      \begin{aligned}
-        &\mathcal{O}(\sum_{x\in V_{\delta'}(z)}(\lvert\mathcal{N}_G(x)\rvert
-        +\log\lvert V_{\delta'}(z)\rvert)) \nonumber\\
-        &\:=\mathcal{O}(\lvert E_{\delta'}(z)\rvert
-        +\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert) \nonumber
-      \end{aligned}
-    \end{equation}
-    である．
-
-  \item ペア依存度の更新
-    \par $x\in V_\delta(z)$について，
-    \begin{enumerate}[label=\arabic*.]
-    \item $y\in\mathcal{N}_{G'}(x)$を走査する
-    \item 順位キューに追加されている
-    \end{enumerate}
-    ので，$z$を固定したとき，ペア依存度の更新に必要な時間計算量は，
-    \begin{equation}
-      \begin{aligned}
-        &\mathcal{O}(\sum_{x\in V_\delta(z)}(\lvert\mathcal{N}_G(x)\rvert
-        +\log\lvert V_\delta(z)\rvert)) \nonumber\\
-        &\:=\mathcal{O}(\lvert E_\delta(z)\rvert
-        +\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert) \nonumber
-      \end{aligned}
-    \end{equation}
-    である．
-  \end{enumerate}
-  
-  補題\ref{lemma:condition-of-invariability-of-pairwise-dependency}と
-  補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}より
-  $V_\delta(z)\supset V_{\delta'}(z)$なので，\textproc{IncrementalPart}全体の計算量は
-  \begin{equation*}
-    \begin{aligned}
-      &\mathcal{O}(
-        \lvert E_{\delta'}(z)\rvert+\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert
-        +\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert
-      ) \nonumber\\
-      &\:=\mathcal{O}(\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert)
-    \end{aligned}
-  \end{equation*}
-  である．
-
-  \textproc{Incremental}は\textproc{IncrementalPart}を$\lvert V\rvert$回繰り返すが，
-  更新が起こらない場合，つまり$z\notin V_\delta$が成り立つ場合の時間計算量は，
-  最初の判定のみであるため，$\mathcal{O}(1)$である．したがって，\textproc{Incremental}の時間計算量は
-  \begin{equation*}
-    \begin{aligned}
-      &\mathcal{O}(
-      \sum_{z\in V_\delta}(\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert)
-      +\sum_{z\notin V_\delta}1) \nonumber\\
-      &=\:\mathcal{O}(\sum_{z\in V_\delta}(\lvert E_\delta\rvert
-      +\lvert V_\delta\rvert\log\lvert V_\delta\rvert))\nonumber\\
-      &\:=\mathcal{O}(\lvert V_\delta\rvert\lvert E_\delta\rvert
-      +\lvert V_\delta\rvert^2\log\lvert V_\delta\rvert) \nonumber\\
-    \end{aligned}
-  \end{equation*}
-  である．
+  $s\in S(v)$についての総和をとって，\textproc{DecreaseBetweenness}全体の計算量を求めると，
+  それぞれ式\eqref{eq:decrease-betweenness-weighted-complexity}と
+  式\eqref{eq:decrease-betweenness-unweighted-complexity}になる．
 \end{proof}
 
-\section{削除時の計算量の解析}
-\label{subsect:computational-complexity-of-decremental-algorithm}
+次に，最短経路の更新の後に行う，新たに追加された最短経路に関する各頂点の依存度を求めるアルゴリズムの
+計算量を求める．
 
-\begin{lemma}
-  アルゴリズム\ref{algo:decremental-algorithm}の\textproc{Decremental}の時間計算量は，
-  \[ \mathcal{O}(\lvert V_\delta\rvert\lvert E_\delta\rvert
-  +\lvert V_\delta\rvert^2\log \lvert V_\delta\rvert) \]
-  である．
-\end{lemma}
+\begin{theorem}[Bergamini et.al.\cite{Bergamini2017}]
+  \label{thm:increase-betweenness-weight-complexity}
+  アルゴリズム\ref{alg:update-betweenness}の\textproc{IncreaseBetweenness}の
+  重み付きグラフと重みなしグラフに対する計算量は，それぞれ次式で与えられる．
+  \begin{align}
+    &\mathcal{O}(\sum_{s\in S(v)}(\|\tau'(s)\|+|\tau'(s)|\log|\tau'(s)|))
+    \label{eq:increase-betweenness-weighted-complexity} \\
+    &\mathcal{O}(\sum_{s\in S(v)}\|\tau'(s)\|)
+    \label{eq:increase-betweenness-unweighted-complexity}
+  \end{align}
+\end{theorem}
 \begin{proof}
-  アルゴリズム\ref{algo:decremental-algorithm}の\textproc{DecrementalPart}は
-  以下の手順で構成される．
-  \begin{enumerate}[label=(\alph*)]
-  \item 距離と経路数を更新する頂点の探索
-  \item 距離と経路数の更新
-  \item ペア依存度の更新
-  \end{enumerate}
-  それぞれの手順について，時間計算量を求める．
-  その後，アルゴリズムの全体である\textproc{Decremental}の時間計算量を求める．
-  以下，\textproc{DecrementalPart}で注目している頂点を$z$とする．
+  定理\ref{thm:decrease-betweenness-weight-complexity}と同じ要領で示すことができる．
+  まず，アルゴリズム\ref{alg:update-betweenness}の8行目から27行目の部分に相当する，
+  与えられた$s$に対する$\Delta'_{s\bullet}(x)$を求めるアルゴリズムの計算量を示す．
 
-  \begin{enumerate}[label=(\alph*)]
-  \item 距離と経路数を更新する頂点の探索
-    \par $x\in V_{\delta'}(z)$について，
-    \begin{enumerate}[label=\arabic*.]
-    \item $y\in\mathcal{N}_{G'}(x)$を走査する
-    \item 集合$\text{WorkSet}$に追加されている
-    \end{enumerate}
-    ので，$z$を固定したとき，距離と最短経路数を更新する頂点の探索に必要な時間計算量は，
-    \begin{equation}
-      \begin{aligned}
-        &\mathcal{O}(\sum_{x\in V_{\delta'}(z)}(\lvert\mathcal{N}_G(x)\rvert
-        +\log\lvert V_{\delta'}(z)\rvert)) \nonumber\\
-        &\:=\mathcal{O}(\lvert E_{\delta'}(z)\rvert
-        +\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert) \nonumber
-      \end{aligned}
-    \end{equation}
-    である．
+  12行目の取り出しの操作はそれぞれ対数時間と定数時間で実行でき，
+  14行目から26行目で取り出された要素の近傍を走査する．
+  残りは優先度付きキューから取り出された要素の数が$|\tau'(s)|$と一致することを示す．
+  10行目で\texttt{PQ}には$|T(s)|$個の要素が入っている．
+  また，24行で\texttt{PQ}に追加される要素は，$s$と$T(s)$のひとつの頂点との間の最短経路の上にある．
+  これは，少なくとも一つの$t\in T(s)$が，$\sigma'_{st}(y)>0$であることを示し，
+  $\Delta'_{s\bullet}(y)>0$が成り立つ．したがって，\texttt{PQ}に追加される要素は
+  $T(s)\cup\{x|\Delta'_{s\bullet}(x)>0\}=\tau'(s)$である．
+  したがって，アルゴリズムの8行目から27行目の部分に相当する部分の計算量は，
+  重みグラフに対して$\mathcal{O}(\|\tau'(s)\|+|\tau'(s)|\log|\tau'(s)|)$
+  で，重みなしグラフに対して$\mathcal{O}(\|\tau'(s)\|)$である．
 
-  \item 距離と経路数の更新
-    \par $x\in V_{\delta'}(z)$について，
-    \begin{enumerate}[label=\arabic*.]
-    \item $y\in\mathcal{N}_{G'}(x)$を走査する
-    \item 順位キューに追加されている
-    \end{enumerate}
-    ので，$z$を固定したとき，距離と最短経路数の更新に必要な時間計算量は，
-    \begin{equation}
-      \begin{aligned}
-        &\mathcal{O}(\sum_{x\in V_{\delta'}(z)}(\lvert\mathcal{N}_G(x)\rvert
-        +\log\lvert V_{\delta'}(z)\rvert)) \nonumber\\
-        &\:=\mathcal{O}(\lvert E_{\delta'}(z)\rvert
-        +\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert) \nonumber
-      \end{aligned}
-    \end{equation}
-    である．
+  $s\in S(v)$についての総和をとって，\textproc{IncreaseBetweenness}全体の計算量を求めると，
+  それぞれ式\eqref{eq:increase-betweenness-weighted-complexity}と
+  式\eqref{eq:increase-betweenness-unweighted-complexity}になる．
 
-  \item ペア依存度の更新
-    \par $x\in V_\delta(z)$について，
-    \begin{enumerate}[label=\arabic*.]
-    \item $y\in\mathcal{N}_{G'}(x)$を走査する
-    \item 順位キューに追加されている
-    \end{enumerate}
-    ので，$z$を固定したとき，ペア依存度の更新に必要な時間計算量は，
-    \begin{equation}
-      \begin{aligned}
-        &\mathcal{O}(\sum_{x\in V_\delta(z)}(\lvert\mathcal{N}_G(x)\rvert
-        +\log\lvert V_\delta(z)\rvert)) \nonumber\\
-        &\:=\mathcal{O}(\lvert E_\delta(z)\rvert
-        +\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert) \nonumber
-      \end{aligned}
-    \end{equation}
-    である．
-  \end{enumerate}
-  
-  補題\ref{lemma:condition-of-invariability-of-pairwise-dependency}と
-  補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}より
-  $V_\delta(z)\supset V_{\delta'}(z)$なので，\textproc{DecrementalPart}全体の計算量は
-  \begin{equation*}
-    \begin{aligned}
-      &\mathcal{O}(
-        \lvert E_{\delta'}(z)\rvert+\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert
-        +\lvert E_{\delta'}(z)\rvert+\lvert V_{\delta'}(z)\rvert\log\lvert V_{\delta'}(z)\rvert
-        +\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert
-      ) \nonumber\\
-      &\:=\mathcal{O}(\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert)
-    \end{aligned}
-  \end{equation*}
-  である．
-
-  \textproc{Decremental}は\textproc{DecrementalPart}を$\lvert V\rvert$回繰り返すが，
-  更新が起こらない場合，つまり$z\notin V_\delta$が成り立つ場合の時間計算量は，
-  最初の判定のみであるため，$\mathcal{O}(1)$である．したがって，\textproc{Decremental}の時間計算量は
-  \begin{equation*}
-    \begin{aligned}
-      &\mathcal{O}(
-      \sum_{z\in V_\delta}(\lvert E_\delta(z)\rvert+\lvert V_\delta(z)\rvert\log\lvert V_\delta(z)\rvert)
-      +\sum_{z\notin V_\delta}1) \nonumber\\
-      &=\:\mathcal{O}(\sum_{z\in V_\delta}(\lvert E_\delta\rvert
-      +\lvert V_\delta\rvert\log\lvert V_\delta\rvert))\nonumber\\
-      &\:=\mathcal{O}(\lvert V_\delta\rvert\lvert E_\delta\rvert
-      +\lvert V_\delta\rvert^2\log\lvert V_\delta\rvert) \nonumber\\
-    \end{aligned}
-  \end{equation*}
-  である．
 \end{proof}
+
+次の定理は，最短経路更新アルゴリズムの計算量を示す．
+まず，辺挿入時の最短経路変更アルゴリズムの計算量を示す．
+
+\begin{theorem}
+  \label{thm:incremental-shortest-path-update}
+  アルゴリズム\ref{alg:incremental-algorithm}の\textproc{UpdateShortestPath}の
+  重み付きグラフと重みなしグラフに対する計算量はそれぞれ次式で与えられる．
+  \begin{align}
+    &\mathcal{O}(\sum_{s\in S(v)}(\|T(s)\|\log|T(s)|)+\sum_{t\in T(u)}(\|S(t)\|\log|S(t)|))
+    \label{eq:incremental-shortest-path-update-weighted} \\
+    &\mathcal{O}(\sum_{s\in S(v)}\|T(s)\|+\sum_{t\in T(u)}\|S(t)\|)
+    \label{eq:incremental-shortest-path-update-unweighted}
+  \end{align}
+\end{theorem}
+\begin{proof}
+  式\eqref{eq:incremental-shortest-path-update-weighted}のみについて示す．
+  式\eqref{eq:incremental-shortest-path-update-unweighted}については，
+  式\eqref{eq:incremental-shortest-path-update-weighted}と同じ要領で示すことができる．
+
+  まず，アルゴリズム\ref{alg:incremental-algorithm}の\textproc{UpdatePart}に，
+  ある$t$が与えられたときの計算量を導出する．
+  16行目から26行目のループで，20行目および21行目で優先度つきキューから取り出された
+  要素の近傍を走査している．さらに，23行で優先度付きキューに要素を追加している．
+  そして22行目の条件から，このループは$s\in S(t)$に対して繰り返される．
+  以上から，アルゴリズム\ref{alg:incremental-algorithm}の\textproc{UpdatePart}に，
+  ある$t$が与えられたときの計算量は，
+  \begin{equation*}
+    \begin{aligned}
+      \mathcal{O}(\sum_{s\in S(t)}(|(\mathcal{S}(s)|+|\mathcal{P}(s)|\log|S(t)|))
+      &=\mathcal{O}(\|S(t)\|+\|S(t)\|\log|S(t)|) \\
+      &=\mathcal{O}(\|S(t)\|\log|S(t)|)
+    \end{aligned}
+  \end{equation*}
+
+  \textproc{UpdateShortestPath}は，$S(v)$と$T(u)$を求め，\textproc{UpdatePart}を
+  $s\in S(v)$と$t\in T(u)$を対象として実行する．
+  したがって，\textproc{UpdateShortestPath}全体の計算量は
+  \textproc{UpdatePart}に渡すグラフの向きに注意して，
+  \begin{equation*}
+    \begin{aligned}
+      &\mathcal{O}(\|S(v)\|+\|T(u)\|+\sum_{s\in S(v)}(\|T(s)\|\log|T(s)|)+\sum_{t\in T(u)}(\|S(t)\|\log|S(t)|)) \\
+      &\:=\mathcal{O}(\sum_{s\in S(v)}(\|T(s)\|\log|T(s)|)+\sum_{t\in T(u)}(\|S(t)\|\log|S(t)|)).
+    \end{aligned}
+  \end{equation*}
+\end{proof}
+
+次に，辺挿削除時の最短経路変更アルゴリズムの計算量を示す．
+
+\begin{theorem}
+  \label{thm:decremental-shortest-path-update}
+  アルゴリズム\ref{alg:decremental-algorithm}の\textproc{UpdateShortestPath}の
+  重み付きグラフと重みなしグラフに対する計算量はそれぞれ次式で与えられる．
+  \begin{align}
+    &\mathcal{O}(\sum_{s\in S(v)}(\|T(s)\|\log|T(s)|)+\sum_{t\in T(u)}(\|S(t)\|\log|S(t)|))
+    \label{eq:decremental-shortest-path-update-weighted} \\
+    &\mathcal{O}(\sum_{s\in S(v)}\|T(s)\|+\sum_{t\in T(u)}\|S(t)\|)
+    \label{eq:decremental-shortest-path-update-unweighted}
+  \end{align}
+\end{theorem}
+\begin{proof}
+  式\eqref{eq:decremental-shortest-path-update-weighted}のみについて示す．
+  式\eqref{eq:decremental-shortest-path-update-unweighted}については，
+  式\eqref{eq:decremental-shortest-path-update-weighted}と同じ要領で示すことができる．
+
+  まず，アルゴリズム\ref{alg:decremental-algorithm}の\textproc{UpdatePart}に，
+  ある$t$が与えられたときの計算量を導出する．
+
+  $s\in S(t)$を16行目の条件に従って二つに分ける．つまり，
+  $\exists y|y\in\mathcal{S}(s)\land y\notin S(t)$と
+  $\forall y\in\mathcal{S}(s),\,y\in S(t)$に分ける．
+  16行目を満たす頂点$s\in S(t)$に対して，実行される処理は以下である．
+  16行目および17行目で$s$の後継を走査し，18行目で優先度付きキューに追加している．
+  また，25行目で$\sigma_{st}$を更新するために後継を走査して，
+  26行目から30行目のループで，$s$の先行を走査し，優先度付きキューに追加している．
+  これらから，16行目を満たす頂点$s\in S(t)$に対する\textproc{UpdatePart}
+  の計算量は，
+  $\mathcal{O}(|\mathcal{S}(s)|+|\mathcal{P}(s)|+|\mathcal{P}(s)|\log|S(t)|)$
+  である．
+
+  16行目を満たさない頂点$s\in S(t)$に対して実行される処理は，
+  16行目を満たす頂点に対して行われる実行から，18行目の優先度付きキュー
+  に追加する処理を除いたものである．
+  よって，16行目を満たさない頂点$s\in S(t)$に対して実行される処理の計算量は，
+  $\mathcal{O}(|\mathcal{S}(s)|+|\mathcal{P}(s)|+|\mathcal{P}(s)|\log|S(t)|)$
+  である．したがって，\textproc{UpdatePart}にある$t$が与えられたときの計算量は，
+  \begin{equation*}
+    \begin{aligned}
+      \mathcal{O}(\sum_{s\in S(t)}(|\mathcal{S}(s)|+|\mathcal{P}(s)|+|\mathcal{P}(s)|\log|S(t)|)
+      &=\mathcal{O}(\|S(t)\|+\|S(t)\|\log|S(t)|) \\
+      &=\mathcal{O}(\|S(t)\|\log|S(t)|)
+    \end{aligned}
+  \end{equation*}
+
+  挿入時と同様に，\textproc{UpdateShortestPath}は，$S(v)$と$T(u)$を求め，
+  \textproc{UpdatePart}を$s\in S(v)$と$t\in T(u)$を対象として実行する．
+  したがって，\textproc{UpdateShortestPath}全体の計算量は
+  \textproc{UpdatePart}に渡すグラフの向きに注意して，
+  \begin{equation*}
+    \begin{aligned}
+      &\mathcal{O}(\|S(v)\|+\|T(u)\|+\sum_{s\in S(v)}(\|T(s)\|\log|T(s)|)+\sum_{t\in T(u)}(\|S(t)\|\log|S(t)|)) \\
+      &\:=\mathcal{O}(\sum_{s\in S(v)}(\|T(s)\|\log|T(s)|)+\sum_{t\in T(u)}(\|S(t)\|\log|S(t)|)).
+    \end{aligned}
+  \end{equation*}
+\end{proof}
+
+重み付きグラフ$G=(V,E)$に対するアルゴリズムの最悪計算量を評価する．
+定理\ref{thm:decrease-betweenness-weight-complexity}および
+定理\ref{thm:increase-betweenness-weight-complexity}より，
+最短経路更新の前後で媒介中心性を更新するアルゴリズムの最悪計算量は，$S(v)=\tau(s)=V$のときで，
+$\mathcal{O}(|V||E|+|V|^2\log|V|)$である．これは，Brandesのアルゴリズムの計算量と同じである．
+また，定理\ref{thm:incremental-shortest-path-update}および
+定理\ref{thm:decremental-shortest-path-update}より，
+最短経路を更新するアルゴリズムの最悪計算量は，$S(v)=T(u)=V$のときで，
+$\mathcal{O}(|V||E|\log|V|)$である．これは，Dijkstraのアルゴリズムを
+全頂点に対して行うときの計算量と同じである．

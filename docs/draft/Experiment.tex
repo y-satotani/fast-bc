@@ -83,6 +83,37 @@
 増加することを示し，理論的な解析結果と一致する．
 
 \subsection{媒介中心性を更新した頂点の数と変化した頂点の数の関係}
+\textcolor{red}{書きかけ注意}
+\begin{example}
+  \label{ex:counter-of-invariability-of-pairwise-dependency}
+  図\ref{fig:pd-invariability-counterexample}において$\delta_s(v_1)=\delta'_s(v_1)$であるが，
+  $\delta_s(w_1)\neq\delta'_s(w_1)$である．
+  同様に，$\delta_s(v_2)=\delta'_s(v_2)$であるが，$\sigma_{sv_2}\neq\sigma'_{sv_2}$である．
+
+  \begin{figure}[tb]
+    \centering
+    \def\svgwidth{.45\linewidth}
+    \input{pd-invariability-counterexample.pdf_tex}
+    \caption{冗長な更新の例}
+    \label{fig:pd-invariability-counterexample}
+  \end{figure}
+\end{example}
+
+実際に媒介中心性が変化した頂点の数と$\lvert V_\delta\rvert$の関係について，一般的な議論は難しい．
+
+\begin{example}
+  図\ref{fig:bc-many-phony}のグラフにおいて，辺$\{V,W\}$を削除したときにアルゴリズムが
+  ペア依存度を更新する頂点の数は$\lvert V_\delta\rvert\sim \lvert V\rvert$であるが，
+  実際に媒介中心性が変化する頂点は$T,U,V,W$の$4$個である．
+
+  \begin{figure}[tb]
+    \centering
+    \def\svgwidth{.8\linewidth}
+    \input{bc-many-phony.pdf_tex}
+    \caption{媒介中心性が変化しない頂点を多く更新する例}
+    \label{fig:bc-many-phony}
+  \end{figure}
+\end{example}
 
 \ref{subsect:computational-complexity-of-incremental-algorithm}と
 \ref{subsect:computational-complexity-of-decremental-algorithm}で
@@ -148,7 +179,7 @@ SNAPデータセットのいくつかの実ネットワークに対して，
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=.9\textwidth]{road-oka.pdf}
+  \includegraphics[width=.9\textwidth]{road-oka.eps}
   \caption{実験で用いる道路ネットワーク}
   \label{fig:road-okayama}
 \end{figure}
@@ -172,21 +203,21 @@ $0.1379$まで減少させることに成功した．
 
 \begin{figure}[tb]
   \centering
-  \includegraphics{exp-road-oka-correlation-insert.pdf}
+  \includegraphics{exp-road-oka-correlation-insert.eps}
   \caption{辺挿入後の媒介中心性の最大値の分布}
   \label{fig:exp-road-oka-correlation-insert}
 \end{figure}
 
 \begin{figure}[tb]
   \centering
-  \includegraphics{exp-road-oka-correlation-delete.pdf}
+  \includegraphics{exp-road-oka-correlation-delete.eps}
   \caption{辺削除後の媒介中心性の最大値の分布}
   \label{fig:exp-road-oka-correlation-delete}
 \end{figure}
 
 \begin{figure}[tb]
   \centering
-  \includegraphics{road-oka-minmax.pdf}
+  \includegraphics{road-oka-minmax.eps}
   \caption{
     挿入すると媒介中心性の最大値を大きく変化させる辺 \\
     図\ref{fig:road-okayama}の拡大図である．
@@ -215,7 +246,7 @@ $0.1379$まで減少させることに成功した．
 
 \begin{figure}[tb]
   \centering
-  \includegraphics{exp-sfhh.pdf}
+  \includegraphics{exp-sfhh.eps}
   \caption{SFHHに対する実験結果}
   \label{fig:exp-sfhh}
 \end{figure}

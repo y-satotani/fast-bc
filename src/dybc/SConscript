@@ -1,0 +1,3 @@
+Import('env')
+lib = env.Library('dybc', Glob('*.c'))
+Return('lib')

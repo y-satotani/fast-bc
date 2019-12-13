@@ -5,8 +5,7 @@
 #include <time.h>
 #include <assert.h>
 #include <argp.h>
-#include <igraph.h>
-#include "dybc/custom_igraph.h"
+#include <igraph/igraph.h>
 #include "dybc/aug_dist.h"
 #include "dybc/betweenness.h"
 #include "dybc/incremental.h"

@@ -8,6 +8,6 @@ all: $(pdf) $(eps)
 %.pdf: %.R
 	Rscript $<
 %.eps: %.pdf
-	inkscape -z -f $< -E $@ -d 300
+	inkscape -z -o $@ -d 300 $<
 clean:
 	rm *.pdf *.eps

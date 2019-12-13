@@ -1,9 +1,9 @@
 
 #include "decremental.h"
 
-#include <igraph_types_internal.h>
-#include "custom_igraph.h"
-#include "betweenness.h"
+#include <igraph/igraph_types_internal.h>
+#include <igraph/igraph_math.h>
+//#include "static_betweenness.h"
 
 #include <stdio.h>
 
@@ -73,10 +73,7 @@ void decremental_part(igraph_t*            G,
                       igraph_integer_t*     n_update_path_pairs,
                       igraph_integer_t*     n_update_dep_pairs,
                       igraph_vector_bool_t* update_dep_verts) {
-#ifdef DEBUG
-  printf("DEBUG: decremental_part of %d begin\n", z);
-#endif
-  if(igraph_cmp_epsilon(MATRIX(*D, v, z), c + MATRIX(*D, w, z)) < 0
+  if(igraph_cmp_epsilon(MATRIX(*D, v, z), c + MATRIX(*D, w, z), IGRAPH_SHORTEST_PATH_EPSILON) < 0
      || MATRIX(*Sigma, w, z) == 0)
     return;
   igraph_vector_t dp_z;
@@ -146,7 +143,7 @@ void decremental_part(igraph_t*            G,
         continue;
       igraph_real_t d_yz = MATRIX(*D, y, z);
       igraph_real_t l_yx = EAN(G, weight, eid);
-      if(d_xz_d < 0 || igraph_cmp_epsilon(d_xz_d, l_yx + d_yz) > 0)
+      if(d_xz_d < 0 || igraph_cmp_epsilon(d_xz_d, l_yx + d_yz, IGRAPH_SHORTEST_PATH_EPSILON) > 0)
         d_xz_d = l_yx + d_yz;
     }
 #ifdef DEBUG
@@ -190,16 +187,18 @@ void decremental_part(igraph_t*            G,
       igraph_real_t l_yx = EAN(G, weight, eid);
 
       if(igraph_vector_bool_e(&is_affected, y)) {
-        igraph_2wheap_update(&queue, y, -(l_yx+d_xz));
+        igraph_2wheap_modify(&queue, y, -(l_yx+d_xz));
+        //printf("--debug1-- %d %f added to queue\n", y, -(l_yx+d_xz));
+
       }
-      else if(igraph_cmp_epsilon(d_xz, l_yx + d_yz) == 0)
+      else if(igraph_cmp_epsilon(d_xz, l_yx + d_yz, IGRAPH_SHORTEST_PATH_EPSILON) == 0)
         MATRIX(*Sigma, x, z) += MATRIX(*Sigma, y, z);
-      if((igraph_cmp_epsilon(dp_yz, l_yx + dp_xz) == 0)
-         != (igraph_cmp_epsilon(d_yz, l_yx + d_xz) == 0)) {
+      if((igraph_cmp_epsilon(dp_yz, l_yx + dp_xz, IGRAPH_SHORTEST_PATH_EPSILON) == 0)
+         != (igraph_cmp_epsilon(d_yz, l_yx + d_xz, IGRAPH_SHORTEST_PATH_EPSILON) == 0)) {
         igraph_vector_long_push_back(&delta_set, x);
       }
-      if((igraph_cmp_epsilon(dp_xz, l_yx + dp_yz) == 0)
-         != (igraph_cmp_epsilon(d_xz, l_yx + d_yz) == 0)) {
+      if((igraph_cmp_epsilon(dp_xz, l_yx + dp_yz, IGRAPH_SHORTEST_PATH_EPSILON) == 0)
+         != (igraph_cmp_epsilon(d_xz, l_yx + d_yz, IGRAPH_SHORTEST_PATH_EPSILON) == 0)) {
         igraph_vector_long_push_back(&delta_set, y);
       }
     } /* for ni < nnei */
@@ -222,10 +221,7 @@ void decremental_part(igraph_t*            G,
   igraph_2wheap_init(&delta_queue, igraph_vcount(G));
   for(int i = 0; i < igraph_vector_long_size(&delta_set); i++) {
     igraph_integer_t x = VECTOR(delta_set)[i];
-    if(MATRIX(*Sigma, x, z) > 0)
-      igraph_2wheap_update(&delta_queue, x, MATRIX(*D, x, z));
-    else
-      MATRIX(*Delta, z, x) = 0;
+    igraph_2wheap_modify(&delta_queue, x, MATRIX(*D, x, z));
   }
 
 #ifdef DEBUG
@@ -253,18 +249,10 @@ void decremental_part(igraph_t*            G,
       igraph_integer_t s_yz = MATRIX(*Sigma, y, z);
       igraph_real_t l_yx = EAN(G, weight, eid);
 
-      if(igraph_cmp_epsilon(d_yz, l_yx + d_xz) == 0) {
-#ifdef DEBUG
-        printf("DEBUG: update delta_%d(%d) = %.3f+(1+%.3f)*%d/%d",
-               z, x, MATRIX(*Delta, z, x),
-               MATRIX(*Delta, z, y), s_xz, s_yz);
-#endif
+      if(igraph_cmp_epsilon(d_yz, l_yx + d_xz, IGRAPH_SHORTEST_PATH_EPSILON) == 0) {
         MATRIX(*Delta, z, x) += (1 + MATRIX(*Delta, z, y)) * s_xz / s_yz;
-#ifdef DEBUG
-        printf(" = %.3f\n", MATRIX(*Delta, z, x));
-#endif
-      } else if(igraph_cmp_epsilon(d_xz, l_yx + d_yz) == 0) {
-        igraph_2wheap_update(&delta_queue, y, d_yz);
+      } else if(igraph_cmp_epsilon(d_xz, l_yx + d_yz, IGRAPH_SHORTEST_PATH_EPSILON) == 0) {
+        igraph_2wheap_modify(&delta_queue, y, d_yz);
       }
     }
     if(n_update_dep_pairs)

@@ -1,0 +1,37 @@
+
+check = Environment()
+conf = Configure(check)
+if not conf.CheckLib('igraph'):
+    print('igraph library not found')
+    Exit(1)
+if not conf.CheckCHeader('igraph/igraph.h'):
+    print('igraph header not found')
+    Exit(1)
+if not conf.CheckCHeader('igraph/igraph_types_internal.h'):
+    print('custom igraph header not found')
+    Exit(1)
+check = conf.Finish()
+
+custom_lib = Environment(
+    LIBS=['igraph', 'dybc', 'argp'],
+    LIBPATH=['../dybc'],
+    CPPPATH=['..']
+)
+
+env = custom_lib.Clone(CCFLAGS=['-g'])
+Export('env')
+lib = env.SConscript('dybc/SConscript', variant_dir='build/debug/dybc')
+prog_test = env.SConscript('test/SConscript', variant_dir='build/debug/test')
+prog_exp = env.SConscript('exp/SConscript', variant_dir='build/debug/exp')
+env.Depends([prog_test, prog_exp], lib)
+env.Install('debug', [prog_test, prog_exp])
+
+env = custom_lib.Clone(CCFLAGS=['-O2'])
+Export('env')
+lib = env.SConscript('dybc/SConscript', variant_dir='build/release/dybc')
+prog_test = env.SConscript('test/SConscript', variant_dir='build/release/test')
+prog_exp = env.SConscript('exp/SConscript', variant_dir='build/release/exp')
+env.Depends([prog_test, prog_exp], lib)
+env.Install('release', [prog_test, prog_exp])
+
+Clean('.', 'build')

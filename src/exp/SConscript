@@ -1,0 +1,12 @@
+Import('env')
+src_exe = [
+    'exp-compare-performance.c',
+    'exp-sequential-update.c',
+    'exp-betweenness-stats.c',
+    'exp-calculate-cache.c',
+]
+src_lib = [
+    'dybc_exp_common.c',
+]
+prog = [env.Program([s]+src_lib) for s in src_exe]
+Return('prog')

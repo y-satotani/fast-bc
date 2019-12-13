@@ -1,9 +1,9 @@
 
 #include "incremental.h"
 
-#include <igraph_types_internal.h>
-#include "custom_igraph.h"
-#include "betweenness.h"
+#include <igraph/igraph_types_internal.h>
+#include <igraph/igraph_math.h>
+#include "static_betweenness.h"
 
 #include <stdio.h>
 
@@ -68,7 +68,7 @@ void incremental_part(igraph_t*            G,
                       igraph_integer_t*     n_update_path_pairs,
                       igraph_integer_t*     n_update_dep_pairs,
                       igraph_vector_bool_t* update_dep_verts) {
-  if(igraph_cmp_epsilon(MATRIX(*D, v, z), c + MATRIX(*D, w, z)) < 0
+  if(igraph_cmp_epsilon(MATRIX(*D, v, z), c + MATRIX(*D, w, z), IGRAPH_SHORTEST_PATH_EPSILON) < 0
      || MATRIX(*Sigma, w, z) == 0)
     return;
   igraph_vector_t dp_z;
@@ -105,15 +105,16 @@ void incremental_part(igraph_t*            G,
 
       //printf("--debug1-- %d %d %f %f %f %f %f\n", x, y, l_yx, dp_xz, dp_yz, d_xz, d_yz);
 
-      if(igraph_cmp_epsilon(d_yz, l_yx + d_xz) >= 0) {
-        igraph_2wheap_update(&queue, y, -(l_yx+d_xz));
+      if(igraph_cmp_epsilon(d_yz, l_yx + d_xz, IGRAPH_SHORTEST_PATH_EPSILON) >= 0) {
+        // XXX former impl.: igraph_2wheap_update
+        igraph_2wheap_modify(&queue, y, -(l_yx+d_xz));
       }
-      if(igraph_cmp_epsilon(d_xz, l_yx + d_yz) == 0) {
+      if(igraph_cmp_epsilon(d_xz, l_yx + d_yz, IGRAPH_SHORTEST_PATH_EPSILON) == 0) {
         MATRIX(*Sigma, x, z) += MATRIX(*Sigma, y, z);
       }
-      if((igraph_cmp_epsilon(dp_xz, l_yx + dp_yz) == 0
+      if((igraph_cmp_epsilon(dp_xz, l_yx + dp_yz, IGRAPH_SHORTEST_PATH_EPSILON) == 0
           && !(y == w && x == v))
-         != (igraph_cmp_epsilon(d_xz, l_yx + d_yz) == 0)) {
+         != (igraph_cmp_epsilon(d_xz, l_yx + d_yz, IGRAPH_SHORTEST_PATH_EPSILON) == 0)) {
         igraph_vector_long_push_back(&delta_set, y);
         //printf("--debug1-- %d added\n", y);
       }
@@ -130,7 +131,8 @@ void incremental_part(igraph_t*            G,
   igraph_2wheap_init(&delta_queue, igraph_vcount(G));
   for(int i = 0; i < igraph_vector_long_size(&delta_set); i++) {
     igraph_integer_t x = VECTOR(delta_set)[i];
-    igraph_2wheap_update(&delta_queue, x, MATRIX(*D, x, z));
+    // XXX: former impl.: igraph_2wheap_update
+    igraph_2wheap_modify(&delta_queue, x, MATRIX(*D, x, z));
   }
 
   if(n_update_dep_pairs)
@@ -153,10 +155,11 @@ void incremental_part(igraph_t*            G,
       igraph_integer_t s_yz = MATRIX(*Sigma, y, z);
       igraph_real_t l_yx = EAN(G, weight, eid);
 
-      if(igraph_cmp_epsilon(d_yz, l_yx + d_xz) == 0) {
+      if(igraph_cmp_epsilon(d_yz, l_yx + d_xz, IGRAPH_SHORTEST_PATH_EPSILON) == 0) {
         MATRIX(*Delta, z, x) += (1 + MATRIX(*Delta, z, y)) * s_xz / s_yz;
-      } else if(igraph_cmp_epsilon(d_xz, l_yx + d_yz) == 0) {
-        igraph_2wheap_update(&delta_queue, y, d_yz);
+      } else if(igraph_cmp_epsilon(d_xz, l_yx + d_yz, IGRAPH_SHORTEST_PATH_EPSILON) == 0) {
+        // XXX: former impl.: igraph_2wheap_update
+        igraph_2wheap_modify(&delta_queue, y, d_yz);
       }
     }
     if(n_update_dep_pairs)
