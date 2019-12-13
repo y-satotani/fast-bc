@@ -101,6 +101,7 @@ int choose_random_edge_for(igraph_t* G,
                            igraph_integer_t *u,
                            igraph_integer_t *v,
                            unsigned long int seed) {
+  igraph_rng_seed(igraph_rng_default(), seed);
   if(query == QUERY_INSERT) {
     igraph_integer_t eid;
     igraph_t C;
