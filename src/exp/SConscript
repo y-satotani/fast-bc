@@ -1,7 +1,12 @@
 Import('env')
-src = [
-    'exp_bc.c',
-    'exp_seq_bc.c'
+src_exe = [
+    'exp-compare-performance.c',
+    'exp-sequential-update.c',
+    'exp-betweenness-stats.c',
+    'exp-calculate-cache.c',
 ]
-prog = [env.Program(s) for s in src]
+src_lib = [
+    'dybc_exp_common.c',
+]
+prog = [env.Program([s]+src_lib) for s in src_exe]
 Return('prog')
