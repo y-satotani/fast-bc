@@ -2,8 +2,25 @@
 #ifndef _DYBC_EXP_COMMON_
 #define _DYBC_EXP_COMMON_
 
+#include <stdio.h>
 #include <igraph/igraph.h>
 #include <dybc/static_betweenness.h>
+
+int dybc_read_edgelist(igraph_t* G,
+                       igraph_vector_t* weights,
+                       igraph_bool_t is_directed,
+                       FILE* istream);
+
+int dybc_dump_cache(igraph_matrix_t* D,
+                    igraph_matrix_int_t* S,
+                    igraph_vector_t* B,
+                    FILE* ostream);
+
+int dybc_load_cache(igraph_matrix_t* D,
+                    igraph_matrix_int_t* S,
+                    igraph_vector_t* B,
+                    FILE* istream);
+
 int check_quantities(const char* test_name,
                      igraph_t* G,
                      igraph_matrix_t* D,
