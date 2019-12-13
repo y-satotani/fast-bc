@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
   arguments.u = arguments.v = -1;
   arguments.w = -1;
   arguments.seed = 0;
-  argp_parse (&argp, argc, argv, 0, 0, &arguments);
+  argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
   // reading graph
   igraph_t G;
