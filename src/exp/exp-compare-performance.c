@@ -5,6 +5,9 @@
 #include <argp.h>
 #include <igraph/igraph.h>
 #include "dybc_exp_common.h"
+#include "dybc_io.h"
+#include "dybc_update_query.h"
+#include "dybc_update_stats.h"
 
 const char *argp_program_version =
   "exp-compare-performance beta";
@@ -14,7 +17,7 @@ struct arguments {
   char* input_file;
   char* cache_file;
   int is_directed;
-  dybc_query_t query;
+  dybc_update_query_t query;
   igraph_integer_t u, v;
   igraph_real_t w;
   unsigned long int seed;

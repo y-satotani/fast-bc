@@ -7,6 +7,7 @@ src_exe = [
 ]
 src_lib = [
     'dybc_exp_common.c',
+    'dybc_io.c',
 ]
 prog = [env.Program([s]+src_lib) for s in src_exe]
 Return('prog')

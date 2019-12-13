@@ -4,7 +4,7 @@
 #include <argp.h>
 #include <igraph/igraph.h>
 #include "dybc/static_betweenness.h"
-#include "dybc_exp_common.h"
+#include "dybc_io.h"
 
 const char *argp_program_version =
   "exp-calculate-cache beta";
