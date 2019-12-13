@@ -6,6 +6,11 @@ all:
 	$(MAKE) -C exp all
 	$(MAKE) -C test all
 
+debug:
+	$(MAKE) -C dybc debug
+	$(MAKE) -C exp debug
+	$(MAKE) -C test debug
+
 install:
 	mkdir -p bin
 	cp exp/*.out test/*.out bin
