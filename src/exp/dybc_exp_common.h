@@ -6,9 +6,15 @@
 #include <igraph/igraph.h>
 #include <dybc/static_betweenness.h>
 
+typedef enum dybc_query_t {
+  QUERY_NONE,
+  QUERY_INSERT,
+  QUERY_DELETE
+} dybc_query_t;
+
 int dybc_read_edgelist(igraph_t* G,
                        igraph_vector_t* weights,
-                       igraph_bool_t is_directed,
+                       igraph_bool_t directed,
                        FILE* istream);
 
 int dybc_dump_cache(igraph_matrix_t* D,
@@ -20,6 +26,12 @@ int dybc_load_cache(igraph_matrix_t* D,
                     igraph_matrix_int_t* S,
                     igraph_vector_t* B,
                     FILE* istream);
+
+int choose_random_edge_for(igraph_t* G,
+                           dybc_query_t query,
+                           igraph_integer_t *u,
+                           igraph_integer_t *v,
+                           unsigned long int seed);
 
 int check_quantities(const char* test_name,
                      igraph_t* G,
