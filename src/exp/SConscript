@@ -1,6 +1,7 @@
 Import('env')
 src_exe = [
     'exp-compare-performance.c',
+    'exp-update-stats.c',
     'exp-sequential-update.c',
     'exp-betweenness-stats.c',
     'exp-calculate-cache.c',
