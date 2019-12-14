@@ -67,7 +67,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
       argp_usage(state);
     break;
   case ARGP_KEY_END:
-    if(state->arg_num < 1)
+    if(state->arg_num < 2)
       argp_usage(state);
     break;
   default:
@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
 
   FILE* ostream = stdout;
   // input-name,query,directed,weighted,time,upd-path,upd-betw,tau-hat,tau-ast
-  fprintf(stdout, "%s,%s,%s,%s,%g,%g,%g,%ld,%ld\n",
+  fprintf(stdout, "%s,%s,%s,%s,%10.10f,%10.10f,%10.10f,%ld,%ld\n",
           arguments.input_file,
           arguments.query == QUERY_INSERT ? "insert" : "delete",
           arguments.is_directed ? "directed" : "undirected",

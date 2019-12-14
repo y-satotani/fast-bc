@@ -172,7 +172,7 @@ int main(int argc, char* argv[]) {
 
   FILE* ostream = stdout;
   // input-name,query,directed,weighted,max-diff,time-proposed,time-igraph
-  fprintf(stdout, "%s,%s,%s,%s,%g,%g,%g\n",
+  fprintf(stdout, "%s,%s,%s,%s,%10.10f,%10.10f,%10.10f\n",
           arguments.input_file,
           arguments.query == QUERY_INSERT ? "insert" : "delete",
           arguments.is_directed ? "directed" : "undirected",
