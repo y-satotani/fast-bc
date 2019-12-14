@@ -83,7 +83,7 @@ void update_deps_weighted_statistics(igraph_t* G,
                                      igraph_vector_t* weights,
                                      igraph_real_t weight,
                                      igraph_real_t factor,
-                                     igraph_vector_t* traversed_vertices) {
+                                     igraph_vector_int_t* traversed_vertices) {
 #define EPS IGRAPH_SHORTEST_PATH_EPSILON
 #define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
 #define d(a, b) (MATRIX(*D, (a), (b)))
@@ -111,7 +111,7 @@ void update_deps_weighted_statistics(igraph_t* G,
     igraph_2wheap_delete_max(&queue);
     B(x) += factor * Delta(x);
     if(traversed_vertices)
-      igraph_vector_push_back(traversed_vertices, x);
+      igraph_vector_int_push_back(traversed_vertices, x);
     if(igraph_is_inf(d(source, x))) continue;
 
     igraph_vector_int_t* ps = igraph_inclist_get(preds, x);
@@ -152,7 +152,7 @@ void update_deps_unweighted_statistics(igraph_t* G,
                                        igraph_integer_t source,
                                        igraph_vector_int_t* targets,
                                        igraph_real_t factor,
-                                       igraph_vector_t* traversed_vertices) {
+                                       igraph_vector_int_t* traversed_vertices) {
 #define EPS IGRAPH_SHORTEST_PATH_EPSILON
 #define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
 #define d(a, b) (MATRIX(*D, (a), (b)))
@@ -182,7 +182,7 @@ void update_deps_unweighted_statistics(igraph_t* G,
     igraph_integer_t x = igraph_buckets_popmax(&queue);
     B(x) += factor * Delta(x);
     if(traversed_vertices)
-      igraph_vector_push_back(traversed_vertices, x);
+      igraph_vector_int_push_back(traversed_vertices, x);
     if(igraph_is_inf(d(source, x))) continue;
 
     igraph_vector_int_t* ps = igraph_inclist_get(preds, x);

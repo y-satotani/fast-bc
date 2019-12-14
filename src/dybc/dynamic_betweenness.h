@@ -47,7 +47,7 @@ void update_deps_weighted_statistics(igraph_t* G,
                                      igraph_vector_t* weights,
                                      igraph_real_t weight,
                                      igraph_real_t factor,
-                                     igraph_vector_t* traversed_vertices);
+                                     igraph_vector_int_t* traversed_vertices);
 
 void update_deps_unweighted_statistics(igraph_t* G,
                                        igraph_inclist_t* preds,
@@ -59,6 +59,6 @@ void update_deps_unweighted_statistics(igraph_t* G,
                                        igraph_integer_t source,
                                        igraph_vector_int_t* targets,
                                        igraph_real_t factor,
-                                       igraph_vector_t* traversed_vertices);
+                                       igraph_vector_int_t* traversed_vertices);
 
 #endif // _DYNAMIC_BETWEENNESS_H_

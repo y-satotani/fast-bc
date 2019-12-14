@@ -2,6 +2,7 @@
 #include "dybc_exp_common.h"
 
 #include <stdio.h>
+#include <time.h>
 #include <igraph/igraph.h>
 #include <igraph/igraph_math.h>
 
@@ -45,8 +46,10 @@ void incremental_update(igraph_t* G,
                         igraph_integer_t v,
                         igraph_vector_t* weights,
                         igraph_real_t weight,
-                        igraph_integer_t* upd_stats) {
+                        dybc_update_stats_t* upd_stats) {
+  clock_t start, end;
   igraph_inclist_t succs, preds;
+  start = clock();
   if(igraph_is_directed(G)) {
     igraph_inclist_init(G, &succs, IGRAPH_OUT);
     igraph_inclist_init(G, &preds, IGRAPH_IN);
@@ -54,17 +57,58 @@ void incremental_update(igraph_t* G,
     igraph_inclist_init(G, &succs, IGRAPH_ALL);
     preds = succs;
   }
+  end = clock();
+  if(upd_stats)
+    upd_stats->update_time = (double)(end - start) / CLOCKS_PER_SEC;
 
+  long int n_sources, n_targets;
   igraph_vector_int_t targets_;
   igraph_vector_int_t sources, targets;
+  igraph_vector_int_t aff_deps_before, aff_deps_after;
   igraph_vector_int_init(&sources, 0);
   igraph_vector_int_init(&targets, 0);
   igraph_vector_int_init(&targets_, 0);
+  igraph_vector_int_init(&aff_deps_before, 0);
+  igraph_vector_int_init(&aff_deps_after, 0);
+
+  if(upd_stats) {
+    long int n_affected_targets, n_affected_sources;
+    n_affected_sources = n_affected_targets = 0;
+    affected_sources_inc(G, &preds, &sources, D, u, v, v, weights, weight);
+    n_sources = igraph_vector_int_size(&sources);
+    for(long int si = 0; si < igraph_vector_int_size(&sources); si++) {
+      igraph_integer_t s = VECTOR(sources)[si];
+      if(!igraph_is_directed(G))
+        affected_sources_inc(G, &preds, &targets, D, v, u, s, weights, weight);
+      else
+        affected_targets_inc(G, &succs, &targets, D, u, v, s, weights, weight);
+      n_affected_targets += igraph_vector_int_size(&targets);
+    }
+
+    if(!igraph_is_directed(G))
+      affected_sources_inc(G, &preds, &targets, D, v, u, u, weights, weight);
+    else
+      affected_targets_inc(G, &succs, &targets, D, u, v, u, weights, weight);
+    n_targets = igraph_vector_int_size(&targets);
+    for(long int ti = 0; ti < igraph_vector_int_size(&targets); ti++) {
+      igraph_integer_t t = VECTOR(targets)[ti];
+      affected_sources_inc(G, &preds, &sources, D, u, v, t, weights, weight);
+      n_affected_sources += igraph_vector_int_size(&sources);
+    }
+    if(n_sources + n_targets > 0)
+      upd_stats->upd_path
+        = (double)(n_affected_sources + n_affected_targets)
+        / (n_targets + n_sources);
+  }
+
+  start = clock();
   if(!igraph_is_directed(G))
     affected_sources_inc(G, &preds, &targets_, D, v, u, u, weights, weight);
   else
     affected_targets_inc(G, &succs, &targets_, D, u, v, u, weights, weight);
   affected_sources_inc(G, &preds, &sources, D, u, v, v, weights, weight);
+  n_sources = igraph_vector_int_size(&sources);
+  n_targets = igraph_vector_int_size(&targets);
 
   for(igraph_integer_t si = 0; si < igraph_vector_int_size(&sources); si++) {
     // decrease betweenness
@@ -74,11 +118,11 @@ void incremental_update(igraph_t* G,
     // factor is -2 for undirected and -1 for directed
     igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
     if(weights)
-      update_deps_weighted(G, &preds, D, S, B, u, v,
-                           s, &targets, weights, weight, -factor);
+      update_deps_weighted_statistics(G, &preds, D, S, B, u, v,
+         s, &targets, weights, weight, -factor, &aff_deps_before);
     else
-      update_deps_unweighted(G, &preds, D, S, B, u, v,
-                             s, &targets, -factor);
+      update_deps_unweighted_statistics(G, &preds, D, S, B, u, v,
+         s, &targets, -factor, &aff_deps_before);
 
     // add edge
     igraph_add_edge(G, u, v);
@@ -98,11 +142,11 @@ void incremental_update(igraph_t* G,
     // increase betweenness
     // factor is 2 for undirected and 1 for directed
     if(weights)
-      update_deps_weighted(G, &preds, D, S, B, u, v,
-                           s, &targets, weights, weight, factor);
+      update_deps_weighted_statistics(G, &preds, D, S, B, u, v,
+         s, &targets, weights, weight, factor, &aff_deps_after);
     else
-      update_deps_unweighted(G, &preds, D, S, B, u, v,
-                             s, &targets, factor);
+      update_deps_unweighted_statistics(G, &preds, D, S, B, u, v,
+         s, &targets, factor, &aff_deps_after);
 
     // cleanup
     igraph_delete_edges(G, igraph_ess_1(eid));
@@ -136,10 +180,33 @@ void incremental_update(igraph_t* G,
         (G, &preds, &succs, D, S, u, v, t);
   }
 
+  end = clock();
+  if(upd_stats)
+    upd_stats->update_time += (double)(end - start) / CLOCKS_PER_SEC;
+
+  if(upd_stats) {
+    upd_stats->upd_betw
+      = (double)(igraph_vector_int_size(&aff_deps_before)
+                 + igraph_vector_int_size(&aff_deps_after))
+      / (2 * n_sources);
+    upd_stats->n_tau_hat = 0;
+    igraph_vector_bool_t is_affected;
+    igraph_vector_bool_init(&is_affected, igraph_vcount(G));
+    for(long int i = 0; i < igraph_vector_int_size(&aff_deps_before); i++)
+      VECTOR(is_affected)[VECTOR(aff_deps_before)[i]] = 1;
+    for(long int i = 0; i < igraph_vector_int_size(&aff_deps_after); i++)
+      VECTOR(is_affected)[VECTOR(aff_deps_after)[i]] = 1;
+    for(long int i = 0; i < igraph_vector_bool_size(&is_affected); i++)
+      upd_stats->n_tau_hat += VECTOR(is_affected)[i];
+    igraph_vector_bool_destroy(&is_affected);
+  }
+
   // cleanup
   igraph_vector_int_destroy(&sources);
   igraph_vector_int_destroy(&targets);
   igraph_vector_int_destroy(&targets_);
+  igraph_vector_int_destroy(&aff_deps_before);
+  igraph_vector_int_destroy(&aff_deps_after);
   igraph_inclist_destroy(&succs);
   if(igraph_is_directed(G))
     igraph_inclist_destroy(&preds);
@@ -153,7 +220,7 @@ void decremental_update(igraph_t* G,
                         igraph_integer_t v,
                         igraph_vector_t* weights,
                         igraph_real_t weight,
-                        igraph_integer_t* upd_stats) {
+                        dybc_update_stats_t* upd_stats) {
   // move the edge to be deleted to back of list
   igraph_integer_t eid;
   igraph_get_eid(G, &eid, u, v, 0, 1);
@@ -162,7 +229,9 @@ void decremental_update(igraph_t* G,
     weight = igraph_vector_e(weights, eid);
     igraph_vector_remove(weights, eid);
   }
+  clock_t start, end;
   igraph_inclist_t succs, preds;
+  start = clock();
   if(igraph_is_directed(G)) {
     igraph_inclist_init(G, &succs, IGRAPH_OUT);
     igraph_inclist_init(G, &preds, IGRAPH_IN);
@@ -170,6 +239,9 @@ void decremental_update(igraph_t* G,
     igraph_inclist_init(G, &succs, IGRAPH_ALL);
     preds = succs;
   }
+  end = clock();
+  if(upd_stats)
+    upd_stats->update_time = (double)(end - start) / CLOCKS_PER_SEC;
 
   // then push the deleted edge
   eid = igraph_ecount(G);
@@ -180,16 +252,54 @@ void decremental_update(igraph_t* G,
   igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
 
   // finding affected sources
+  long int n_sources, n_targets;
   igraph_vector_int_t targets_;
   igraph_vector_int_t sources, targets;
+  igraph_vector_int_t aff_deps_before, aff_deps_after;
   igraph_vector_int_init(&sources, 0);
   igraph_vector_int_init(&targets, 0);
   igraph_vector_int_init(&targets_, 0);
+  igraph_vector_int_init(&aff_deps_before, 0);
+  igraph_vector_int_init(&aff_deps_after, 0);
+
+  if(upd_stats) {
+    long int n_affected_targets, n_affected_sources;
+    n_affected_sources = n_affected_targets = 0;
+    affected_sources_dec(G, &preds, &sources, D, u, v, v, weights, weight);
+    n_sources = igraph_vector_int_size(&sources);
+    for(long int si = 0; si < igraph_vector_int_size(&sources); si++) {
+      igraph_integer_t s = VECTOR(sources)[si];
+      if(!igraph_is_directed(G))
+        affected_sources_dec(G, &preds, &targets, D, v, u, s, weights, weight);
+      else
+        affected_targets_dec(G, &succs, &targets, D, u, v, s, weights, weight);
+      n_affected_targets += igraph_vector_int_size(&targets);
+    }
+
+    if(!igraph_is_directed(G))
+      affected_sources_dec(G, &preds, &targets, D, v, u, u, weights, weight);
+    else
+      affected_targets_dec(G, &succs, &targets, D, u, v, u, weights, weight);
+    n_targets = igraph_vector_int_size(&targets);
+    for(long int ti = 0; ti < igraph_vector_int_size(&targets); ti++) {
+      igraph_integer_t t = VECTOR(targets)[ti];
+      affected_sources_dec(G, &preds, &sources, D, u, v, t, weights, weight);
+      n_affected_sources += igraph_vector_int_size(&sources);
+    }
+    if(n_sources + n_targets > 0)
+      upd_stats->upd_path
+        = (double)(n_affected_sources + n_affected_targets)
+        / (n_targets + n_sources);
+  }
+
+  start = clock();
   if(!igraph_is_directed(G))
     affected_sources_dec(G, &preds, &targets_, D, v, u, u, weights, weight);
   else
     affected_targets_dec(G, &succs, &targets_, D, u, v, u, weights, weight);
   affected_sources_dec(G, &preds, &sources, D, u, v, v, weights, weight);
+  n_sources = igraph_vector_int_size(&sources);
+  n_targets = igraph_vector_int_size(&targets);
 
   for(igraph_integer_t si = 0; si < igraph_vector_int_size(&sources); si++) {
     igraph_integer_t s = igraph_vector_int_e(&sources, si);
@@ -198,11 +308,11 @@ void decremental_update(igraph_t* G,
     // factor is -2 for undirected and -1 for directed
     igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
     if(weights)
-      update_deps_weighted(G, &preds, D, S, B, u, v,
-                           s, &targets, weights, weight, -factor);
+      update_deps_weighted_statistics(G, &preds, D, S, B, u, v,
+         s, &targets, weights, weight, -factor, &aff_deps_before);
     else
-      update_deps_unweighted(G, &preds, D, S, B, u, v,
-                             s, &targets, -factor);
+      update_deps_unweighted_statistics(G, &preds, D, S, B, u, v,
+         s, &targets, -factor, &aff_deps_before);
 
     // modify
     igraph_delete_edges(G, igraph_ess_1(eid));
@@ -222,11 +332,11 @@ void decremental_update(igraph_t* G,
     // increase betweenness
     // factor is 2 for undirected and 1 for directed
     if(weights)
-      update_deps_weighted(G, &preds, D, S, B, u, v,
-                           s, &targets, weights, weight, factor);
+      update_deps_weighted_statistics(G, &preds, D, S, B, u, v,
+         s, &targets, weights, weight, factor, &aff_deps_after);
     else
-      update_deps_unweighted(G, &preds, D, S, B, u, v,
-                             s, &targets, factor);
+      update_deps_unweighted_statistics(G, &preds, D, S, B, u, v,
+         s, &targets, factor, &aff_deps_after);
 
     // cleanup for next round
     igraph_add_edge(G, u, v);
@@ -258,10 +368,33 @@ void decremental_update(igraph_t* G,
       update_stsp_dec_unweighted
         (G, &preds, &succs, D, S, u, v, t);
   }
+  end = clock();
+  if(upd_stats)
+    upd_stats->update_time += (double)(end - start) / CLOCKS_PER_SEC;
+
+  if(upd_stats) {
+    upd_stats->upd_betw
+      = (double)(igraph_vector_int_size(&aff_deps_before)
+                 + igraph_vector_int_size(&aff_deps_after))
+      / (2 * n_sources);
+    upd_stats->n_tau_hat = 0;
+    igraph_vector_bool_t is_affected;
+    igraph_vector_bool_init(&is_affected, igraph_vcount(G));
+    for(long int i = 0; i < igraph_vector_int_size(&aff_deps_before); i++)
+      VECTOR(is_affected)[VECTOR(aff_deps_before)[i]] = 1;
+    for(long int i = 0; i < igraph_vector_int_size(&aff_deps_after); i++)
+      VECTOR(is_affected)[VECTOR(aff_deps_after)[i]] = 1;
+    for(long int i = 0; i < igraph_vector_bool_size(&is_affected); i++)
+      upd_stats->n_tau_hat += VECTOR(is_affected)[i];
+    igraph_vector_bool_destroy(&is_affected);
+  }
+
   // cleanup
   igraph_vector_int_destroy(&sources);
   igraph_vector_int_destroy(&targets);
   igraph_vector_int_destroy(&targets_);
+  igraph_vector_int_destroy(&aff_deps_before);
+  igraph_vector_int_destroy(&aff_deps_after);
   igraph_inclist_destroy(&succs);
   if(igraph_is_directed(G))
     igraph_inclist_destroy(&preds);
