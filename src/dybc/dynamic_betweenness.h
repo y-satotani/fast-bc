@@ -1,4 +1,3 @@
-
 #ifndef _DYNAMIC_BETWEENNESS_H_
 #define _DYNAMIC_BETWEENNESS_H_
 
@@ -35,5 +34,31 @@ void update_deps_unweighted(igraph_t* G,                  // graph
                             igraph_integer_t source,      // source
                             igraph_vector_int_t* targets, // targets
                             igraph_real_t factor);        // multiplier
+
+void update_deps_weighted_statistics(igraph_t* G,
+                                     igraph_inclist_t* preds,
+                                     igraph_matrix_t* D,
+                                     igraph_matrix_int_t* S,
+                                     igraph_vector_t* B,
+                                     igraph_integer_t u,
+                                     igraph_integer_t v,
+                                     igraph_integer_t source,
+                                     igraph_vector_int_t* targets,
+                                     igraph_vector_t* weights,
+                                     igraph_real_t weight,
+                                     igraph_real_t factor,
+                                     igraph_vector_t* traversed_vertices);
+
+void update_deps_unweighted_statistics(igraph_t* G,
+                                       igraph_inclist_t* preds,
+                                       igraph_matrix_t* D,
+                                       igraph_matrix_int_t* S,
+                                       igraph_vector_t* B,
+                                       igraph_integer_t u,
+                                       igraph_integer_t v,
+                                       igraph_integer_t source,
+                                       igraph_vector_int_t* targets,
+                                       igraph_real_t factor,
+                                       igraph_vector_t* traversed_vertices);
 
 #endif // _DYNAMIC_BETWEENNESS_H_

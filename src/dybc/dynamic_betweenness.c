@@ -53,6 +53,37 @@ void update_deps_weighted(igraph_t* G,
                           igraph_vector_t* weights,
                           igraph_real_t weight,
                           igraph_real_t factor) {
+  update_deps_weighted_statistics
+    (G, preds, D, S, B, u, v, source, targets, weights, weight, factor, 0);
+}
+
+void update_deps_unweighted(igraph_t* G,
+                            igraph_inclist_t* preds,
+                            igraph_matrix_t* D,
+                            igraph_matrix_int_t* S,
+                            igraph_vector_t* B,
+                            igraph_integer_t u,
+                            igraph_integer_t v,
+                            igraph_integer_t source,
+                            igraph_vector_int_t* targets,
+                            igraph_real_t factor) {
+  update_deps_unweighted_statistics
+    (G, preds, D, S, B, u, v, source, targets, factor, 0);
+}
+
+void update_deps_weighted_statistics(igraph_t* G,
+                                     igraph_inclist_t* preds,
+                                     igraph_matrix_t* D,
+                                     igraph_matrix_int_t* S,
+                                     igraph_vector_t* B,
+                                     igraph_integer_t u,
+                                     igraph_integer_t v,
+                                     igraph_integer_t source,
+                                     igraph_vector_int_t* targets,
+                                     igraph_vector_t* weights,
+                                     igraph_real_t weight,
+                                     igraph_real_t factor,
+                                     igraph_vector_t* traversed_vertices) {
 #define EPS IGRAPH_SHORTEST_PATH_EPSILON
 #define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
 #define d(a, b) (MATRIX(*D, (a), (b)))
@@ -79,6 +110,8 @@ void update_deps_weighted(igraph_t* G,
     igraph_integer_t x = igraph_2wheap_max_index(&queue);
     igraph_2wheap_delete_max(&queue);
     B(x) += factor * Delta(x);
+    if(traversed_vertices)
+      igraph_vector_push_back(traversed_vertices, x);
     if(igraph_is_inf(d(source, x))) continue;
 
     igraph_vector_int_t* ps = igraph_inclist_get(preds, x);
@@ -109,16 +142,17 @@ void update_deps_weighted(igraph_t* G,
 #undef Delta
 }
 
-void update_deps_unweighted(igraph_t* G,
-                            igraph_inclist_t* preds,
-                            igraph_matrix_t* D,
-                            igraph_matrix_int_t* S,
-                            igraph_vector_t* B,
-                            igraph_integer_t u,
-                            igraph_integer_t v,
-                            igraph_integer_t source,
-                            igraph_vector_int_t* targets,
-                            igraph_real_t factor) {
+void update_deps_unweighted_statistics(igraph_t* G,
+                                       igraph_inclist_t* preds,
+                                       igraph_matrix_t* D,
+                                       igraph_matrix_int_t* S,
+                                       igraph_vector_t* B,
+                                       igraph_integer_t u,
+                                       igraph_integer_t v,
+                                       igraph_integer_t source,
+                                       igraph_vector_int_t* targets,
+                                       igraph_real_t factor,
+                                       igraph_vector_t* traversed_vertices) {
 #define EPS IGRAPH_SHORTEST_PATH_EPSILON
 #define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
 #define d(a, b) (MATRIX(*D, (a), (b)))
@@ -147,6 +181,8 @@ void update_deps_unweighted(igraph_t* G,
   while(!igraph_buckets_empty(&queue)) {
     igraph_integer_t x = igraph_buckets_popmax(&queue);
     B(x) += factor * Delta(x);
+    if(traversed_vertices)
+      igraph_vector_push_back(traversed_vertices, x);
     if(igraph_is_inf(d(source, x))) continue;
 
     igraph_vector_int_t* ps = igraph_inclist_get(preds, x);
@@ -178,3 +214,4 @@ void update_deps_unweighted(igraph_t* G,
 #undef B
 #undef Delta
 }
+
