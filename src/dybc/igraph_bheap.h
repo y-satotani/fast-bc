@@ -25,7 +25,9 @@ igraph_integer_t igraph_bheap_delete_min(igraph_bheap_t* heap);
 
 typedef struct igraph_2wbheap_t {
   igraph_vector_ptr_t bptr;
+  igraph_vector_int_t b_n_elem;
   igraph_vector_int_t bids;
+  igraph_vector_int_t ibids;
   igraph_integer_t bi_min;
   igraph_integer_t bi_max;
   igraph_integer_t n_elem;
