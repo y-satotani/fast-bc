@@ -8,10 +8,11 @@ int dybc_read_edgelist(igraph_t* G,
   igraph_integer_t u, v;
   igraph_real_t w;
   int n_fields;
-
+  char line[1024];
   igraph_empty(G, 0, is_directed);
   igraph_vector_init(weights, 0);
-  while((n_fields = fscanf(istream, "%d %d %lf\n", &u, &v, &w)) != EOF) {
+  while(fgets(line, 1024, istream) != NULL) {
+    n_fields = sscanf(line, "%d %d %lf", &u, &v, &w);
     igraph_integer_t max_v = u > v ? u : v;
     if(igraph_vcount(G) <= max_v)
       igraph_add_vertices(G, max_v-igraph_vcount(G)+1, 0);
