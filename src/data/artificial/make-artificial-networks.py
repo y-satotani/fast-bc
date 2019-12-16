@@ -31,13 +31,12 @@ def make_path(topo, n, k, weighted, seed):
 def main():
     args = [
         (topo, n, k, weighted, seed, make_path(topo, n, k, weighted, seed))
-        for topo, n, k, weighted, seed in product(
-                ('RRG', 'BA'),
-                chain(range(10, 100, 10), range(100, 1000, 100), (1000, 2000)),
-                (4, 8, 16, 32, 64),
-                (True, False),
-                range(1, 11),
-        ) if n > k
+        for seed in range(1, 11)
+        for topo in ('RRG', 'BA')
+        for n in chain(range(10, 100, 10), range(100, 1000, 100), (1000, 2000))
+        for k in (4, 8, 16, 32, 64)
+        for weighted in (True, False)
+        if n > k
     ]
     p = Pool()
     list(p.map(worker, args))
