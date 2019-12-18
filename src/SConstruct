@@ -26,7 +26,7 @@ prog_exp = env.SConscript('exp/SConscript', variant_dir='build/debug/exp')
 env.Depends([prog_test, prog_exp], lib)
 env.Install('debug', [prog_test, prog_exp])
 
-env = custom_lib.Clone(CCFLAGS=['-O2'])
+env = custom_lib.Clone(CCFLAGS=['-O3', '-march=native'])
 Export('env')
 lib = env.SConscript('dybc/SConscript', variant_dir='build/release/dybc')
 prog_test = env.SConscript('test/SConscript', variant_dir='build/release/test')
