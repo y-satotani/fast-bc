@@ -102,6 +102,8 @@ void incremental_update(igraph_t* G,
       upd_stats->upd_path
         = (double)(n_affected_sources + n_affected_targets)
         / (n_targets + n_sources);
+    else
+      upd_stats->upd_path = 0.0;
   }
 
   start = clock();
@@ -214,10 +216,13 @@ void incremental_update(igraph_t* G,
   }
 
   if(upd_stats) {
-    upd_stats->upd_betw
-      = (double)(igraph_vector_int_size(&aff_deps_before)
-                 + igraph_vector_int_size(&aff_deps_after))
-      / (2 * n_sources);
+    if(n_sources > 0)
+      upd_stats->upd_betw
+        = (double)(igraph_vector_int_size(&aff_deps_before)
+                   + igraph_vector_int_size(&aff_deps_after))
+        / (2 * n_sources);
+    else
+      upd_stats->upd_betw = 0;
     upd_stats->n_tau_hat = 0;
     igraph_vector_bool_t is_affected;
     igraph_vector_bool_init(&is_affected, igraph_vcount(G));
@@ -322,6 +327,8 @@ void decremental_update(igraph_t* G,
       upd_stats->upd_path
         = (double)(n_affected_sources + n_affected_targets)
         / (n_targets + n_sources);
+    else
+      upd_stats->upd_path = 0;
   }
 
   start = clock();
@@ -434,10 +441,13 @@ void decremental_update(igraph_t* G,
   }
 
   if(upd_stats) {
-    upd_stats->upd_betw
-      = (double)(igraph_vector_int_size(&aff_deps_before)
-                 + igraph_vector_int_size(&aff_deps_after))
-      / (2 * n_sources);
+    if(n_sources > 0)
+      upd_stats->upd_betw
+        = (double)(igraph_vector_int_size(&aff_deps_before)
+                   + igraph_vector_int_size(&aff_deps_after))
+        / (2 * n_sources);
+    else
+      upd_stats->upd_betw = 0;
     upd_stats->n_tau_hat = 0;
     igraph_vector_bool_t is_affected;
     igraph_vector_bool_init(&is_affected, igraph_vcount(G));

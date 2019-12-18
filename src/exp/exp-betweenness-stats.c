@@ -163,10 +163,10 @@ int main(int argc, char* argv[]) {
 
   FILE* ostream;
   if(strcmp(arguments.output_file, "-") == 0) ostream = stdout;
-  else ostream = fopen(arguments.output_file, "r");
+  else ostream = fopen(arguments.output_file, "w");
   // input-name,v1,v2,query,time,v,B
   for(igraph_integer_t i = 0; i < igraph_vcount(&G); i++)
-    fprintf(stdout, "%s,%s,%d,%d,%d,%10.10f\n",
+    fprintf(ostream, "%s,%s,%d,%d,%d,%10.10f\n",
             arguments.input_file,
             arguments.query == QUERY_INSERT ? "insert" : "delete",
             u, v, i, VECTOR(B)[i]);
