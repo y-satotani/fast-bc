@@ -6,9 +6,9 @@ library(viridis)
 theme_set(theme_light(base_size = 9, base_family = 'IPAexGothic'))
 out_file <- paste0(sub('^--file=(.+)\\.R$', '\\1', basename(commandArgs()[4])), '.pdf')
 
-data_time <- read_csv('../../res/data/artificial.csv') %>%
-  filter(name %in% c('ER', 'BA')) %>%
-  group_by(name, n, k, mode) %>%
+data_time <- read_csv('../../res/data/artificial-performance-comparison.csv') %>%
+  filter(`is-weighted` == 'weighted') %>%
+  group_by(topology, order, degree, query) %>%
   summarise(
     `proposed-max` = max(`time-proposed`),
     `proposed-mean` = mean(`time-proposed`),
@@ -26,25 +26,26 @@ data_time <- read_csv('../../res/data/artificial.csv') %>%
       levels = c('proposed-max', 'proposed-mean', 'brandes-max', 'brandes-mean'),
       labels = c('更新-最大値', '更新-平均値', '再計算-最大値', '再計算-平均値')
     ),
-    name = factor(
-      name,
-      levels = c('RRG', 'ER', 'BA'),
-      labels = c('ランダム正則グラフ', 'Erdős–Rényiモデル', 'Barabási–Albertモデル')
+    topology = factor(
+      topology,
+      levels = c('RRG', 'BA'),
+      labels = c('ランダム正則グラフ', 'Barabási–Albertモデル')
     ),
-    mode = factor(
-      mode,
+    query = factor(
+      query,
       levels = c('insert', 'delete'),
       labels = c('挿入', '削除')
     ),
   )
 
 gp <- ggplot(
-    data_time %>% filter(k == 4),
-    aes(n, time, colour = method, shape = method, linetype = method)
+    data_time %>% filter(degree == 4),
+    aes(order, time, colour = method, shape = method, linetype = method)
   ) +
   geom_line() + geom_point() +
-  facet_grid(rows = vars(mode), cols = vars(name)) +
-  xlab('頂点数') + ylab('実行時間(s)') +
+  facet_grid(rows = vars(query), cols = vars(topology)) +
+    xlab('頂点数') + ylab('実行時間(s)') +
+    scale_x_log10() + scale_y_log10() +
   scale_colour_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
   theme(
     legend.title = element_blank(),
