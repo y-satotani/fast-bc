@@ -167,13 +167,15 @@ int main(int argc, char* argv[]) {
       n_tau_star++;
 
   FILE* ostream = stdout;
-  // input-name,query,directed,weighted,time,upd-path,upd-betw,tau-hat,tau-ast
+  // input-name,query,directed,weighted,time-full,time-path,time-betw,upd-path,upd-betw,tau-hat,tau-ast
   fprintf(stdout, "%s,%s,%s,%s,%10.10f,%10.10f,%10.10f,%ld,%ld\n",
           arguments.input_file,
           arguments.query == QUERY_INSERT ? "insert" : "delete",
           arguments.is_directed ? "directed" : "undirected",
           weights ? "weighted" : "unweighted",
-          stats.update_time,
+          stats.time_full,
+          stats.time_path,
+          stats.time_betw,
           stats.upd_path,
           stats.upd_betw,
           stats.n_tau_hat,

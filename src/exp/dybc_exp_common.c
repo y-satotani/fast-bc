@@ -58,8 +58,11 @@ void incremental_update(igraph_t* G,
     preds = succs;
   }
   end = clock();
-  if(upd_stats)
-    upd_stats->update_time = (double)(end - start) / CLOCKS_PER_SEC;
+  if(upd_stats) {
+    upd_stats->time_full = (double)(end - start) / CLOCKS_PER_SEC;
+    upd_stats->time_path = 0.0;
+    upd_stats->time_betw = 0.0;
+  }
 
   long int n_sources, n_targets;
   igraph_vector_int_t targets_;
@@ -109,12 +112,15 @@ void incremental_update(igraph_t* G,
   affected_sources_inc(G, &preds, &sources, D, u, v, v, weights, weight);
   n_sources = igraph_vector_int_size(&sources);
   n_targets = igraph_vector_int_size(&targets);
+  end = clock();
+  if(upd_stats)
+    upd_stats->time_full += (double)(end - start) / CLOCKS_PER_SEC;
 
   for(igraph_integer_t si = 0; si < igraph_vector_int_size(&sources); si++) {
     // decrease betweenness
+    start = clock();
     igraph_integer_t s = igraph_vector_int_e(&sources, si);
     affected_targets_inc(G, &succs, &targets, D, u, v, s, weights, weight);
-
     // factor is -2 for undirected and -1 for directed
     igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
     if(weights)
@@ -123,6 +129,12 @@ void incremental_update(igraph_t* G,
     else
       update_deps_unweighted_statistics(G, &preds, D, S, B, u, v,
          s, &targets, -factor, &aff_deps_before);
+    end = clock();
+    if(upd_stats) {
+      double time_betw = (double)(end - start) / CLOCKS_PER_SEC;
+      upd_stats->time_full += time_betw;
+      upd_stats->time_betw += time_betw;
+    }
 
     // add edge
     igraph_add_edge(G, u, v);
@@ -132,13 +144,21 @@ void incremental_update(igraph_t* G,
     igraph_vector_int_push_back(igraph_inclist_get(&succs, u), eid);
     igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
 
+    start = clock();
     if(weights)
       update_sssp_inc_weighted
         (G, &preds, &succs, D, S, u, v, s, weights, weight);
     else
       update_sssp_inc_unweighted
         (G, &preds, &succs, D, S, u, v, s);
+    end = clock();
+    if(upd_stats) {
+      double time_path = (double)(end - start) / CLOCKS_PER_SEC;
+      upd_stats->time_full += time_path;
+      upd_stats->time_path += time_path;
+    }
 
+    start = clock();
     // increase betweenness
     // factor is 2 for undirected and 1 for directed
     if(weights)
@@ -147,6 +167,12 @@ void incremental_update(igraph_t* G,
     else
       update_deps_unweighted_statistics(G, &preds, D, S, B, u, v,
          s, &targets, factor, &aff_deps_after);
+    end = clock();
+    if(upd_stats) {
+      double time_betw = (double)(end - start) / CLOCKS_PER_SEC;
+      upd_stats->time_full += time_betw;
+      upd_stats->time_betw += time_betw;
+    }
 
     // cleanup
     igraph_delete_edges(G, igraph_ess_1(eid));
@@ -164,6 +190,7 @@ void incremental_update(igraph_t* G,
   igraph_vector_int_push_back(igraph_inclist_get(&succs, u), eid);
   igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
 
+  start = clock();
   for(int ti = 0; ti < igraph_vector_int_size(&targets_); ti++) {
     igraph_integer_t t = igraph_vector_int_e(&targets_, ti);
     if(!igraph_is_directed(G) && weights)
@@ -179,10 +206,12 @@ void incremental_update(igraph_t* G,
       update_stsp_inc_unweighted
         (G, &preds, &succs, D, S, u, v, t);
   }
-
   end = clock();
-  if(upd_stats)
-    upd_stats->update_time += (double)(end - start) / CLOCKS_PER_SEC;
+  if(upd_stats) {
+    double time_path = (double)(end - start) / CLOCKS_PER_SEC;
+    upd_stats->time_full += time_path;
+    upd_stats->time_path += time_path;
+  }
 
   if(upd_stats) {
     upd_stats->upd_betw
@@ -240,8 +269,11 @@ void decremental_update(igraph_t* G,
     preds = succs;
   }
   end = clock();
-  if(upd_stats)
-    upd_stats->update_time = (double)(end - start) / CLOCKS_PER_SEC;
+  if(upd_stats) {
+    upd_stats->time_full = (double)(end - start) / CLOCKS_PER_SEC;
+    upd_stats->time_path = 0.0;
+    upd_stats->time_betw = 0.0;
+  }
 
   // then push the deleted edge
   eid = igraph_ecount(G);
@@ -300,8 +332,12 @@ void decremental_update(igraph_t* G,
   affected_sources_dec(G, &preds, &sources, D, u, v, v, weights, weight);
   n_sources = igraph_vector_int_size(&sources);
   n_targets = igraph_vector_int_size(&targets);
+  end = clock();
+  if(upd_stats)
+    upd_stats->time_full += (double)(end - start) / CLOCKS_PER_SEC;
 
   for(igraph_integer_t si = 0; si < igraph_vector_int_size(&sources); si++) {
+    start = clock();
     igraph_integer_t s = igraph_vector_int_e(&sources, si);
     affected_targets_dec(G, &succs, &targets, D, u, v, s, weights, weight);
     // decrease betweenness
@@ -313,6 +349,12 @@ void decremental_update(igraph_t* G,
     else
       update_deps_unweighted_statistics(G, &preds, D, S, B, u, v,
          s, &targets, -factor, &aff_deps_before);
+    end = clock();
+    if(upd_stats) {
+      double time_betw = (double)(end - start) / CLOCKS_PER_SEC;
+      upd_stats->time_full += time_betw;
+      upd_stats->time_betw += time_betw;
+    }
 
     // modify
     igraph_delete_edges(G, igraph_ess_1(eid));
@@ -321,6 +363,7 @@ void decremental_update(igraph_t* G,
     igraph_vector_int_pop_back(igraph_inclist_get(&succs, u));
     igraph_vector_int_pop_back(igraph_inclist_get(&preds, v));
 
+    start = clock();
     // update sssp
     if(weights)
       update_sssp_dec_weighted
@@ -328,7 +371,14 @@ void decremental_update(igraph_t* G,
     else
       update_sssp_dec_unweighted
         (G, &preds, &succs, D, S, u, v, s);
+    end = clock();
+    if(upd_stats) {
+      double time_path = (double)(end - start) / CLOCKS_PER_SEC;
+      upd_stats->time_full += time_path;
+      upd_stats->time_path += time_path;
+    }
 
+    start = clock();
     // increase betweenness
     // factor is 2 for undirected and 1 for directed
     if(weights)
@@ -337,6 +387,12 @@ void decremental_update(igraph_t* G,
     else
       update_deps_unweighted_statistics(G, &preds, D, S, B, u, v,
          s, &targets, factor, &aff_deps_after);
+    end = clock();
+    if(upd_stats) {
+      double time_betw = (double)(end - start) / CLOCKS_PER_SEC;
+      upd_stats->time_full += time_betw;
+      upd_stats->time_betw += time_betw;
+    }
 
     // cleanup for next round
     igraph_add_edge(G, u, v);
@@ -352,6 +408,8 @@ void decremental_update(igraph_t* G,
     igraph_vector_pop_back(weights);
   igraph_vector_int_pop_back(igraph_inclist_get(&succs, u));
   igraph_vector_int_pop_back(igraph_inclist_get(&preds, v));
+
+  start = clock();
   // update stsp
   for(int ti = 0; ti < igraph_vector_int_size(&targets_); ti++) {
     igraph_integer_t t = igraph_vector_int_e(&targets_, ti);
@@ -369,8 +427,11 @@ void decremental_update(igraph_t* G,
         (G, &preds, &succs, D, S, u, v, t);
   }
   end = clock();
-  if(upd_stats)
-    upd_stats->update_time += (double)(end - start) / CLOCKS_PER_SEC;
+  if(upd_stats) {
+    double time_path = (double)(end - start) / CLOCKS_PER_SEC;
+    upd_stats->time_full += time_path;
+    upd_stats->time_path += time_path;
+  }
 
   if(upd_stats) {
     upd_stats->upd_betw
