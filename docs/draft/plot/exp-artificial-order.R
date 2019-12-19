@@ -6,8 +6,10 @@ library(viridis)
 theme_set(theme_light(base_size = 9, base_family = 'IPAexGothic'))
 out_file <- paste0(sub('^--file=(.+)\\.R$', '\\1', basename(commandArgs()[4])), '.pdf')
 
-data_time <- read_csv('../../res/data/artificial-performance-comparison.csv') %>%
+data_time <- read_csv('../../res/data/result-performance-comparison.csv') %>%
   filter(`is-weighted` == 'weighted') %>%
+  separate('network', c('topology', 'order', 'degree', NA, 'net-seed', NA)) %>%
+  mutate(order = as.numeric(order), degree = as.numeric(degree)) %>%
   group_by(topology, order, degree, query) %>%
   summarise(
     `proposed-max` = max(`time-proposed`),
@@ -45,7 +47,7 @@ gp <- ggplot(
   geom_line() + geom_point() +
   facet_grid(rows = vars(query), cols = vars(topology)) +
     xlab('頂点数') + ylab('実行時間(s)') +
-    scale_x_log10() + scale_y_log10() +
+    #scale_x_log10() + scale_y_log10() +
   scale_colour_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
   theme(
     legend.title = element_blank(),
