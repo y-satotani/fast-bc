@@ -104,6 +104,8 @@ void incremental_update(igraph_t* G,
         / (n_targets + n_sources);
     else
       upd_stats->upd_path = 0.0;
+    upd_stats->n_aff_src = n_sources;
+    upd_stats->n_aff_tgt = n_targets;
   }
 
   start = clock();
@@ -329,6 +331,8 @@ void decremental_update(igraph_t* G,
         / (n_targets + n_sources);
     else
       upd_stats->upd_path = 0;
+    upd_stats->n_aff_src = n_sources;
+    upd_stats->n_aff_tgt = n_targets;
   }
 
   start = clock();

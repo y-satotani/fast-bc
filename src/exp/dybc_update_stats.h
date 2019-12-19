@@ -6,6 +6,8 @@ typedef struct dybc_update_stats_t {
   double upd_betw;
   double upd_path;
   unsigned long n_tau_hat;
+  unsigned long n_aff_src;
+  unsigned long n_aff_tgt;
   double time_betw;
   double time_path;
   double time_full;

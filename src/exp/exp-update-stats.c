@@ -167,8 +167,8 @@ int main(int argc, char* argv[]) {
       n_tau_star++;
 
   FILE* ostream = stdout;
-  // input-name,query,directed,weighted,time-full,time-path,time-betw,upd-path,upd-betw,tau-hat,tau-ast
-  fprintf(stdout, "%s,%s,%s,%s,%10.10f,%10.10f,%10.10f,%ld,%ld\n",
+  // input-name,query,directed,weighted,time-full,time-path,time-betw,n-aff-src,n-aff-tgt,upd-path,upd-betw,tau-hat,tau-ast
+  fprintf(stdout, "%s,%s,%s,%s,%10.10f,%10.10f,%10.10f,%ld,%ld,%10.10f,%10.10f,%ld,%ld\n",
           arguments.input_file,
           arguments.query == QUERY_INSERT ? "insert" : "delete",
           arguments.is_directed ? "directed" : "undirected",
@@ -176,6 +176,8 @@ int main(int argc, char* argv[]) {
           stats.time_full,
           stats.time_path,
           stats.time_betw,
+          stats.n_aff_src,
+          stats.n_aff_tgt,
           stats.upd_path,
           stats.upd_betw,
           stats.n_tau_hat,
