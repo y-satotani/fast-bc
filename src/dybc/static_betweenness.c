@@ -142,6 +142,9 @@ void _betweenness_unweighted(igraph_t* G,
   igraph_stack_init(&stack, n);
 
   for(igraph_integer_t source = 0; source < n; source++) {
+    for(igraph_integer_t target = 0; target < n; target++)
+      MATRIX(*D, source, target) = IGRAPH_INFINITY;
+
     igraph_dqueue_push(&queue, source);
     MATRIX(*D, source, source) = 0;
     MATRIX(*S, source, source) = 1;
@@ -149,7 +152,6 @@ void _betweenness_unweighted(igraph_t* G,
     while(!igraph_dqueue_empty(&queue)) {
       long int u = igraph_dqueue_pop(&queue);
       igraph_stack_push(&stack, u);
-
       igraph_vector_int_t* neis = igraph_inclist_get(&inclist, u);
       long int nneis = igraph_vector_int_size(neis);
       for(long int ni = 0; ni < nneis; ni++) {
@@ -158,7 +160,7 @@ void _betweenness_unweighted(igraph_t* G,
         igraph_real_t d_v = MATRIX(*D, source, v);
         igraph_real_t d_vp = 1 + MATRIX(*D, source, u);
 
-        if(d_v == 0. && v != source) {
+        if(d_v == IGRAPH_INFINITY && v != source) {
           // first visit
           igraph_vector_int_t* pv = igraph_adjlist_get(&precedings, v);
           igraph_vector_int_resize(pv, 1);
