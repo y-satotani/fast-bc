@@ -6,8 +6,8 @@
 #include <igraph/igraph.h>
 #include "dybc_exp_common.h"
 #include "dybc_io.h"
-#include "dybc_update_query.h"
-#include "dybc_update_stats.h"
+#include "dybc/dybc_update_query.h"
+#include "dybc/dybc_update_stats.h"
 
 const char *argp_program_version =
   "exp-compare-performance beta";

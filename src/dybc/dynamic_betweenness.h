@@ -4,6 +4,7 @@
 #include <igraph/igraph.h>
 #include "graph_info.h"
 #include "update_info.h"
+#include "dybc_update_stats.h"
 
 void insert_edge(graph_info_t* graph, update_info_t* update);
 void delete_edge(graph_info_t* graph, update_info_t* update);
@@ -60,5 +61,11 @@ void update_deps_unweighted_statistics(igraph_t* G,
                                        igraph_vector_int_t* targets,
                                        igraph_real_t factor,
                                        igraph_vector_int_t* traversed_vertices);
+
+void count_affected_vertices_betw(igraph_t* G,
+                                  igraph_vector_int_t* aff_deps_before,
+                                  igraph_vector_int_t* aff_deps_after,
+                                  igraph_vector_int_t* sources,
+                                  dybc_update_stats_t* upd_stats);
 
 #endif // _DYNAMIC_BETWEENNESS_H_

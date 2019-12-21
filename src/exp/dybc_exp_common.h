@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <igraph/igraph.h>
 #include <dybc/static_betweenness.h>
-#include "dybc_update_query.h"
-#include "dybc_update_stats.h"
+#include "dybc/dybc_update_stats.h"
+#include "dybc/dybc_update_query.h"
 
 int choose_random_edge_for(igraph_t* G,
                            dybc_update_query_t query,
