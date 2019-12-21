@@ -8,8 +8,8 @@
 
 #include "dybc/static_betweenness.h"
 #include "dybc/dynamic_betweenness.h"
-#include "dybc/incremental_betweenness.h"
-#include "dybc/decremental_betweenness.h"
+#include "dybc/incremental_shortest_path.h"
+#include "dybc/decremental_shortest_path.h"
 
 int choose_random_edge_for(igraph_t* G,
                            dybc_update_query_t query,
@@ -36,64 +36,6 @@ int choose_random_edge_for(igraph_t* G,
     *u = *v = -1;
     return 0;
   }
-}
-
-void count_affected_vertices_path_inc(igraph_t* G,
-                                      igraph_inclist_t* preds,
-                                      igraph_inclist_t* succs,
-                                      igraph_matrix_t* D,
-                                      igraph_matrix_int_t* S,
-                                      igraph_vector_t* B,
-                                      igraph_integer_t u,
-                                      igraph_integer_t v,
-                                      igraph_vector_t* weights,
-                                      igraph_real_t weight,
-                                      dybc_update_stats_t* upd_stats) {
-  if(!upd_stats) return;
-
-  long int n_sources, n_targets;
-  long int n_affected_targets, n_affected_sources;
-  igraph_vector_int_t sources, targets;
-  n_affected_sources = n_affected_targets = 0;
-  igraph_vector_int_init(&sources, 0);
-  igraph_vector_int_init(&targets, 0);
-
-  // count targets
-  affected_sources_inc(G, preds, &sources, D, u, v, v, weights, weight);
-  n_sources = igraph_vector_int_size(&sources);
-  for(long int si = 0; si < igraph_vector_int_size(&sources); si++) {
-    igraph_integer_t s = VECTOR(sources)[si];
-    if(!igraph_is_directed(G))
-      affected_sources_inc(G, preds, &targets, D, v, u, s, weights, weight);
-    else
-      affected_targets_inc(G, succs, &targets, D, u, v, s, weights, weight);
-    n_affected_targets += igraph_vector_int_size(&targets);
-  }
-
-  // count sources
-  if(!igraph_is_directed(G))
-    affected_sources_inc(G, preds, &targets, D, v, u, u, weights, weight);
-  else
-    affected_targets_inc(G, succs, &targets, D, u, v, u, weights, weight);
-  n_targets = igraph_vector_int_size(&targets);
-  for(long int ti = 0; ti < igraph_vector_int_size(&targets); ti++) {
-    igraph_integer_t t = VECTOR(targets)[ti];
-    affected_sources_inc(G, preds, &sources, D, u, v, t, weights, weight);
-    n_affected_sources += igraph_vector_int_size(&sources);
-  }
-
-  // calculate the average of the number of affected vertices
-  if(n_sources + n_targets > 0)
-    upd_stats->upd_path
-      = (double)(n_affected_sources + n_affected_targets)
-      / (n_targets + n_sources);
-  else
-    upd_stats->upd_path = 0.0;
-  upd_stats->n_aff_src = n_sources;
-  upd_stats->n_aff_tgt = n_targets;
-
-  igraph_vector_int_destroy(&sources);
-  igraph_vector_int_destroy(&targets);
 }
 
 void incremental_update(igraph_t* G,
@@ -259,65 +201,6 @@ void incremental_update(igraph_t* G,
   igraph_inclist_destroy(&succs);
   if(igraph_is_directed(G))
     igraph_inclist_destroy(&preds);
-}
-
-
-void count_affected_vertices_path_dec(igraph_t* G,
-                                      igraph_inclist_t* preds,
-                                      igraph_inclist_t* succs,
-                                      igraph_matrix_t* D,
-                                      igraph_matrix_int_t* S,
-                                      igraph_vector_t* B,
-                                      igraph_integer_t u,
-                                      igraph_integer_t v,
-                                      igraph_vector_t* weights,
-                                      igraph_real_t weight,
-                                      dybc_update_stats_t* upd_stats) {
-  if(!upd_stats) return;
-
-  long int n_sources, n_targets;
-  long int n_affected_targets, n_affected_sources;
-  igraph_vector_int_t sources, targets;
-  n_affected_sources = n_affected_targets = 0;
-  igraph_vector_int_init(&sources, 0);
-  igraph_vector_int_init(&targets, 0);
-
-  // count targets
-  affected_sources_dec(G, preds, &sources, D, u, v, v, weights, weight);
-  n_sources = igraph_vector_int_size(&sources);
-  for(long int si = 0; si < igraph_vector_int_size(&sources); si++) {
-    igraph_integer_t s = VECTOR(sources)[si];
-    if(!igraph_is_directed(G))
-      affected_sources_dec(G, preds, &targets, D, v, u, s, weights, weight);
-    else
-      affected_targets_dec(G, succs, &targets, D, u, v, s, weights, weight);
-    n_affected_targets += igraph_vector_int_size(&targets);
-  }
-
-  // count sources
-  if(!igraph_is_directed(G))
-    affected_sources_dec(G, preds, &targets, D, v, u, u, weights, weight);
-  else
-    affected_targets_dec(G, succs, &targets, D, u, v, u, weights, weight);
-  n_targets = igraph_vector_int_size(&targets);
-  for(long int ti = 0; ti < igraph_vector_int_size(&targets); ti++) {
-    igraph_integer_t t = VECTOR(targets)[ti];
-    affected_sources_dec(G, preds, &sources, D, u, v, t, weights, weight);
-    n_affected_sources += igraph_vector_int_size(&sources);
-  }
-
-  // calculate the mean of the number of affected vertices
-  if(n_sources + n_targets > 0)
-    upd_stats->upd_path
-      = (double)(n_affected_sources + n_affected_targets)
-      / (n_targets + n_sources);
-  else
-    upd_stats->upd_path = 0;
-  upd_stats->n_aff_src = n_sources;
-  upd_stats->n_aff_tgt = n_targets;
-
-  igraph_vector_int_destroy(&sources);
-  igraph_vector_int_destroy(&targets);
 }
 
 void decremental_update(igraph_t* G,

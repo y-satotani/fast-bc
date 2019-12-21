@@ -1,11 +1,12 @@
 
-#ifndef _INCREMENTAL_BETWEENNESS_H_
-#define _INCREMENTAL_BETWEENNESS_H_
+#ifndef _DECREMENTAL_SHORTEST_PATH_H_
+#define _DECREMENTAL_SHORTEST_PATH_H_
 
 #include <igraph/igraph.h>
 #include <igraph/igraph_types_internal.h>
+#include "dybc_update_stats.h"
 
-void update_sssp_inc_weighted(igraph_t* G,               // graph
+void update_sssp_dec_weighted(igraph_t* G,               // graph
                               igraph_inclist_t* preds,   // predecessors list
                               igraph_inclist_t* succs,   // successors list
                               igraph_matrix_t* D,        // distance matrix
@@ -16,7 +17,7 @@ void update_sssp_inc_weighted(igraph_t* G,               // graph
                               igraph_vector_t* weights,  // weight vector
                               igraph_real_t weight);     // weight of u-v
 
-void update_stsp_inc_weighted(igraph_t* G,               // graph
+void update_stsp_dec_weighted(igraph_t* G,               // graph
                               igraph_inclist_t* preds,   // predecessors list
                               igraph_inclist_t* succs,   // successors list
                               igraph_matrix_t* D,        // distance matrix
@@ -27,7 +28,7 @@ void update_stsp_inc_weighted(igraph_t* G,               // graph
                               igraph_vector_t* weights,  // weight vector
                               igraph_real_t weight);     // weight of u-v
 
-void update_sssp_inc_unweighted(igraph_t* G,             // graph
+void update_sssp_dec_unweighted(igraph_t* G,             // graph
                                 igraph_inclist_t* preds, // predecessors list
                                 igraph_inclist_t* succs, // successors list
                                 igraph_matrix_t* D,      // distance matrix
@@ -36,7 +37,7 @@ void update_sssp_inc_unweighted(igraph_t* G,             // graph
                                 igraph_integer_t v,      // endpoint
                                 igraph_integer_t source);// source vertex
 
-void update_stsp_inc_unweighted(igraph_t* G,             // graph
+void update_stsp_dec_unweighted(igraph_t* G,             // graph
                                 igraph_inclist_t* preds, // predecessors list
                                 igraph_inclist_t* succs, // successors list
                                 igraph_matrix_t* D,      // distance matrix
@@ -45,7 +46,7 @@ void update_stsp_inc_unweighted(igraph_t* G,             // graph
                                 igraph_integer_t v,      // endpoint
                                 igraph_integer_t target);// target vertex
 
-void affected_targets_inc(igraph_t* G,               // graph
+void affected_targets_dec(igraph_t* G,               // graph
                           igraph_inclist_t* inclist, // incident list
                           igraph_vector_int_t* out,  // result
                           igraph_matrix_t* D,        // distance matrix
@@ -55,7 +56,7 @@ void affected_targets_inc(igraph_t* G,               // graph
                           igraph_vector_t* weights,  // weight vector (opt)
                           igraph_real_t weight);     // weight of u-v (opt)
 
-void affected_sources_inc(igraph_t* G,               // graph
+void affected_sources_dec(igraph_t* G,               // graph
                           igraph_inclist_t* inclist, // incident list
                           igraph_vector_int_t* out,  // result
                           igraph_matrix_t* D,        // distance matrix
@@ -65,4 +66,16 @@ void affected_sources_inc(igraph_t* G,               // graph
                           igraph_vector_t* weights,  // weight vector (opt)
                           igraph_real_t weight);     // weight of u-v (opt)
 
-#endif // _INCREMENTAL_BETWEENNESS_H_
+void count_affected_vertices_path_dec(igraph_t* G,
+                                      igraph_inclist_t* preds,
+                                      igraph_inclist_t* succs,
+                                      igraph_matrix_t* D,
+                                      igraph_matrix_int_t* S,
+                                      igraph_vector_t* B,
+                                      igraph_integer_t u,
+                                      igraph_integer_t v,
+                                      igraph_vector_t* weights,
+                                      igraph_real_t weight,
+                                      dybc_update_stats_t* upd_stats);
+
+#endif // _DECREMENTAL_SHORTEST_PATH_H_
