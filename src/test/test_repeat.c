@@ -49,11 +49,11 @@ int test_repeat(unsigned long int seed, int steps, igraph_bool_t directed) {
     eid = igraph_rng_get_integer
       (igraph_rng_default(), 0, igraph_ecount(&G)-1);
     igraph_edge(&G, eid, &u, &v);
-    weight = igraph_vector_e(&weights, eid);
+    weight = IGRAPH_INFINITY;
     decremental_update_weighted(&G, &D, &S, &B, u, v, &weights, weight);
 
     sprintf(test_name, "test_repeat (%lu) at dec step %d", seed, step);
-    int res = check_quantities(test_name, &G, &D, &S, &B, &weights);
+    res |= check_quantities(test_name, &G, &D, &S, &B, &weights);
   }
 
   _DYBC_TEST_DEST_;

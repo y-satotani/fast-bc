@@ -5,23 +5,32 @@ int dybc_read_edgelist(igraph_t* G,
                        igraph_vector_t* weights,
                        igraph_bool_t is_directed,
                        FILE* istream) {
-  igraph_integer_t u, v;
+
+  igraph_vector_t edges;
+  igraph_integer_t max_vid = -1, u, v;
   igraph_real_t w;
   int n_fields;
   char line[1024];
-  igraph_empty(G, 0, is_directed);
+
+  igraph_vector_init(&edges, 0);
   igraph_vector_init(weights, 0);
+
   while(fgets(line, 1024, istream) != NULL) {
     n_fields = sscanf(line, "%d %d %lf", &u, &v, &w);
-    igraph_integer_t max_v = u > v ? u : v;
-    if(igraph_vcount(G) <= max_v)
-      igraph_add_vertices(G, max_v-igraph_vcount(G)+1, 0);
-    igraph_add_edge(G, u, v);
+    igraph_integer_t vid = u > v ? u : v;
+    if(max_vid < vid) max_vid = vid;
+    igraph_vector_push_back(&edges, u);
+    igraph_vector_push_back(&edges, v);
     if(n_fields == 3)
       igraph_vector_push_back(weights, w);
   }
+
+  igraph_empty(G, max_vid+1, is_directed);
+  igraph_add_edges(G, &edges, 0);
+
   if(igraph_ecount(G) != igraph_vector_size(weights))
     igraph_vector_clear(weights);
+  igraph_vector_destroy(&edges);
   return 1;
 }
 

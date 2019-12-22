@@ -5,7 +5,7 @@
 #include <argp.h>
 #include <igraph/igraph.h>
 #include <dybc/static_betweenness.h>
-#include "dybc_update_query.h"
+#include "dybc/dybc_update_query.h"
 #include "dybc_batch_update.h"
 
 const char *argp_program_version =

@@ -52,9 +52,10 @@ void update_deps_weighted(igraph_t* G,
                           igraph_vector_int_t* targets,
                           igraph_vector_t* weights,
                           igraph_real_t weight,
-                          igraph_real_t factor) {
+                          igraph_real_t factor,
+                          igraph_bool_t is_post_update) {
   update_deps_weighted_statistics
-    (G, preds, D, S, B, u, v, source, targets, weights, weight, factor, 0);
+    (G, preds, D, S, B, u, v, source, targets, weights, weight, factor, is_post_update, 0);
 }
 
 void update_deps_unweighted(igraph_t* G,
@@ -66,9 +67,10 @@ void update_deps_unweighted(igraph_t* G,
                             igraph_integer_t v,
                             igraph_integer_t source,
                             igraph_vector_int_t* targets,
-                            igraph_real_t factor) {
+                            igraph_real_t factor,
+                            igraph_bool_t is_post_update) {
   update_deps_unweighted_statistics
-    (G, preds, D, S, B, u, v, source, targets, factor, 0);
+    (G, preds, D, S, B, u, v, source, targets, factor, is_post_update, 0);
 }
 
 void update_deps_weighted_statistics(igraph_t* G,
@@ -83,6 +85,7 @@ void update_deps_weighted_statistics(igraph_t* G,
                                      igraph_vector_t* weights,
                                      igraph_real_t weight,
                                      igraph_real_t factor,
+                                     igraph_bool_t is_post_update,
                                      igraph_vector_int_t* traversed_vertices) {
 #define EPS IGRAPH_SHORTEST_PATH_EPSILON
 #define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
@@ -128,6 +131,18 @@ void update_deps_weighted_statistics(igraph_t* G,
       if(!igraph_2wheap_has_elem(&queue, y))
         igraph_2wheap_push_with_index(&queue, y, d(source, y));
     }
+
+    // this is for incremental updates
+    if(is_post_update && v == x && u != source
+       && cmp(d(source, u) + weight, d(source, v)) == 0) {
+      igraph_integer_t y = u;
+      if(VECTOR(is_target)[x])
+        Delta(y) += (1. + Delta(x)) * s(source, y) / s(source, x);
+      else
+        Delta(y) += Delta(x) * s(source, y) / s(source, x);
+      if(!igraph_2wheap_has_elem(&queue, y))
+        igraph_2wheap_push_with_index(&queue, y, d(source, y));
+    }
   }
 
   igraph_vector_destroy(&Delta);
@@ -152,6 +167,7 @@ void update_deps_unweighted_statistics(igraph_t* G,
                                        igraph_integer_t source,
                                        igraph_vector_int_t* targets,
                                        igraph_real_t factor,
+                                       igraph_bool_t is_post_update,
                                        igraph_vector_int_t* traversed_vertices) {
 #define EPS IGRAPH_SHORTEST_PATH_EPSILON
 #define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
@@ -201,6 +217,20 @@ void update_deps_unweighted_statistics(igraph_t* G,
         igraph_vector_bool_set(&visited, y, 1);
       }
     }
+
+    // this is for incremental updates
+    if(is_post_update && v == x && u != source
+       && cmp(d(source, u) + 1.0, d(source, v)) == 0) {
+      igraph_integer_t y = u;
+      if(VECTOR(is_target)[x])
+        Delta(y) += (1. + Delta(x)) * s(source, y) / s(source, x);
+      else
+        Delta(y) += Delta(x) * s(source, y) / s(source, x);
+      if(!igraph_vector_bool_e(&visited, y)) {
+        igraph_buckets_add(&queue, (long int)d(source, y), y);
+        igraph_vector_bool_set(&visited, y, 1);
+      }
+    }
   }
 
   igraph_vector_destroy(&Delta);
@@ -215,3 +245,30 @@ void update_deps_unweighted_statistics(igraph_t* G,
 #undef Delta
 }
 
+void count_affected_vertices_betw(igraph_t* G,
+                                  igraph_vector_int_t* aff_deps_before,
+                                  igraph_vector_int_t* aff_deps_after,
+                                  igraph_vector_int_t* sources,
+                                  dybc_update_stats_t* upd_stats) {
+  if(!upd_stats) return;
+
+  igraph_integer_t n_sources = igraph_vector_int_size(sources);
+  if(n_sources > 0)
+    upd_stats->upd_betw
+      = (double)(igraph_vector_int_size(aff_deps_before)
+                 + igraph_vector_int_size(aff_deps_after))
+      / (2 * n_sources);
+  else
+    upd_stats->upd_betw = 0;
+
+  upd_stats->n_tau_hat = 0;
+  igraph_vector_bool_t is_affected;
+  igraph_vector_bool_init(&is_affected, igraph_vcount(G));
+  for(long int i = 0; i < igraph_vector_int_size(aff_deps_before); i++)
+    VECTOR(is_affected)[VECTOR(*aff_deps_before)[i]] = 1;
+  for(long int i = 0; i < igraph_vector_int_size(aff_deps_after); i++)
+    VECTOR(is_affected)[VECTOR(*aff_deps_after)[i]] = 1;
+  for(long int i = 0; i < igraph_vector_bool_size(&is_affected); i++)
+    upd_stats->n_tau_hat += VECTOR(is_affected)[i];
+  igraph_vector_bool_destroy(&is_affected);
+}

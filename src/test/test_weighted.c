@@ -19,7 +19,10 @@ int test_weighted_random(igraph_bool_t directed,
     weight = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
     igraph_vector_set(&weights, eid, weight);
   }
-  weight = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
+  if(incremental)
+    weight = igraph_rng_get_integer(igraph_rng_default(), 1, 5);
+  else
+    weight = IGRAPH_INFINITY;
   // select endpoints
   if(incremental) {
     igraph_t C;
