@@ -132,7 +132,7 @@ void update_deps_weighted_statistics(igraph_t* G,
         igraph_2wheap_push_with_index(&queue, y, d(source, y));
     }
 
-    // TODO: this is for incremental updates
+    // this is for incremental updates
     if(is_post_update && v == x && u != source
        && cmp(d(source, u) + weight, d(source, v)) == 0) {
       igraph_integer_t y = u;
@@ -218,7 +218,7 @@ void update_deps_unweighted_statistics(igraph_t* G,
       }
     }
 
-    // TODO: this is for incremental updates
+    // this is for incremental updates
     if(is_post_update && v == x && u != source
        && cmp(d(source, u) + 1.0, d(source, v)) == 0) {
       igraph_integer_t y = u;
