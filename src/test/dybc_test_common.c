@@ -9,6 +9,8 @@
 #include "dybc/dynamic_betweenness.h"
 #include "dybc/incremental_shortest_path.h"
 #include "dybc/decremental_shortest_path.h"
+#include "dybc/incremental_betweenness.h"
+#include "dybc/decremental_betweenness.h"
 
 int check_quantities(const char* test_name,
                      igraph_t* G,
@@ -130,37 +132,19 @@ void incremental_update_weighted(igraph_t* G,
 
     // factor is -2 for undirected and -1 for directed
     igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
-    update_deps_weighted(G, &preds, D, S, B, u, v,
-                         s, &targets, weights, weight, -factor, 0);
+    update_betw_inc_weighted(G, &preds, D, S, B, u, v,
+                             s, &targets, weights, weight, -factor, 0);
 
-    // add edge
-    igraph_add_edge(G, u, v);
-    igraph_vector_push_back(weights, weight);
-    igraph_integer_t eid = igraph_ecount(G) - 1;
-    igraph_vector_int_push_back(igraph_inclist_get(&succs, u), eid);
-    igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
-
+    // update sssp
     update_sssp_inc_weighted
       (G, &preds, &succs, D, S, u, v, s, weights, weight, 0);
 
     // increase betweenness
     // factor is 2 for undirected and 1 for directed
-    update_deps_weighted(G, &preds, D, S, B, u, v,
-                         s, &targets, weights, weight, factor, 0);
+    update_betw_inc_weighted(G, &preds, D, S, B, u, v,
+                             s, &targets, weights, weight, factor, 1);
 
-    // cleanup
-    igraph_delete_edges(G, igraph_ess_1(eid));
-    igraph_vector_remove(weights, eid);
-    igraph_vector_int_pop_back(igraph_inclist_get(&succs, u));
-    igraph_vector_int_pop_back(igraph_inclist_get(&preds, v));
   }
-
-  // add edge
-  igraph_integer_t eid = igraph_ecount(G);
-  igraph_add_edge(G, u, v);
-  igraph_vector_push_back(weights, weight);
-  igraph_vector_int_push_back(igraph_inclist_get(&succs, u), eid);
-  igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
 
   for(int ti = 0; ti < igraph_vector_int_size(&targets_); ti++) {
     igraph_integer_t t = igraph_vector_int_e(&targets_, ti);
@@ -171,6 +155,13 @@ void incremental_update_weighted(igraph_t* G,
       update_stsp_inc_weighted
         (G, &preds, &succs, D, S, u, v, t, weights, IGRAPH_INFINITY, 0);
   }
+
+  // add edge
+  igraph_integer_t eid = igraph_ecount(G);
+  igraph_add_edge(G, u, v);
+  igraph_vector_push_back(weights, weight);
+  igraph_vector_int_push_back(igraph_inclist_get(&succs, u), eid);
+  igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
 
   // cleanup
   igraph_vector_int_destroy(&sources);
@@ -189,12 +180,6 @@ void decremental_update_weighted(igraph_t* G,
                                  igraph_integer_t v,
                                  igraph_vector_t* weights,
                                  igraph_real_t weight) {
-  // move the edge to be deleted to back of list
-  igraph_integer_t eid;
-  igraph_get_eid(G, &eid, u, v, 0, 1);
-  igraph_delete_edges(G, igraph_ess_1(eid));
-  weight = igraph_vector_e(weights, eid);
-  igraph_vector_remove(weights, eid);
 
   igraph_inclist_t succs, preds;
   if(igraph_is_directed(G)) {
@@ -204,13 +189,6 @@ void decremental_update_weighted(igraph_t* G,
     igraph_inclist_init(G, &succs, IGRAPH_ALL);
     preds = succs;
   }
-
-  // then push the deleted edge
-  eid = igraph_ecount(G);
-  igraph_add_edge(G, u, v);
-  igraph_vector_push_back(weights, weight);
-  igraph_vector_int_push_back(igraph_inclist_get(&succs, u), eid);
-  igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
 
   // finding affected sources
   igraph_vector_int_t targets_;
@@ -230,14 +208,8 @@ void decremental_update_weighted(igraph_t* G,
     // decrease betweenness
     // factor is -2 for undirected and -1 for directed
     igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
-    update_deps_weighted(G, &preds, D, S, B, u, v,
-                         s, &targets, weights, weight, -factor, 0);
-
-    // modify
-    igraph_delete_edges(G, igraph_ess_1(eid));
-    igraph_vector_pop_back(weights);
-    igraph_vector_int_pop_back(igraph_inclist_get(&succs, u));
-    igraph_vector_int_pop_back(igraph_inclist_get(&preds, v));
+    update_betw_dec_weighted(G, &preds, D, S, B, u, v,
+                             s, &targets, weights, weight, -factor, 0);
 
     // update sssp
     update_sssp_dec_weighted
@@ -245,21 +217,10 @@ void decremental_update_weighted(igraph_t* G,
 
     // increase betweenness
     // factor is 2 for undirected and 1 for directed
-    update_deps_weighted(G, &preds, D, S, B, u, v,
-                         s, &targets, weights, weight, factor, 0);
-
-    // cleanup for next round
-    igraph_add_edge(G, u, v);
-    igraph_vector_push_back(weights, weight);
-    igraph_vector_int_push_back(igraph_inclist_get(&succs, u), eid);
-    igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
+    update_betw_dec_weighted(G, &preds, D, S, B, u, v,
+                         s, &targets, weights, weight, factor, 1);
   }
 
-  // delete an edge
-  igraph_delete_edges(G, igraph_ess_1(eid));
-  igraph_vector_pop_back(weights);
-  igraph_vector_int_pop_back(igraph_inclist_get(&succs, u));
-  igraph_vector_int_pop_back(igraph_inclist_get(&preds, v));
   // update stsp
   for(int ti = 0; ti < igraph_vector_int_size(&targets_); ti++) {
     igraph_integer_t t = igraph_vector_int_e(&targets_, ti);
@@ -270,6 +231,13 @@ void decremental_update_weighted(igraph_t* G,
       update_stsp_dec_weighted
         (G, &preds, &succs, D, S, u, v, t, weights, IGRAPH_INFINITY, 0);
   }
+
+  // delete an edge
+  igraph_integer_t eid;
+  igraph_get_eid(G, &eid, u, v, 0, 1);
+  igraph_delete_edges(G, igraph_ess_1(eid));
+  igraph_vector_remove(weights, eid);
+
   // cleanup
   igraph_vector_int_destroy(&sources);
   igraph_vector_int_destroy(&targets);
@@ -312,32 +280,17 @@ void incremental_update_unweighted(igraph_t* G,
 
     // factor is -2 for undirected and -1 for directed
     igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
-    update_deps_unweighted(G, &preds, D, S, B, u, v, s, &targets, -factor, 0);
+    update_betw_inc_unweighted(G, &preds, D, S, B, u, v, s, &targets, -factor, 0);
 
-    // add edge
-    igraph_add_edge(G, u, v);
-    igraph_integer_t eid = igraph_ecount(G) - 1;
-    igraph_vector_int_push_back(igraph_inclist_get(&succs, u), eid);
-    igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
-
+    // update sssp
     update_sssp_inc_unweighted(G, &preds, &succs, D, S, u, v, s, 0);
 
     // increase betweenness
     // factor is 2 for undirected and 1 for directed
-    update_deps_unweighted(G, &preds, D, S, B, u, v, s, &targets, factor, 0);
-
-    // cleanup
-    igraph_delete_edges(G, igraph_ess_1(eid));
-    igraph_vector_int_pop_back(igraph_inclist_get(&succs, u));
-    igraph_vector_int_pop_back(igraph_inclist_get(&preds, v));
+    update_betw_inc_unweighted(G, &preds, D, S, B, u, v, s, &targets, factor, 1);
   }
 
-  // add edge
-  igraph_integer_t eid = igraph_ecount(G);
-  igraph_add_edge(G, u, v);
-  igraph_vector_int_push_back(igraph_inclist_get(&succs, u), eid);
-  igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
-
+  // update stsp
   for(int ti = 0; ti < igraph_vector_int_size(&targets_); ti++) {
     igraph_integer_t t = igraph_vector_int_e(&targets_, ti);
     if(!igraph_is_directed(G))
@@ -345,6 +298,12 @@ void incremental_update_unweighted(igraph_t* G,
     else
       update_stsp_inc_unweighted(G, &preds, &succs, D, S, u, v, t, 0);
   }
+
+  // add edge
+  igraph_integer_t eid = igraph_ecount(G);
+  igraph_add_edge(G, u, v);
+  igraph_vector_int_push_back(igraph_inclist_get(&succs, u), eid);
+  igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
 
   // cleanup
   igraph_vector_int_destroy(&sources);
@@ -361,11 +320,8 @@ void decremental_update_unweighted(igraph_t* G,
                                    igraph_vector_t* B,
                                    igraph_integer_t u,
                                    igraph_integer_t v) {
-  // move the edge to be deleted to back of list
-  igraph_integer_t eid;
-  igraph_get_eid(G, &eid, u, v, 0, 1);
-  igraph_delete_edges(G, igraph_ess_1(eid));
 
+  // prepare incident list
   igraph_inclist_t succs, preds;
   if(igraph_is_directed(G)) {
     igraph_inclist_init(G, &succs, IGRAPH_OUT);
@@ -374,12 +330,6 @@ void decremental_update_unweighted(igraph_t* G,
     igraph_inclist_init(G, &succs, IGRAPH_ALL);
     preds = succs;
   }
-
-  // then push the deleted edge
-  eid = igraph_ecount(G);
-  igraph_add_edge(G, u, v);
-  igraph_vector_int_push_back(igraph_inclist_get(&succs, u), eid);
-  igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
 
   // finding affected sources
   igraph_vector_int_t targets_;
@@ -399,30 +349,17 @@ void decremental_update_unweighted(igraph_t* G,
     // decrease betweenness
     // factor is -2 for undirected and -1 for directed
     igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
-    update_deps_unweighted(G, &preds, D, S, B, u, v, s, &targets, -factor, 0);
-
-    // modify
-    igraph_delete_edges(G, igraph_ess_1(eid));
-    igraph_vector_int_pop_back(igraph_inclist_get(&succs, u));
-    igraph_vector_int_pop_back(igraph_inclist_get(&preds, v));
+    update_betw_dec_unweighted(G, &preds, D, S, B, u, v, s, &targets, -factor, 0);
 
     // update sssp
     update_sssp_dec_unweighted(G, &preds, &succs, D, S, u, v, s, 0);
 
     // increase betweenness
     // factor is 2 for undirected and 1 for directed
-    update_deps_unweighted(G, &preds, D, S, B, u, v, s, &targets, factor, 0);
+    update_betw_dec_unweighted(G, &preds, D, S, B, u, v, s, &targets, factor, 1);
 
-    // cleanup for next round
-    igraph_add_edge(G, u, v);
-    igraph_vector_int_push_back(igraph_inclist_get(&succs, u), eid);
-    igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
   }
 
-  // delete an edge
-  igraph_delete_edges(G, igraph_ess_1(eid));
-  igraph_vector_int_pop_back(igraph_inclist_get(&succs, u));
-  igraph_vector_int_pop_back(igraph_inclist_get(&preds, v));
   // update stsp
   for(int ti = 0; ti < igraph_vector_int_size(&targets_); ti++) {
     igraph_integer_t t = igraph_vector_int_e(&targets_, ti);
@@ -431,6 +368,14 @@ void decremental_update_unweighted(igraph_t* G,
     else
       update_stsp_dec_unweighted(G, &preds, &succs, D, S, u, v, t, 0);
   }
+
+  // delete an edge
+  igraph_integer_t eid;
+  igraph_get_eid(G, &eid, u, v, 1, 1);
+  igraph_delete_edges(G, igraph_ess_1(eid));
+  igraph_vector_int_pop_back(igraph_inclist_get(&succs, u));
+  igraph_vector_int_pop_back(igraph_inclist_get(&preds, v));
+
   // cleanup
   igraph_vector_int_destroy(&sources);
   igraph_vector_int_destroy(&targets);

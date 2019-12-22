@@ -160,7 +160,7 @@ void make_more_graph_and_edge(igraph_t* G,
 
   *v = 4;
   *w = 7;
-  *c = 2.;
+  *c = IGRAPH_INFINITY;
 }
 
 int check_aug_dist_of_minigraph(igraph_matrix_t* D,
