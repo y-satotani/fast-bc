@@ -7,8 +7,8 @@
 
 #include "dybc/static_betweenness.h"
 #include "dybc/dynamic_betweenness.h"
-#include "dybc/incremental_betweenness.h"
-#include "dybc/decremental_betweenness.h"
+#include "dybc/incremental_shortest_path.h"
+#include "dybc/decremental_shortest_path.h"
 
 int check_quantities(const char* test_name,
                      igraph_t* G,
@@ -118,20 +118,20 @@ void incremental_update_weighted(igraph_t* G,
   igraph_vector_int_init(&targets, 0);
   igraph_vector_int_init(&targets_, 0);
   if(!igraph_is_directed(G))
-    affected_sources_inc(G, &preds, &targets_, D, v, u, u, weights, weight);
+    affected_sources_inc(G, &preds, &targets_, D, v, u, u, weights, weight, 0);
   else
-    affected_targets_inc(G, &succs, &targets_, D, u, v, u, weights, weight);
-  affected_sources_inc(G, &preds, &sources, D, u, v, v, weights, weight);
+    affected_targets_inc(G, &succs, &targets_, D, u, v, u, weights, weight, 0);
+  affected_sources_inc(G, &preds, &sources, D, u, v, v, weights, weight, 0);
 
   for(igraph_integer_t si = 0; si < igraph_vector_int_size(&sources); si++) {
     // decrease betweenness
     igraph_integer_t s = igraph_vector_int_e(&sources, si);
-    affected_targets_inc(G, &succs, &targets, D, u, v, s, weights, weight);
+    affected_targets_inc(G, &succs, &targets, D, u, v, s, weights, weight, 0);
 
     // factor is -2 for undirected and -1 for directed
     igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
     update_deps_weighted(G, &preds, D, S, B, u, v,
-                             s, &targets, weights, weight, -factor);
+                         s, &targets, weights, weight, -factor, 0);
 
     // add edge
     igraph_add_edge(G, u, v);
@@ -141,12 +141,12 @@ void incremental_update_weighted(igraph_t* G,
     igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
 
     update_sssp_inc_weighted
-      (G, &preds, &succs, D, S, u, v, s, weights, weight);
+      (G, &preds, &succs, D, S, u, v, s, weights, weight, 0);
 
     // increase betweenness
     // factor is 2 for undirected and 1 for directed
     update_deps_weighted(G, &preds, D, S, B, u, v,
-                             s, &targets, weights, weight, factor);
+                         s, &targets, weights, weight, factor, 0);
 
     // cleanup
     igraph_delete_edges(G, igraph_ess_1(eid));
@@ -166,10 +166,10 @@ void incremental_update_weighted(igraph_t* G,
     igraph_integer_t t = igraph_vector_int_e(&targets_, ti);
     if(!igraph_is_directed(G))
       update_sssp_inc_weighted
-        (G, &succs, &preds, D, S, v, u, t, weights, weight);
+        (G, &succs, &preds, D, S, v, u, t, weights, weight, 0);
     else
       update_stsp_inc_weighted
-        (G, &preds, &succs, D, S, u, v, t, weights, IGRAPH_INFINITY);
+        (G, &preds, &succs, D, S, u, v, t, weights, IGRAPH_INFINITY, 0);
   }
 
   // cleanup
@@ -219,19 +219,19 @@ void decremental_update_weighted(igraph_t* G,
   igraph_vector_int_init(&targets, 0);
   igraph_vector_int_init(&targets_, 0);
   if(!igraph_is_directed(G))
-    affected_sources_dec(G, &preds, &targets_, D, v, u, u, weights, weight);
+    affected_sources_dec(G, &preds, &targets_, D, v, u, u, weights, weight, 0);
   else
-    affected_targets_dec(G, &succs, &targets_, D, u, v, u, weights, weight);
-  affected_sources_dec(G, &preds, &sources, D, u, v, v, weights, weight);
+    affected_targets_dec(G, &succs, &targets_, D, u, v, u, weights, weight, 0);
+  affected_sources_dec(G, &preds, &sources, D, u, v, v, weights, weight, 0);
 
   for(igraph_integer_t si = 0; si < igraph_vector_int_size(&sources); si++) {
     igraph_integer_t s = igraph_vector_int_e(&sources, si);
-    affected_targets_dec(G, &succs, &targets, D, u, v, s, weights, weight);
+    affected_targets_dec(G, &succs, &targets, D, u, v, s, weights, weight, 0);
     // decrease betweenness
     // factor is -2 for undirected and -1 for directed
     igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
     update_deps_weighted(G, &preds, D, S, B, u, v,
-                             s, &targets, weights, weight, -factor);
+                         s, &targets, weights, weight, -factor, 0);
 
     // modify
     igraph_delete_edges(G, igraph_ess_1(eid));
@@ -241,12 +241,12 @@ void decremental_update_weighted(igraph_t* G,
 
     // update sssp
     update_sssp_dec_weighted
-      (G, &preds, &succs, D, S, u, v, s, weights, weight);
+      (G, &preds, &succs, D, S, u, v, s, weights, weight, 0);
 
     // increase betweenness
     // factor is 2 for undirected and 1 for directed
     update_deps_weighted(G, &preds, D, S, B, u, v,
-                             s, &targets, weights, weight, factor);
+                         s, &targets, weights, weight, factor, 0);
 
     // cleanup for next round
     igraph_add_edge(G, u, v);
@@ -265,10 +265,10 @@ void decremental_update_weighted(igraph_t* G,
     igraph_integer_t t = igraph_vector_int_e(&targets_, ti);
     if(!igraph_is_directed(G))
       update_sssp_dec_weighted
-        (G, &succs, &preds, D, S, v, u, t, weights, weight);
+        (G, &succs, &preds, D, S, v, u, t, weights, weight, 0);
     else
       update_stsp_dec_weighted
-        (G, &preds, &succs, D, S, u, v, t, weights, IGRAPH_INFINITY);
+        (G, &preds, &succs, D, S, u, v, t, weights, IGRAPH_INFINITY, 0);
   }
   // cleanup
   igraph_vector_int_destroy(&sources);
@@ -300,19 +300,19 @@ void incremental_update_unweighted(igraph_t* G,
   igraph_vector_int_init(&targets, 0);
   igraph_vector_int_init(&targets_, 0);
   if(!igraph_is_directed(G))
-    affected_sources_inc(G, &preds, &targets_, D, v, u, u, NULL, 0);
+    affected_sources_inc(G, &preds, &targets_, D, v, u, u, NULL, 0, 0);
   else
-    affected_targets_inc(G, &succs, &targets_, D, u, v, u, NULL, 0);
-  affected_sources_inc(G, &preds, &sources, D, u, v, v, NULL, 0);
+    affected_targets_inc(G, &succs, &targets_, D, u, v, u, NULL, 0, 0);
+  affected_sources_inc(G, &preds, &sources, D, u, v, v, NULL, 0, 0);
 
   for(igraph_integer_t si = 0; si < igraph_vector_int_size(&sources); si++) {
     // decrease betweenness
     igraph_integer_t s = igraph_vector_int_e(&sources, si);
-    affected_targets_inc(G, &succs, &targets, D, u, v, s, NULL, 0);
+    affected_targets_inc(G, &succs, &targets, D, u, v, s, NULL, 0, 0);
 
     // factor is -2 for undirected and -1 for directed
     igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
-    update_deps_unweighted(G, &preds, D, S, B, u, v, s, &targets, -factor);
+    update_deps_unweighted(G, &preds, D, S, B, u, v, s, &targets, -factor, 0);
 
     // add edge
     igraph_add_edge(G, u, v);
@@ -320,11 +320,11 @@ void incremental_update_unweighted(igraph_t* G,
     igraph_vector_int_push_back(igraph_inclist_get(&succs, u), eid);
     igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
 
-    update_sssp_inc_unweighted(G, &preds, &succs, D, S, u, v, s);
+    update_sssp_inc_unweighted(G, &preds, &succs, D, S, u, v, s, 0);
 
     // increase betweenness
     // factor is 2 for undirected and 1 for directed
-    update_deps_unweighted(G, &preds, D, S, B, u, v, s, &targets, factor);
+    update_deps_unweighted(G, &preds, D, S, B, u, v, s, &targets, factor, 0);
 
     // cleanup
     igraph_delete_edges(G, igraph_ess_1(eid));
@@ -341,9 +341,9 @@ void incremental_update_unweighted(igraph_t* G,
   for(int ti = 0; ti < igraph_vector_int_size(&targets_); ti++) {
     igraph_integer_t t = igraph_vector_int_e(&targets_, ti);
     if(!igraph_is_directed(G))
-      update_sssp_inc_unweighted(G, &succs, &preds, D, S, v, u, t);
+      update_sssp_inc_unweighted(G, &succs, &preds, D, S, v, u, t, 0);
     else
-      update_stsp_inc_unweighted(G, &preds, &succs, D, S, u, v, t);
+      update_stsp_inc_unweighted(G, &preds, &succs, D, S, u, v, t, 0);
   }
 
   // cleanup
@@ -388,18 +388,18 @@ void decremental_update_unweighted(igraph_t* G,
   igraph_vector_int_init(&targets, 0);
   igraph_vector_int_init(&targets_, 0);
   if(!igraph_is_directed(G))
-    affected_sources_dec(G, &preds, &targets_, D, v, u, u, NULL, 0);
+    affected_sources_dec(G, &preds, &targets_, D, v, u, u, NULL, 0, 0);
   else
-    affected_targets_dec(G, &succs, &targets_, D, u, v, u, NULL, 0);
-  affected_sources_dec(G, &preds, &sources, D, u, v, v, NULL, 0);
+    affected_targets_dec(G, &succs, &targets_, D, u, v, u, NULL, 0, 0);
+  affected_sources_dec(G, &preds, &sources, D, u, v, v, NULL, 0, 0);
 
   for(igraph_integer_t si = 0; si < igraph_vector_int_size(&sources); si++) {
     igraph_integer_t s = igraph_vector_int_e(&sources, si);
-    affected_targets_dec(G, &succs, &targets, D, u, v, s, NULL, 0);
+    affected_targets_dec(G, &succs, &targets, D, u, v, s, NULL, 0, 0);
     // decrease betweenness
     // factor is -2 for undirected and -1 for directed
     igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
-    update_deps_unweighted(G, &preds, D, S, B, u, v, s, &targets, -factor);
+    update_deps_unweighted(G, &preds, D, S, B, u, v, s, &targets, -factor, 0);
 
     // modify
     igraph_delete_edges(G, igraph_ess_1(eid));
@@ -407,11 +407,11 @@ void decremental_update_unweighted(igraph_t* G,
     igraph_vector_int_pop_back(igraph_inclist_get(&preds, v));
 
     // update sssp
-    update_sssp_dec_unweighted(G, &preds, &succs, D, S, u, v, s);
+    update_sssp_dec_unweighted(G, &preds, &succs, D, S, u, v, s, 0);
 
     // increase betweenness
     // factor is 2 for undirected and 1 for directed
-    update_deps_unweighted(G, &preds, D, S, B, u, v, s, &targets, factor);
+    update_deps_unweighted(G, &preds, D, S, B, u, v, s, &targets, factor, 0);
 
     // cleanup for next round
     igraph_add_edge(G, u, v);
@@ -427,9 +427,9 @@ void decremental_update_unweighted(igraph_t* G,
   for(int ti = 0; ti < igraph_vector_int_size(&targets_); ti++) {
     igraph_integer_t t = igraph_vector_int_e(&targets_, ti);
     if(!igraph_is_directed(G))
-      update_sssp_dec_unweighted(G, &succs, &preds, D, S, v, u, t);
+      update_sssp_dec_unweighted(G, &succs, &preds, D, S, v, u, t, 0);
     else
-      update_stsp_dec_unweighted(G, &preds, &succs, D, S, u, v, t);
+      update_stsp_dec_unweighted(G, &preds, &succs, D, S, u, v, t, 0);
   }
   // cleanup
   igraph_vector_int_destroy(&sources);

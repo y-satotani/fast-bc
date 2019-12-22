@@ -52,9 +52,10 @@ void update_deps_weighted(igraph_t* G,
                           igraph_vector_int_t* targets,
                           igraph_vector_t* weights,
                           igraph_real_t weight,
-                          igraph_real_t factor) {
+                          igraph_real_t factor,
+                          igraph_bool_t is_post_update) {
   update_deps_weighted_statistics
-    (G, preds, D, S, B, u, v, source, targets, weights, weight, factor, 0);
+    (G, preds, D, S, B, u, v, source, targets, weights, weight, factor, is_post_update, 0);
 }
 
 void update_deps_unweighted(igraph_t* G,
@@ -66,9 +67,10 @@ void update_deps_unweighted(igraph_t* G,
                             igraph_integer_t v,
                             igraph_integer_t source,
                             igraph_vector_int_t* targets,
-                            igraph_real_t factor) {
+                            igraph_real_t factor,
+                            igraph_bool_t is_post_update) {
   update_deps_unweighted_statistics
-    (G, preds, D, S, B, u, v, source, targets, factor, 0);
+    (G, preds, D, S, B, u, v, source, targets, factor, is_post_update, 0);
 }
 
 void update_deps_weighted_statistics(igraph_t* G,
@@ -83,6 +85,7 @@ void update_deps_weighted_statistics(igraph_t* G,
                                      igraph_vector_t* weights,
                                      igraph_real_t weight,
                                      igraph_real_t factor,
+                                     igraph_bool_t is_post_update,
                                      igraph_vector_int_t* traversed_vertices) {
 #define EPS IGRAPH_SHORTEST_PATH_EPSILON
 #define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
@@ -152,6 +155,7 @@ void update_deps_unweighted_statistics(igraph_t* G,
                                        igraph_integer_t source,
                                        igraph_vector_int_t* targets,
                                        igraph_real_t factor,
+                                       igraph_bool_t is_post_update,
                                        igraph_vector_int_t* traversed_vertices) {
 #define EPS IGRAPH_SHORTEST_PATH_EPSILON
 #define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))

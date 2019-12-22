@@ -15,7 +15,8 @@ void update_sssp_dec_weighted(igraph_t* G,
                               igraph_integer_t v,
                               igraph_integer_t source,
                               igraph_vector_t* weights,
-                              igraph_real_t weight) {
+                              igraph_real_t weight,
+                              igraph_bool_t is_post_mod) {
 #define EPS IGRAPH_SHORTEST_PATH_EPSILON
 #define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
 #define d(a, b) (MATRIX(*D, (a), (b)))
@@ -30,7 +31,8 @@ void update_sssp_dec_weighted(igraph_t* G,
   igraph_vector_int_t targets, is_affected;
   igraph_vector_int_init(&targets, 0);
   igraph_vector_int_init(&is_affected, igraph_vcount(G));
-  affected_targets_dec(G, succs, &targets, D, u, v, source, weights, weight);
+  affected_targets_dec
+    (G, succs, &targets, D, u, v, source, weights, weight, is_post_mod);
   for(long int ti = 0; ti < igraph_vector_int_size(&targets); ti++)
     VECTOR(is_affected)[igraph_vector_int_e(&targets, ti)] = 1;
 
@@ -102,7 +104,8 @@ void update_stsp_dec_weighted(igraph_t* G,
                               igraph_integer_t v,
                               igraph_integer_t target,
                               igraph_vector_t* weights,
-                              igraph_real_t weight) {
+                              igraph_real_t weight,
+                              igraph_bool_t is_post_mod) {
 #define EPS IGRAPH_SHORTEST_PATH_EPSILON
 #define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
 #define d(a, b) (MATRIX(*D, (a), (b)))
@@ -117,7 +120,8 @@ void update_stsp_dec_weighted(igraph_t* G,
   igraph_vector_int_t sources, is_affected;
   igraph_vector_int_init(&sources, 0);
   igraph_vector_int_init(&is_affected, igraph_vcount(G));
-  affected_sources_dec(G, preds, &sources, D, u, v, target, weights, weight);
+  affected_sources_dec
+    (G, preds, &sources, D, u, v, target, weights, weight, is_post_mod);
   for(long int si = 0; si < igraph_vector_int_size(&sources); si++)
     VECTOR(is_affected)[igraph_vector_int_e(&sources, si)] = 1;
 
@@ -185,7 +189,8 @@ void update_sssp_dec_unweighted(igraph_t* G,
                                 igraph_matrix_int_t* S,
                                 igraph_integer_t u,
                                 igraph_integer_t v,
-                                igraph_integer_t source) {
+                                igraph_integer_t source,
+                                igraph_bool_t is_post_mod) {
 #define EPS IGRAPH_SHORTEST_PATH_EPSILON
 #define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
 #define d(a, b) (MATRIX(*D, (a), (b)))
@@ -201,7 +206,8 @@ void update_sssp_dec_unweighted(igraph_t* G,
   igraph_vector_bool_t is_affected;
   igraph_vector_int_init(&targets, 0);
   igraph_vector_bool_init(&is_affected, igraph_vcount(G));
-  affected_targets_dec(G, succs, &targets, D, u, v, source, NULL, 0);
+  affected_targets_dec
+    (G, succs, &targets, D, u, v, source, NULL, 0, is_post_mod);
   for(long int xi = 0; xi < igraph_vector_int_size(&targets); xi++)
     VECTOR(is_affected)[VECTOR(targets)[xi]] = 1;
 
@@ -274,7 +280,8 @@ void update_stsp_dec_unweighted(igraph_t* G,
                                 igraph_matrix_int_t* S,
                                 igraph_integer_t u,
                                 igraph_integer_t v,
-                                igraph_integer_t target) {
+                                igraph_integer_t target,
+                                igraph_bool_t is_post_mod) {
 #define EPS IGRAPH_SHORTEST_PATH_EPSILON
 #define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
 #define d(a, b) (MATRIX(*D, (a), (b)))
@@ -290,7 +297,8 @@ void update_stsp_dec_unweighted(igraph_t* G,
   igraph_vector_bool_t is_affected;
   igraph_vector_int_init(&sources, 0);
   igraph_vector_bool_init(&is_affected, igraph_vcount(G));
-  affected_sources_dec(G, preds, &sources, D, u, v, target, NULL, 0);
+  affected_sources_dec
+    (G, preds, &sources, D, u, v, target, NULL, 0, is_post_mod);
   for(long int xi = 0; xi < igraph_vector_int_size(&sources); xi++)
     VECTOR(is_affected)[VECTOR(sources)[xi]] = 1;
 
@@ -364,7 +372,8 @@ void affected_targets_dec(igraph_t* G,
                           igraph_integer_t v,
                           igraph_integer_t source,
                           igraph_vector_t* weights,
-                          igraph_real_t weight) {
+                          igraph_real_t weight,
+                          igraph_bool_t is_post_mod) {
 #define EPS IGRAPH_SHORTEST_PATH_EPSILON
 #define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
 #define d(a, b) (MATRIX(*D, (a), (b)))
@@ -418,7 +427,8 @@ void affected_sources_dec(igraph_t* G,
                           igraph_integer_t v,
                           igraph_integer_t target,
                           igraph_vector_t* weights,
-                          igraph_real_t weight) {
+                          igraph_real_t weight,
+                          igraph_bool_t is_post_mod) {
 #define EPS IGRAPH_SHORTEST_PATH_EPSILON
 #define cmp(a, b) (igraph_cmp_epsilon((a), (b), EPS))
 #define d(a, b) (MATRIX(*D, (a), (b)))
@@ -474,7 +484,8 @@ void count_affected_vertices_path_dec(igraph_t* G,
                                       igraph_integer_t v,
                                       igraph_vector_t* weights,
                                       igraph_real_t weight,
-                                      dybc_update_stats_t* upd_stats) {
+                                      dybc_update_stats_t* upd_stats,
+                                      igraph_bool_t is_post_mod) {
   if(!upd_stats) return;
 
   long int n_sources, n_targets;
@@ -485,26 +496,32 @@ void count_affected_vertices_path_dec(igraph_t* G,
   igraph_vector_int_init(&targets, 0);
 
   // count targets
-  affected_sources_dec(G, preds, &sources, D, u, v, v, weights, weight);
+  affected_sources_dec
+    (G, preds, &sources, D, u, v, v, weights, weight, is_post_mod);
   n_sources = igraph_vector_int_size(&sources);
   for(long int si = 0; si < igraph_vector_int_size(&sources); si++) {
     igraph_integer_t s = VECTOR(sources)[si];
     if(!igraph_is_directed(G))
-      affected_sources_dec(G, preds, &targets, D, v, u, s, weights, weight);
+      affected_sources_dec
+        (G, preds, &targets, D, v, u, s, weights, weight, is_post_mod);
     else
-      affected_targets_dec(G, succs, &targets, D, u, v, s, weights, weight);
+      affected_targets_dec
+        (G, succs, &targets, D, u, v, s, weights, weight, is_post_mod);
     n_affected_targets += igraph_vector_int_size(&targets);
   }
 
   // count sources
   if(!igraph_is_directed(G))
-    affected_sources_dec(G, preds, &targets, D, v, u, u, weights, weight);
+    affected_sources_dec
+      (G, preds, &targets, D, v, u, u, weights, weight, is_post_mod);
   else
-    affected_targets_dec(G, succs, &targets, D, u, v, u, weights, weight);
+    affected_targets_dec
+      (G, succs, &targets, D, u, v, u, weights, weight, is_post_mod);
   n_targets = igraph_vector_int_size(&targets);
   for(long int ti = 0; ti < igraph_vector_int_size(&targets); ti++) {
     igraph_integer_t t = VECTOR(targets)[ti];
-    affected_sources_dec(G, preds, &sources, D, u, v, t, weights, weight);
+    affected_sources_dec
+      (G, preds, &sources, D, u, v, t, weights, weight, is_post_mod);
     n_affected_sources += igraph_vector_int_size(&sources);
   }
 

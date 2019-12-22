@@ -66,7 +66,7 @@ void incremental_update(igraph_t* G,
   }
 
   count_affected_vertices_path_inc
-    (G, &preds, &succs, D, S, B, u, v, weights, weight, upd_stats);
+    (G, &preds, &succs, D, S, B, u, v, weights, weight, upd_stats, 0);
 
   // initialize vectors store affected vertices
   igraph_vector_int_t targets_;
@@ -81,10 +81,13 @@ void incremental_update(igraph_t* G,
   // find affected sources/targets
   start = clock();
   if(!igraph_is_directed(G))
-    affected_sources_inc(G, &preds, &targets_, D, v, u, u, weights, weight);
+    affected_sources_inc
+      (G, &preds, &targets_, D, v, u, u, weights, weight, 0);
   else
-    affected_targets_inc(G, &succs, &targets_, D, u, v, u, weights, weight);
-  affected_sources_inc(G, &preds, &sources, D, u, v, v, weights, weight);
+    affected_targets_inc
+      (G, &succs, &targets_, D, u, v, u, weights, weight, 0);
+  affected_sources_inc
+    (G, &preds, &sources, D, u, v, v, weights, weight, 0);
   end = clock();
   if(upd_stats)
     upd_stats->time_full += (double)(end - start) / CLOCKS_PER_SEC;
@@ -94,15 +97,16 @@ void incremental_update(igraph_t* G,
     // decrease betweenness
     start = clock();
     igraph_integer_t s = igraph_vector_int_e(&sources, si);
-    affected_targets_inc(G, &succs, &targets, D, u, v, s, weights, weight);
+    affected_targets_inc
+      (G, &succs, &targets, D, u, v, s, weights, weight, 0);
     // factor is -2 for undirected and -1 for directed
     igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
     if(weights)
       update_deps_weighted_statistics(G, &preds, D, S, B, u, v,
-         s, &targets, weights, weight, -factor, &aff_deps_before);
+                                      s, &targets, weights, weight, -factor, 0, &aff_deps_before);
     else
       update_deps_unweighted_statistics(G, &preds, D, S, B, u, v,
-         s, &targets, -factor, &aff_deps_before);
+                                        s, &targets, -factor, 0, &aff_deps_before);
     end = clock();
     if(upd_stats) {
       double time_betw = (double)(end - start) / CLOCKS_PER_SEC;
@@ -122,10 +126,10 @@ void incremental_update(igraph_t* G,
     start = clock();
     if(weights)
       update_sssp_inc_weighted
-        (G, &preds, &succs, D, S, u, v, s, weights, weight);
+        (G, &preds, &succs, D, S, u, v, s, weights, weight, 0);
     else
       update_sssp_inc_unweighted
-        (G, &preds, &succs, D, S, u, v, s);
+        (G, &preds, &succs, D, S, u, v, s, 0);
     end = clock();
     if(upd_stats) {
       double time_path = (double)(end - start) / CLOCKS_PER_SEC;
@@ -138,10 +142,10 @@ void incremental_update(igraph_t* G,
     start = clock();
     if(weights)
       update_deps_weighted_statistics(G, &preds, D, S, B, u, v,
-         s, &targets, weights, weight, factor, &aff_deps_after);
+                                      s, &targets, weights, weight, factor, 0, &aff_deps_after);
     else
       update_deps_unweighted_statistics(G, &preds, D, S, B, u, v,
-         s, &targets, factor, &aff_deps_after);
+                                        s, &targets, factor, 0, &aff_deps_after);
     end = clock();
     if(upd_stats) {
       double time_betw = (double)(end - start) / CLOCKS_PER_SEC;
@@ -171,16 +175,16 @@ void incremental_update(igraph_t* G,
     igraph_integer_t t = igraph_vector_int_e(&targets_, ti);
     if(!igraph_is_directed(G) && weights)
       update_sssp_inc_weighted
-        (G, &succs, &preds, D, S, v, u, t, weights, weight);
+        (G, &succs, &preds, D, S, v, u, t, weights, weight, 0);
     else if(igraph_is_directed(G) && weights)
       update_stsp_inc_weighted
-        (G, &preds, &succs, D, S, u, v, t, weights, IGRAPH_INFINITY);
+        (G, &preds, &succs, D, S, u, v, t, weights, IGRAPH_INFINITY, 0);
     else if(!igraph_is_directed(G) && !weights)
       update_sssp_inc_unweighted
-        (G, &succs, &preds, D, S, v, u, t);
+        (G, &succs, &preds, D, S, v, u, t, 0);
     else if(igraph_is_directed(G) && !weights)
       update_stsp_inc_unweighted
-        (G, &preds, &succs, D, S, u, v, t);
+        (G, &preds, &succs, D, S, u, v, t, 0);
   }
   end = clock();
   if(upd_stats) {
@@ -247,7 +251,7 @@ void decremental_update(igraph_t* G,
   igraph_vector_int_push_back(igraph_inclist_get(&preds, v), eid);
 
   count_affected_vertices_path_dec
-    (G, &preds, &succs, D, S, B, u, v, weights, weight, upd_stats);
+    (G, &preds, &succs, D, S, B, u, v, weights, weight, upd_stats, 0);
 
   // initialize vectors for storing affected vertices
   igraph_vector_int_t targets_;
@@ -262,10 +266,10 @@ void decremental_update(igraph_t* G,
   // find affected source/targets
   start = clock();
   if(!igraph_is_directed(G))
-    affected_sources_dec(G, &preds, &targets_, D, v, u, u, weights, weight);
+    affected_sources_dec(G, &preds, &targets_, D, v, u, u, weights, weight, 0);
   else
-    affected_targets_dec(G, &succs, &targets_, D, u, v, u, weights, weight);
-  affected_sources_dec(G, &preds, &sources, D, u, v, v, weights, weight);
+    affected_targets_dec(G, &succs, &targets_, D, u, v, u, weights, weight, 0);
+  affected_sources_dec(G, &preds, &sources, D, u, v, v, weights, weight, 0);
   end = clock();
   if(upd_stats)
     upd_stats->time_full += (double)(end - start) / CLOCKS_PER_SEC;
@@ -275,15 +279,15 @@ void decremental_update(igraph_t* G,
     // decrease betweenness
     start = clock();
     igraph_integer_t s = igraph_vector_int_e(&sources, si);
-    affected_targets_dec(G, &succs, &targets, D, u, v, s, weights, weight);
+    affected_targets_dec(G, &succs, &targets, D, u, v, s, weights, weight, 0);
     // factor is -2 for undirected and -1 for directed
     igraph_real_t factor = igraph_is_directed(G) ? 1 : 2;
     if(weights)
       update_deps_weighted_statistics(G, &preds, D, S, B, u, v,
-         s, &targets, weights, weight, -factor, &aff_deps_before);
+                                      s, &targets, weights, weight, -factor, 0, &aff_deps_before);
     else
       update_deps_unweighted_statistics(G, &preds, D, S, B, u, v,
-         s, &targets, -factor, &aff_deps_before);
+                                        s, &targets, -factor, 0, &aff_deps_before);
     end = clock();
     if(upd_stats) {
       double time_betw = (double)(end - start) / CLOCKS_PER_SEC;
@@ -302,10 +306,10 @@ void decremental_update(igraph_t* G,
     start = clock();
     if(weights)
       update_sssp_dec_weighted
-        (G, &preds, &succs, D, S, u, v, s, weights, weight);
+        (G, &preds, &succs, D, S, u, v, s, weights, weight, 0);
     else
       update_sssp_dec_unweighted
-        (G, &preds, &succs, D, S, u, v, s);
+        (G, &preds, &succs, D, S, u, v, s, 0);
     end = clock();
     if(upd_stats) {
       double time_path = (double)(end - start) / CLOCKS_PER_SEC;
@@ -318,10 +322,10 @@ void decremental_update(igraph_t* G,
     start = clock();
     if(weights)
       update_deps_weighted_statistics(G, &preds, D, S, B, u, v,
-         s, &targets, weights, weight, factor, &aff_deps_after);
+                                      s, &targets, weights, weight, factor, 0, &aff_deps_after);
     else
       update_deps_unweighted_statistics(G, &preds, D, S, B, u, v,
-         s, &targets, factor, &aff_deps_after);
+                                        s, &targets, factor, 0, &aff_deps_after);
     end = clock();
     if(upd_stats) {
       double time_betw = (double)(end - start) / CLOCKS_PER_SEC;
@@ -350,16 +354,16 @@ void decremental_update(igraph_t* G,
     igraph_integer_t t = igraph_vector_int_e(&targets_, ti);
     if(!igraph_is_directed(G) && weights)
       update_sssp_dec_weighted
-        (G, &succs, &preds, D, S, v, u, t, weights, weight);
+        (G, &succs, &preds, D, S, v, u, t, weights, weight, 0);
     else if(igraph_is_directed(G) && weights)
       update_stsp_dec_weighted
-        (G, &preds, &succs, D, S, u, v, t, weights, IGRAPH_INFINITY);
+        (G, &preds, &succs, D, S, u, v, t, weights, IGRAPH_INFINITY, 0);
     else if(!igraph_is_directed(G) && !weights)
       update_sssp_dec_unweighted
-        (G, &succs, &preds, D, S, v, u, t);
+        (G, &succs, &preds, D, S, v, u, t, 0);
     else if(igraph_is_directed(G) && !weights)
       update_stsp_dec_unweighted
-        (G, &preds, &succs, D, S, u, v, t);
+        (G, &preds, &succs, D, S, u, v, t, 0);
   }
   end = clock();
   if(upd_stats) {

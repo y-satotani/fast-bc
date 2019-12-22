@@ -23,7 +23,8 @@ void update_deps_weighted(igraph_t* G,                  // graph
                           igraph_vector_int_t* targets, // targets
                           igraph_vector_t* weights,     // weights
                           igraph_real_t weight,         // weight of u-v
-                          igraph_real_t factor);        // multiplier
+                          igraph_real_t factor,         // multiplier
+                          igraph_bool_t is_post_upd);   // post-update flag
 
 void update_deps_unweighted(igraph_t* G,                  // graph
                             igraph_inclist_t* preds,      // predecessors
@@ -34,7 +35,8 @@ void update_deps_unweighted(igraph_t* G,                  // graph
                             igraph_integer_t v,           // endpoint
                             igraph_integer_t source,      // source
                             igraph_vector_int_t* targets, // targets
-                            igraph_real_t factor);        // multiplier
+                            igraph_real_t factor,         // multiplier
+                            igraph_bool_t is_post_upd);   // post-update flag
 
 void update_deps_weighted_statistics(igraph_t* G,
                                      igraph_inclist_t* preds,
@@ -48,6 +50,7 @@ void update_deps_weighted_statistics(igraph_t* G,
                                      igraph_vector_t* weights,
                                      igraph_real_t weight,
                                      igraph_real_t factor,
+                                     igraph_bool_t is_post_upd,
                                      igraph_vector_int_t* traversed_vertices);
 
 void update_deps_unweighted_statistics(igraph_t* G,
@@ -60,6 +63,7 @@ void update_deps_unweighted_statistics(igraph_t* G,
                                        igraph_integer_t source,
                                        igraph_vector_int_t* targets,
                                        igraph_real_t factor,
+                                       igraph_bool_t is_post_upd,
                                        igraph_vector_int_t* traversed_vertices);
 
 void count_affected_vertices_betw(igraph_t* G,
