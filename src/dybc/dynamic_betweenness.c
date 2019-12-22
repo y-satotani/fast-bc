@@ -131,6 +131,18 @@ void update_deps_weighted_statistics(igraph_t* G,
       if(!igraph_2wheap_has_elem(&queue, y))
         igraph_2wheap_push_with_index(&queue, y, d(source, y));
     }
+
+    // TODO: this is for incremental updates
+    if(is_post_update && v == x && u != source
+       && cmp(d(source, u) + weight, d(source, v)) == 0) {
+      igraph_integer_t y = u;
+      if(VECTOR(is_target)[x])
+        Delta(y) += (1. + Delta(x)) * s(source, y) / s(source, x);
+      else
+        Delta(y) += Delta(x) * s(source, y) / s(source, x);
+      if(!igraph_2wheap_has_elem(&queue, y))
+        igraph_2wheap_push_with_index(&queue, y, d(source, y));
+    }
   }
 
   igraph_vector_destroy(&Delta);
@@ -196,6 +208,20 @@ void update_deps_unweighted_statistics(igraph_t* G,
 
       if(y == source || cmp(d(source, x), d(source, y) + 1.0) < 0)
         continue;
+      if(VECTOR(is_target)[x])
+        Delta(y) += (1. + Delta(x)) * s(source, y) / s(source, x);
+      else
+        Delta(y) += Delta(x) * s(source, y) / s(source, x);
+      if(!igraph_vector_bool_e(&visited, y)) {
+        igraph_buckets_add(&queue, (long int)d(source, y), y);
+        igraph_vector_bool_set(&visited, y, 1);
+      }
+    }
+
+    // TODO: this is for incremental updates
+    if(is_post_update && v == x && u != source
+       && cmp(d(source, u) + 1.0, d(source, v)) == 0) {
+      igraph_integer_t y = u;
       if(VECTOR(is_target)[x])
         Delta(y) += (1. + Delta(x)) * s(source, y) / s(source, x);
       else
