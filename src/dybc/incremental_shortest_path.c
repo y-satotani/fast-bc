@@ -28,36 +28,64 @@ void update_sssp_inc_weighted(igraph_t* G,
   }
 
   igraph_2wheap_t queue;
+  igraph_vector_t d_old;
+  igraph_vector_int_t s_old;
   igraph_2wheap_init(&queue, igraph_vcount(G));
-  igraph_2wheap_push_with_index(&queue, v, -(d(source, u) + weight));
+  igraph_vector_init(&d_old, igraph_vcount(G));
+  igraph_vector_int_init(&s_old, igraph_vcount(G));
+
+  VECTOR(d_old)[u] = d(source, u);
+  VECTOR(s_old)[u] = s(source, u);
+  VECTOR(d_old)[v] = d(source, v);
+  VECTOR(s_old)[v] = s(source, v);
+  if(cmp(d(source, u) + weight, d(source, v)) < 0) {
+    d(source, v) = d(source, u) + weight;
+    s(source, v) = s(source, u);
+    igraph_2wheap_push_with_index(&queue, v, -d(source, v));
+  } else if(cmp(d(source, u) + weight, d(source, v)) == 0) {
+    s(source, v) += s(source, u);
+    igraph_2wheap_push_with_index(&queue, v, -d(source, v));
+  }
 
   while(!igraph_2wheap_empty(&queue)) {
     long int x = igraph_2wheap_max_index(&queue);
-    d(source, x) = -igraph_2wheap_delete_max(&queue);
-    s(source, x) = 0;
+    igraph_2wheap_delete_max(&queue);
 
-    igraph_vector_int_t* ps = igraph_inclist_get(preds, x);
-    for(long int pi = 0; pi < igraph_vector_int_size(ps); pi++) {
-      igraph_integer_t eid = VECTOR(*ps)[pi];
-      igraph_integer_t p = IGRAPH_OTHER(G, eid, x);
-      if(cmp(d(source, x), d(source, p) + l(eid)) == 0)
-        s(source, x) += s(source, p);
-    } /* for preds */
+    igraph_vector_int_t* neis = igraph_inclist_get(succs, x);
+    long int nneis = igraph_vector_int_size(neis);
+    for(long int ni = 0; ni < nneis; ni++) {
+      igraph_integer_t eid = VECTOR(*neis)[ni];
+      igraph_integer_t y = IGRAPH_OTHER(G, eid, x);
+      if(x == u && y == v) continue;
 
-    igraph_vector_int_t* ss = igraph_inclist_get(succs, x);
-    for(long int si = 0; si < igraph_vector_int_size(ss); si++) {
-      igraph_integer_t eid = VECTOR(*ss)[si];
-      igraph_integer_t s = IGRAPH_OTHER(G, eid, x);
-      igraph_real_t d_s = d(source, x) + l(eid);
-      if(cmp(d_s, d(source, s)) > 0) continue;
-      if(!igraph_2wheap_has_elem(&queue, s))
-        igraph_2wheap_push_with_index(&queue, s, -d_s);
-      else if(cmp(d_s, -igraph_2wheap_get(&queue, s)) < 0)
-        igraph_2wheap_modify(&queue, s, -d_s);
-    } /* for succs */
-  } /* !igraph_2wheap_empty(&Q) */
+      if(VECTOR(d_old)[y] == 0.) {
+        VECTOR(d_old)[y] = d(source, y);
+        VECTOR(s_old)[y] = s(source, y);
+      }
+      if(cmp(d(source, x) + l(eid), d(source, y)) < 0) {
+        d(source, y) = d(source, x) + l(eid);
+        s(source, y) = s(source, x);
+      } else if(cmp(d(source, x) + l(eid), d(source, y)) == 0) {
+        if(cmp(VECTOR(d_old)[y], d(source, y)) == 0
+           && cmp(VECTOR(d_old)[x] + l(eid), VECTOR(d_old)[y]) == 0) {
+          s(source, y) += s(source, x) - VECTOR(s_old)[x];
+        } else {
+          s(source, y) += s(source, x);
+        }
+      } // end if(d_sx+l_xy == d_sy)
+      if(cmp(d(source, x) + l(eid), d(source, y)) == 0) {
+        if(!igraph_2wheap_has_elem(&queue, y))
+          igraph_2wheap_push_with_index(&queue, y, -d(source, y));
+        else
+          igraph_2wheap_modify(&queue, y, -d(source, y));
+      }
+    } // end for all y in neighbors
+  } // end while queue is not empty
 
   igraph_2wheap_destroy(&queue);
+  igraph_vector_destroy(&d_old);
+  igraph_vector_int_destroy(&s_old);
+
 #undef EPS
 #undef cmp
 #undef d
@@ -87,36 +115,64 @@ void update_stsp_inc_weighted(igraph_t* G,
   }
 
   igraph_2wheap_t queue;
+  igraph_vector_t d_old;
+  igraph_vector_int_t s_old;
   igraph_2wheap_init(&queue, igraph_vcount(G));
-  igraph_2wheap_push_with_index(&queue, u, -(weight + d(v, target)));
+  igraph_vector_init(&d_old, igraph_vcount(G));
+  igraph_vector_int_init(&s_old, igraph_vcount(G));
+
+  VECTOR(d_old)[u] = d(u, target);
+  VECTOR(s_old)[u] = s(u, target);
+  VECTOR(d_old)[v] = d(v, target);
+  VECTOR(s_old)[v] = s(v, target);
+  if(cmp(weight + d(v, target), d(u, target)) < 0) {
+    d(u, target) = weight + d(v, target);
+    s(u, target) = s(v, target);
+    igraph_2wheap_push_with_index(&queue, u, -d(u, target));
+  } else if(cmp(weight + d(v, target), d(u, target)) == 0) {
+    s(u, target) += s(v, target);
+    igraph_2wheap_push_with_index(&queue, u, -d(u, target));
+  }
 
   while(!igraph_2wheap_empty(&queue)) {
     long int x = igraph_2wheap_max_index(&queue);
-    d(x, target) = -igraph_2wheap_delete_max(&queue);
-    s(x, target) = 0;
+    igraph_2wheap_delete_max(&queue);
 
-    igraph_vector_int_t* ss = igraph_inclist_get(succs, x);
-    for(long int si = 0; si < igraph_vector_int_size(ss); si++) {
-      igraph_integer_t eid = VECTOR(*ss)[si];
-      igraph_integer_t s = IGRAPH_OTHER(G, eid, x);
-      if(cmp(d(x, target), l(eid) + d(s, target)) == 0)
-        s(x, target) += s(s, target);
-    } /* for succs */
+    igraph_vector_int_t* neis = igraph_inclist_get(preds, x);
+    long int nneis = igraph_vector_int_size(neis);
+    for(long int ni = 0; ni < nneis; ni++) {
+      igraph_integer_t eid = VECTOR(*neis)[ni];
+      igraph_integer_t y = IGRAPH_OTHER(G, eid, x);
+      if(x == v && y == u) continue;
 
-    igraph_vector_int_t* ps = igraph_inclist_get(preds, x);
-    for(long int pi = 0; pi < igraph_vector_int_size(ps); pi++) {
-      igraph_integer_t eid = VECTOR(*ps)[pi];
-      igraph_integer_t p = IGRAPH_OTHER(G, eid, x);
-      igraph_real_t d_p = l(eid) + d(x, target);
-      if(cmp(d_p, d(p, target)) > 0) continue;
-      if(!igraph_2wheap_has_elem(&queue, p))
-        igraph_2wheap_push_with_index(&queue, p, -d_p);
-      else if(cmp(d_p, -igraph_2wheap_get(&queue, p)) < 0)
-        igraph_2wheap_modify(&queue, p, -d_p);
-    } /* for preds */
-  } /* !igraph_2wheap_empty(&Q) */
+      if(VECTOR(d_old)[y] == 0.) {
+        VECTOR(d_old)[y] = d(y, target);
+        VECTOR(s_old)[y] = s(y, target);
+      }
+      if(cmp(l(eid) + d(x, target), d(y, target)) < 0) {
+        d(y, target) = l(eid) + d(x, target);
+        s(y, target) = s(x, target);
+      } else if(cmp(l(eid) + d(x, target), d(y, target)) == 0) {
+        if(cmp(VECTOR(d_old)[y], d(y, target)) == 0
+           && cmp(l(eid) + VECTOR(d_old)[x], VECTOR(d_old)[y]) == 0) {
+          s(y, target) += s(x, target) - VECTOR(s_old)[x];
+        } else {
+          s(y, target) += s(x, target);
+        }
+      } // end if(d_sx+l_xy == d_sy)
+      if(cmp(l(eid) + d(x, target), d(y, target)) == 0) {
+        if(!igraph_2wheap_has_elem(&queue, y))
+          igraph_2wheap_push_with_index(&queue, y, -d(y, target));
+        else
+          igraph_2wheap_modify(&queue, y, -d(y, target));
+      }
+    } // end for all y in neighbors
+  } // end while queue is not empty
 
   igraph_2wheap_destroy(&queue);
+  igraph_vector_destroy(&d_old);
+  igraph_vector_int_destroy(&s_old);
+
 #undef EPS
 #undef cmp
 #undef d
@@ -324,12 +380,25 @@ void affected_targets_inc(igraph_t* G,
      || cmp(d(source, v), d(source, u) + weight) < 0) {
     return;
   }
+
   igraph_vector_bool_t visited;
   igraph_dqueue_int_t queue;
   igraph_vector_bool_init(&visited, igraph_vcount(G));
   igraph_dqueue_int_init(&queue, 0);
   igraph_vector_bool_set(&visited, v, 1);
   igraph_dqueue_int_push(&queue, v);
+
+  igraph_bool_t use_post_mod = 0;
+  if(is_post_mod) {
+    igraph_integer_t eid;
+    igraph_get_eid(G, &eid, u, v, 1, 0);
+    if(eid < 0) use_post_mod = 1;                        // an edge is added
+    else if(weight && weight < l(eid)) use_post_mod = 1; // weight decreases
+  }
+  if(use_post_mod) {
+    igraph_vector_bool_set(&visited, v, 1);
+    igraph_dqueue_int_push(&queue, v);
+  }
 
   while(!igraph_dqueue_int_empty(&queue)) {
     igraph_integer_t x = igraph_dqueue_int_pop(&queue);
@@ -339,6 +408,7 @@ void affected_targets_inc(igraph_t* G,
     for(ni = 0; ni < igraph_vector_int_size(neis); ni++) {
       igraph_integer_t eid = VECTOR(*neis)[ni];
       igraph_integer_t y = IGRAPH_OTHER(G, eid, x);
+      if(use_post_mod && x == u && y == v) continue; // this edge is traversed
       igraph_real_t d_sy = d(source, y);
       igraph_real_t d_sy_p = d(source, u) + weight + d(v, x) + l(eid);
       if(cmp(d_sy, d_sy_p) >= 0 && !igraph_vector_bool_e(&visited, y)) {
@@ -379,12 +449,25 @@ void affected_sources_inc(igraph_t* G,
      || cmp(d(u, target), weight + d(v, target)) < 0) {
     return;
   }
+
   igraph_vector_bool_t visited;
   igraph_dqueue_int_t queue;
   igraph_vector_bool_init(&visited, igraph_vcount(G));
   igraph_dqueue_int_init(&queue, 0);
   igraph_vector_bool_set(&visited, u, 1);
   igraph_dqueue_int_push(&queue, u);
+
+  igraph_bool_t use_post_mod = 0;
+  if(is_post_mod) {
+    igraph_integer_t eid;
+    igraph_get_eid(G, &eid, u, v, 1, 0);
+    if(eid < 0) use_post_mod = 1;                        // an edge is added
+    else if(weight && weight < l(eid)) use_post_mod = 1; // weight decreases
+  }
+  if(use_post_mod) {
+    igraph_vector_bool_set(&visited, v, 1);
+    igraph_dqueue_int_push(&queue, v);
+  }
 
   while(!igraph_dqueue_int_empty(&queue)) {
     igraph_integer_t x = igraph_dqueue_int_pop(&queue);
@@ -394,6 +477,7 @@ void affected_sources_inc(igraph_t* G,
     for(ni = 0; ni < igraph_vector_int_size(neis); ni++) {
       igraph_integer_t eid = VECTOR(*neis)[ni];
       igraph_integer_t y = IGRAPH_OTHER(G, eid, x);
+      if(use_post_mod && x == u && y == v) continue; // this edge is traversed
       igraph_real_t d_sy = d(y, target);
       igraph_real_t d_sy_p = l(eid) + d(x, u) + weight + d(v, target);
       if(cmp(d_sy, d_sy_p) >= 0 && !igraph_vector_bool_e(&visited, y)) {
