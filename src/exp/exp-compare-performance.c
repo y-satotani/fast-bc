@@ -148,10 +148,12 @@ int main(int argc, char* argv[]) {
     igraph_vector_minmax(weights, &v_min, &v_max);
     w = igraph_rng_get_integer(igraph_rng_default(), v_min, v_max);
   }
+  if(arguments.query == QUERY_DELETE)
+    w = IGRAPH_INFINITY;
 
-  // update
   clock_t start, end;
   double time_proposed, time_igraph;
+  // measure for proposed algorithm
   start = clock();
   if(arguments.query == QUERY_INSERT)
     incremental_update(&G, &D, &S, &B, u, v, weights, w, NULL);
@@ -162,11 +164,26 @@ int main(int argc, char* argv[]) {
   if(!arguments.is_directed) igraph_vector_scale(&B, 0.5);
   end = clock();
   time_proposed = (double)(end - start) / CLOCKS_PER_SEC;
+
+  // update
+  if(arguments.query == QUERY_INSERT) {
+    igraph_add_edge(&G, u, v);
+    if(weights)
+      igraph_vector_push_back(weights, w);
+  } else if(arguments.query == QUERY_DELETE) {
+    // delete the edge
+    igraph_get_eid(&G, &eid, u, v, 1, 1);
+    igraph_delete_edges(&G, igraph_ess_1(eid));
+    if(weights)
+      igraph_vector_remove(weights, eid);
+  }
+
+  // measure time for igraph betweenness
   igraph_vector_t B_true;
   igraph_vector_init(&B_true, igraph_vcount(&G));
   start = clock();
   igraph_betweenness
-    (&G, &B_true, igraph_vss_all(), arguments.is_directed, weights, 0);
+    (&G, &B_true, igraph_vss_all(), arguments.is_directed, weights, 1);
   end = clock();
   time_igraph = (double)(end - start) / CLOCKS_PER_SEC;
 

@@ -149,6 +149,8 @@ int main(int argc, char* argv[]) {
     igraph_vector_minmax(weights, &v_min, &v_max);
     w = igraph_rng_get_integer(igraph_rng_default(), v_min, v_max);
   }
+  if(arguments.query == QUERY_DELETE)
+    w = IGRAPH_INFINITY;
 
   // update
   igraph_vector_t B_old;
