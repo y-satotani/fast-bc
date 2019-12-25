@@ -1,0 +1,100 @@
+---
+title: "研究進捗報告"
+author: "里谷 佳紀"
+date: "2019年12月25日"
+documentclass: bxjsarticle
+classoption: xelatex,ja=standard,11pt
+geometry: false
+header-includes:
+  - \usepackage{xltxtra}
+  - \usepackage{zxjatype}
+  - \usepackage[ipaex]{zxjafont}
+output:
+  pdf_document:
+    latex_engine: xelatex
+    template: mytemplate.tex
+    number_sections: true
+    fig_caption: true
+  github_document:
+    html_preview: false
+---
+
+```{r setup, include = FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(xtable)
+```
+
+```{r readin, include = FALSE}
+data_net_info <- read_csv('../res/data/real-network-info.csv') %>%
+    rename(nodes = order, links = size)
+
+data_time <- read_csv('../res/data/real-performance-comparison.csv') %>%
+    select(c('network', 'query', 'time-proposed', 'time-brandes')) %>%
+    mutate(network = sub('.edgelist', '', network)) %>%
+    filter(query == 'delete') %>%
+    group_by(network, query) %>%
+    summarise(
+        `Brandes` = median(`time-brandes`),
+        `proposed` = median(`time-proposed`),
+        speedup = median(`time-brandes` / `time-proposed`)
+    ) %>%
+    ungroup() %>%
+    inner_join(data_net_info) %>%
+    select(c('network', 'nodes', 'links', 'is-directed', 'Brandes', 'proposed', 'speedup'))
+
+geomean = function(x) { exp(sum(log(x)) / length(x)) }
+geomean_of_speedups = c(
+    network = 'geometric mean',
+    nodes = NA,
+    links = NA,
+    `is-directed` = NA,
+    `Brandes` = NA,
+    `proposed` = NA,
+    speedup = geomean(data_time$speedup)
+)
+```
+
+# 研究全体の目的
+グラフと全頂点間距離と最短経路の数および依存度が与えられたとき，グラフの辺が削除されたとする．
+このときの全頂点間距離と最短経路の数と依存度を高速に更新する方法を開発する．
+また，実験と理論の両方から既存の方法と比較することで，新方法の有用性を検証する．
+
+# 前回打ち合わせ時に定めた短期目標
+1. 修士論文の執筆
+2. 投稿論文の修正
+3. 実ネットワークでの性能評価
+
+# 本日までの進捗状況
+1. 先週の結果を反映させた．
+2. アルゴリズムと計算量の説明を修正した．現在，実験と実験結果の部分を執筆している．
+3. Stanford large network dataset collection から取得した実ネットワークでの，提案アルゴリズムの性能を評価した．
+結果を以下に示す．
+
+# 実ネットワークでの実験結果
+
+ネットワークから辺をひとつ取り除いた際，媒介中心性更新に要する時間を計測した．
+これを，各ネットワークについて20回計測し，その中央値を計算した．
+
+```{r echo = FALSE, warning = FALSE, message = FALSE, results = 'asis'}
+data_time <- rbind(data_time, t(as.data.frame(geomean_of_speedups))) %>%
+    mutate(
+        nodes = as.numeric(nodes),
+        links = as.numeric(links),
+        `Brandes` = as.numeric(`Brandes`),
+        `proposed` = as.numeric(`proposed`),
+        speedup = as.numeric(speedup)
+    )
+
+hlines = c(-1, 0, nrow(data_time)-1, nrow(data_time))
+print(
+    xtable(data_time,
+           caption = 'Execution time on real networks (in seconds)',
+           digits = c(0, 0, 0, 0, 0, 2, 2, 2)
+           ),
+    caption.placement = 'top',
+    include.rownames = FALSE,
+    hline.after = hlines,
+)
+```
