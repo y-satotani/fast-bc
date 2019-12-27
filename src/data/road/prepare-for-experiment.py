@@ -5,8 +5,8 @@ import subprocess
 import networkx as nx
 from itertools import chain
 
-gml_file = 'road-oka-integer-distance.gml'
-gml_add_file = 'road-oka-additional-integer-distance.gml'
+gml_file = 'road-oka-integer-distance.graphml'
+gml_add_file = 'road-oka-additional-integer-distance.graphml'
 out_base = os.path.splitext(gml_file)[0]
 
 G = nx.read_graphml(gml_file)
@@ -32,17 +32,17 @@ args = [
     f'{out_base}.edgelist',
     f'{out_base}.dybccache',
 ]
-#subprocess.run(args)
+subprocess.run(args)
 
 # 3. .txt which maps graphml vertices <-> edgelist vertices
-with open(f'{out_base}.map.txt', 'w') as fp:
+with open(f'{out_base}.map.list', 'w') as fp:
     contents = '\n'.join(
         f'{a} {b}' for a, b in edgelist_to_graphml.items()
     )
     print(contents, file=fp)
 
 # 4. arguments to pass exp-betweenness-stats
-with open(f'{out_base}.arg.txt', 'w') as fp:
+with open(f'{out_base}.arg.list', 'w') as fp:
     contents = '\n'.join(chain(
         (f'-c {out_base}.dybccache -u {g_to_e(u)} -v {g_to_e(v)} {out_base}.edgelist delete {out_base}-{g_to_e(u)}-{g_to_e(v)}.out.csv'
          for u, v in G.edges),
