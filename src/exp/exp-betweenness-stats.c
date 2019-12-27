@@ -154,22 +154,26 @@ int main(int argc, char* argv[]) {
   }
 
   // update
+  clock_t start, end;
+  start = clock();
   if(arguments.query == QUERY_INSERT)
     incremental_update(&G, &D, &S, &B, u, v, weights, w, 0);
   else if(arguments.query == QUERY_DELETE)
     decremental_update(&G, &D, &S, &B, u, v, weights, w, 0);
   else
     assert(0 && "query must be insert or delete");
+  end = clock();
+  double time = (double)(end - start) / CLOCKS_PER_SEC;
 
   FILE* ostream;
   if(strcmp(arguments.output_file, "-") == 0) ostream = stdout;
   else ostream = fopen(arguments.output_file, "w");
   // input-name,v1,v2,query,time,v,B
   for(igraph_integer_t i = 0; i < igraph_vcount(&G); i++)
-    fprintf(ostream, "%s,%s,%d,%d,%d,%10.10f\n",
+    fprintf(ostream, "%s,%s,%d,%d,%10.10f,%d,%10.10f\n",
             arguments.input_file,
             arguments.query == QUERY_INSERT ? "insert" : "delete",
-            u, v, i, VECTOR(B)[i]);
+            u, v, time, i, VECTOR(B)[i]);
   fclose(ostream);
 
   igraph_matrix_destroy(&D);
