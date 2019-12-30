@@ -32,7 +32,7 @@ ecol = nx.draw_networkx_edges(
     ax=ax_road
 )
 col = plt.colorbar(ecol, cax=ax_bar, orientation='horizontal')
-col.set_label('Normaized betweenness value')
+col.set_label('Normalized betweenness value')
 
 ax_road.set_title(G.name)
 ax_road.set_xlabel('経度')
