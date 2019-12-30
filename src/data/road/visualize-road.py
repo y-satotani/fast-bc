@@ -20,11 +20,14 @@ pos = dict(
 )
 
 ebc = nx.edge_betweenness_centrality(G, weight='distance')
+edgelist = edgelist=sorted(G.edges, key=lambda e: ebc[e])
+edge_color = [ebc[e] for e in edgelist]
 
 fig, (ax_road, ax_bar) = plt.subplots(2, 1, figsize=(7, 7.5), gridspec_kw={'height_ratios': [7, 0.5]})
 ecol = nx.draw_networkx_edges(
     G, pos,
-    edge_color=[ebc[e] for e in G.edges],
+    edgelist=edgelist,
+    edge_color=edge_color,
     edge_cmap=plt.cm.YlGnBu,
     ax=ax_road
 )
