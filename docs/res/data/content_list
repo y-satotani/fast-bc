@@ -2,7 +2,8 @@
 1dEhpc_biBGfWI8V8jVvNpli9h0LsMbag artificial-performance-comparison.csv
 1M-v_tQdAG5tnVkPE1FrjfsuvCO3DF6wa real-performance-comparison.csv
 1ZePvr_V7LHWwZIJSIqdig0nUkcau5r0D real-network-info.csv
-1miF7EUraJjmdoHBBeHplFzvxX6oOFVEK road-oka-static.csv
+1miF7EUraJjmdoHBBeHplFzvxX6oOFVEK road-oka-vertex-betweenness.csv
+1t-tUgGfK9KGPntzX_6KYZxAMUJC_6_yy road-oka-edge-betweenness.csv
 1qQ6LZMW044tiNKtC4LlvFyx8lLWljFbU road-oka-dynamic.csv
 1Xf6opJwHFnUfq4hX7SqYGmieffloCrwj road-oka-betweenness.tar.gz
 1IICZIO3KISa1gAYMj8yVjwP5J2-PPrZ4 road-oka-time.csv
