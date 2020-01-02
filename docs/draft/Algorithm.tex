@@ -11,14 +11,6 @@
 ここでは，グラフ$G=(V,E)$に辺$(u,v)$が挿入または削除されたあとの最短経路および依存度が変化する条件について述べる．
 挿入操作について$(u,v)\notin E$が，削除操作については$(u,v)\in E$が成り立っていると仮定する．
 記号について，挿入または削除の操作後であることを明示するため，記号$'$をつける．例えば，操作後のグラフは$G'$と表す．
-また，頂点$t$に対して，辺操作によって$t$への最短経路が変化する頂点の集合を$S(t)$と表す．
-同様に，頂点$s$に対して，辺操作によって$s$からの最短経路が変化する頂点の集合を$T(s)$と表す．
-$S(t)$および$T(s)$に属する頂点は，それぞれ$t$および$s$について，辺更新の影響を受ける頂点集合と言える．
-後述するが，$S(t)$および$T(s)$具体的な式は，操作によって異なる．
-さらに，頂点$s,x\in V$に対して，$T(s)$に含まれる頂点$t$についてペア依存度$\delta_{st}(x)$の総和を
-$\Delta_{s\bullet}(x)$で表す\cite{Bergamini2017}．
-つまり，$\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x)$である．
-同様に，$\Delta'_{s\bullet}(x)=\sum_{t\in T(s)}\delta'_{st}(x)$とする．
 
 次の定理は，最短経路の変化が最短距離および最短経路数の変化につながることを示す．
 \begin{theorem}
@@ -50,6 +42,15 @@ $\Delta_{s\bullet}(x)$で表す\cite{Bergamini2017}．
   \caption{$s$と$t$の一般的な最短経路}
   \label{fig:proof-invariability-of-paths}
 \end{figure}
+
+頂点$t$に対して，辺操作によって$t$への最短経路が変化する頂点の集合を$S(t)$と表す．
+同様に，頂点$s$に対して，辺操作によって$s$からの最短経路が変化する頂点の集合を$T(s)$と表す．
+$S(t)$および$T(s)$に属する頂点は，それぞれ$t$および$s$について，辺更新の影響を受ける頂点集合と言える．
+後述するが，$S(t)$および$T(s)$具体的な式は，操作によって異なる．
+さらに，頂点$s,x\in V$に対して，$T(s)$に含まれる頂点$t$についてペア依存度$\delta_{st}(x)$の総和を
+$\Delta_{s\bullet}(x)$で表す\cite{Bergamini2017}．
+つまり，$\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x)$である．
+同様に，$\Delta'_{s\bullet}(x)=\sum_{t\in T(s)}\delta'_{st}(x)$とする．
 
 次の定理は，更新による依存度の変化量と$\Delta_{s\bullet}(x)$が一致することを示す．
 \begin{theorem}
@@ -116,6 +117,16 @@ $\Delta_{s\bullet}(x)$で表す\cite{Bergamini2017}．
   \end{equation*}
   $\Delta'_{s\bullet}(x)$に対しても同様に証明できる．
 \end{proof}
+
+$s\in S(v),x\in V$について$\Delta_{s\bullet}(x)$を計算するには，$s\in S(v)$に対して
+Brandesのアルゴリズムに基づく次の手順を行う．まず，$T(s)$の各要素$t$を，その優先度を
+$d_{st}$として順位付きキュー\texttt{PQ}に挿入する．キューに要素が有る限り次を繰り返す．
+\texttt{PQ}の優先度最大の要素$x$を取り出し，$\mathcal{P}(x)$の各要素$y$について，
+$(y,x)$が$s$からの最短経路に含まれているならば，式\eqref{delta-dependency-1}を用いて
+$\Delta_{s\bullet}(y)$に加算する．さらに，$y$が\texttt{PQ}に含まれていなければ，
+優先度を$d_{sy}$として$y$を\texttt{PQ}に追加する．
+これらの操作を優先度付きキュー\texttt{PQ}が空になるまで繰り返す．
+$\Delta'_{s\bullet}(x)$についても同様の手順で計算できる．
 
 挿入と削除共通のアルゴリズムの流れは以下である．
 まず，$T(u)$および$S(v)$を計算する．
@@ -389,7 +400,7 @@ $d'_{xs}$と$\sigma'_{xs}$を計算する．
   \begin{multicols}{2}
     \begin{algorithmic}[1]\small
       \Procedure{UpdateShortestPath}{}
-      \State $G'\gets (V,E\textbackslash\{(u,v)\})$
+      \State $G\gets (V,E\setminus\{(u,v)\})$
       \ForAll{$x\in S(v)$}
       \State $\textproc{UpdatePart}(\bar{G},(v,u),x)$
       \EndFor
