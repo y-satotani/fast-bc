@@ -5,10 +5,10 @@ library(ggplot2)
 library(viridis)
 library(latex2exp)
 library(cowplot)
-theme_set(theme_light(base_size = 9, base_family = 'IPAexGothic'))
+theme_set(theme_light(base_size = 8, base_family = 'IPAexGothic'))
 out_file <- paste0(sub('^--file=(.+)\\.R$', '\\1', basename(commandArgs()[4])), '.pdf')
 
-data <- read_csv('../../res/data/artificial-update-stats-order.csv') %>%
+data <- read_csv('../../res/data/artificial-update-statistics.csv') %>%
     separate(
         'network',
         c('topology', 'order', 'degree', NA, 'net-seed', NA)
@@ -64,21 +64,6 @@ make_gp = function(topology_, is_weighted_, query_) {
         aes(`tau-ast`, `tau-hat`, colour = factor(degree))
     ) +
         geom_point(alpha = 0.2) +
-        geom_text(
-            aes(x = x, y = 0, label = `line-label`),
-            data = max_slope %>%
-                filter(
-                    topology == topology_,
-                    `is-weighted` == is_weighted_,
-                    query == query_
-                ),
-            parse = TRUE,
-            size = 3,
-            colour = 'black',
-            family = 'Times New Roman',
-            vjust = 0,
-            hjust = 1
-        ) +
         geom_abline(
             aes(slope = slope, intercept = 0),
             data = max_slope %>%
@@ -92,7 +77,6 @@ make_gp = function(topology_, is_weighted_, query_) {
         xlab(expression(tau*"*")) +
         ylab(TeX('$\\mathit{\\hat{\\tau}}$')) +
         xlim(0, max(data$order)) +
-        ggtitle(paste(is_weighted_, topology_, query_)) +
         scale_colour_viridis(discrete = TRUE, begin = 0.8, end = 0.2) +
         theme(
             legend.position = 'none',
@@ -113,6 +97,7 @@ gp4 = make_gp('Barabási–Albertモデル', is_weighted, '削除')
 gp <- plot_grid(
     gp1, gp2, gp3, gp4,
     ncol = 2,
-    label_size = 10
+    label_size = 10,
+    labels = c('a', 'b', 'c', 'd')
 )
-ggsave(out_file, gp, cairo_pdf, width = 15, height = 10, units = 'cm')
+ggsave(out_file, gp, cairo_pdf, width = 9, height = 9, units = 'cm')

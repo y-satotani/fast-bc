@@ -3,17 +3,20 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(viridis)
-theme_set(theme_light(base_size = 9, base_family = 'IPAexGothic'))
+library(latex2exp)
+theme_set(theme_light(base_size = 9))
 out_file <- paste0(sub('^--file=(.+)\\.R$', '\\1', basename(commandArgs()[4])), '.pdf')
+
+
 
 data_time <- read_csv('../../res/data/artificial-performance-comparison.csv') %>%
     separate(
         'network',
-        c('topology', 'order', 'degree', NA, 'net-seed', NA)
+        c('topology', 'order', 'degree', NA, NA, 'net-seed', NA)
     ) %>%
     mutate(order = as.numeric(order), degree = as.numeric(degree)) %>%
-    filter(degree == 4, `is-weighted` == 'weighted') %>%
-    group_by(topology, order, degree, query) %>%
+    filter(degree == 4, `is-weighted` == 'unweighted') %>%
+    group_by(topology, order, degree, query, `is-weighted`) %>%
     summarise(
         `proposed-mean` = mean(`time-proposed`),
         `brandes-mean` = mean(`time-brandes`),
@@ -27,18 +30,23 @@ data_time <- read_csv('../../res/data/artificial-performance-comparison.csv') %>
         method = factor(
             method,
             levels = c('proposed-mean', 'brandes-mean'),
-            labels = c('提案手法', 'Brandes法')
+            labels = c('proposed', 'Brandes')
         ),
         topology = factor(
             topology,
             levels = c('RRG', 'BA'),
-            labels = c('ランダム正則グラフ', 'Barabási–Albertモデル')
+            labels = c('RRG', 'BA')
         ),
         query = factor(
-            query,
+            `query`,
             levels = c('insert', 'delete'),
-            labels = c('挿入', '削除')
+            labels = c('insert', 'delete')
         ),
+        `is-weighted` = factor(
+            `is-weighted`,
+            levels = c('unweighted', 'weighted'),
+            labels = c('unweighted', 'weighted')
+        )
     )
 
 gp <- ggplot(
@@ -47,9 +55,9 @@ gp <- ggplot(
 ) +
     geom_line() + geom_point() +
     facet_grid(rows = vars(query), cols = vars(topology)) +
-    xlab('頂点数') + ylab('実行時間(s)') +
+    xlab(TeX('$n$')) + ylab('Execution time(s)') +
     scale_x_log10() + scale_y_log10() +
-    scale_colour_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    scale_colour_viridis(discrete = TRUE) +
     theme(
         legend.title = element_blank(),
         legend.position = 'top',
@@ -57,4 +65,4 @@ gp <- ggplot(
         strip.background = element_blank()
     )
 
-ggsave(out_file, gp, cairo_pdf, width = 12, height = 10, units = 'cm')
+ggsave(out_file, gp, cairo_pdf, width = 10, height = 8, units = 'cm')

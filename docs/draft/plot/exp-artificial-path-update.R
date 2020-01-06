@@ -5,10 +5,10 @@ library(ggplot2)
 library(viridis)
 library(latex2exp)
 library(cowplot)
-theme_set(theme_light(base_size = 9, base_family = 'IPAexGothic'))
+theme_set(theme_light(base_size = 8, base_family = 'IPAexGothic'))
 out_file <- paste0(sub('^--file=(.+)\\.R$', '\\1', basename(commandArgs()[4])), '.pdf')
 
-data_time <- read_csv('../../res/data/artificial-update-stats-time.csv') %>%
+data_time <- read_csv('../../res/data/artificial-update-statistics.csv') %>%
     separate(
         'network',
         c('topology', 'order', 'degree', NA, 'net-seed', NA)
@@ -48,14 +48,6 @@ linear_models <- data_time %>%
     select(c(topology, order, degree, query, `is-weighted`, term, estimate)) %>%
     spread(key = term, value = estimate) %>%
     rename(intercept = `(Intercept)`, slope = `\`pred-time-path\``) %>%
-    mutate(
-        `line-label` = as.character(TeX(paste0(
-            '$\\mathit{y}=',
-            sprintf('%.3e', slope),
-            '\\mathit{x}+',
-            sprintf('%.3e', intercept),
-            '$'), output = 'expression'))
-    ) %>%
     left_join(
         data_time %>%
         group_by(topology, order, degree, query, `is-weighted`) %>%
@@ -63,23 +55,15 @@ linear_models <- data_time %>%
         ungroup(),
         by = c("topology", "order", "degree", "query", "is-weighted")
     )
+linear_models
 
 linear_models_glance <- data_time %>%
     group_by(topology, order, degree, query, `is-weighted`) %>%
     do(broom::glance(lm(`time-path` ~ `pred-time-path`, .)))
 linear_models_glance
 
-x_label_weighted = TeX(paste0(
-    '$\\mathit{x}',
-    '=(|\\mathit{S}(\\mathit{v})|+|\\mathit{T}(\\mathit{u})|)',
-    '(\\mathit{k}\\bar{\\mathit{A}}+\\bar{\\mathit{A}}\\log\\bar{\\mathit{A}})$'
-))
-x_label_unweighted = TeX(paste0(
-    '$\\mathit{x}',
-    '=(|\\mathit{S}(\\mathit{v})|+|\\mathit{T}(\\mathit{u})|)',
-    '\\mathit{k}\\bar{\\mathit{A}}$'
-))
-y_label = TeX('$\\mathit{y}$：実行時間(s)')
+x_label = '計算ステップ'
+y_label = '実行時間(s)'
 
 make_gp = function(is_weighted_, query_) {
     gp <- ggplot(
@@ -87,17 +71,6 @@ make_gp = function(is_weighted_, query_) {
         aes(`pred-time-path`, `time-path`, colour = factor(degree))
     ) +
         geom_point(alpha = 0.2) +
-        geom_text(
-            aes(x = x, y = 0, label = `line-label`),
-            data = linear_models %>%
-                filter(`is-weighted` == is_weighted_, query == query_),
-            parse = TRUE,
-            size = 3,
-            colour = 'black',
-            family = 'Times New Roman',
-            vjust = 0,
-            hjust = 1
-        ) +
         geom_abline(
             aes(slope = slope, intercept = intercept),
             data = linear_models %>%
@@ -109,16 +82,11 @@ make_gp = function(is_weighted_, query_) {
                 title = '次数', override.aes = list(alpha = 1)
             )
         ) +
-        xlab(ifelse(
-            is_weighted_ == '重み付き', x_label_weighted, x_label_unweighted
-        )) +
+        xlab(x_label) +
         ylab(y_label) +
-        ggtitle(paste(is_weighted_, query_)) +
         scale_colour_viridis(discrete = TRUE, begin = 0.8, end = 0.2) +
         theme(
-            legend.position = 'none',
-            plot.title = element_text(size = 10),
-            axis.title.x = element_text(family = 'Times New Roman')
+            legend.position = 'none'
         )
     return(gp)
 }
@@ -130,6 +98,7 @@ gp4 = make_gp('重みなし', '削除')
 gp <- plot_grid(
     gp1, gp2, gp3, gp4,
     ncol = 2,
-    label_size = 10
+    label_size = 10,
+    labels = c('a', 'b', 'c', 'd')
 )
-ggsave(out_file, gp, cairo_pdf, width = 15, height = 10, units = 'cm')
+ggsave(out_file, gp, cairo_pdf, width = 9, height = 9, units = 'cm')
