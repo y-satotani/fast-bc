@@ -7,15 +7,13 @@
 \item 再計算（Brandesのアルゴリズム）
   \par 辺が挿入または削除される度にBrandesのアルゴリズム(アルゴリズム\ref{algo:brandes})で媒介中心性を再計算する
 \item 更新（提案手法）
-  \par 辺が挿入された場合アルゴリズム\ref{algo:incremental-algorithm}で，削除された場合アルゴリズム\ref{algo:decremental-algorithm}で媒介中心性を更新する
+  \par 辺が挿入または削除される度にアルゴリズム\ref{alg:proposed-algorithm-full}によって媒介中心性を更新する
 \end{enumerate}
 
 まず，人工ネットワークに対する実験を行う．ここでは，Brandesのアルゴリズムとの
 比較や，更新したペア依存度の数と実行時間の関係，媒介中心性を更新した頂点数と
 実際に媒介中心性が変化した頂点の関係を明らかにし，
-\ref{subsect:computational-complexity-of-incremental-algorithm}と
-\ref{subsect:computational-complexity-of-decremental-algorithm}で
-行った理論的な解析結果との関連を示す．
+第\ref{chap:complexity-analysis}章で行った理論的な解析結果との関連を示す．
 
 次に，実ネットワークに対する実験を行う．この実験では，実ネットワークでの性能の比較および，
 頑健な道路ネットワークの構築と，媒介中心性のリアルタイム計算への応用を想定した実験を行う．
@@ -78,11 +76,10 @@ SNAPデータセットのいくつかの実ネットワークに対して，
 \cite{Ramalingam1996,Lee2012,Pontecorvi2014}
 ここでは，ペア依存度を更新した頂点ペア数と実行時間の関係を実験によって
 明らかにする．さらに，
-\ref{subsect:computational-complexity-of-incremental-algorithm}と
-\ref{subsect:computational-complexity-of-decremental-algorithm}で
-行った理論的な解析結果と，実験データの挙動が一致するかを検証する．
+第\ref{chap:complexity-analysis}章で行った理論的な解析結果と，
+実際の計算時間の挙動に解離がないかを検証する．
 
-図\ref{fig:exp-artificial-update}はペア依存度を更新した頂点ペア数と実行時間の関係を表す．
+図\ref{fig:exp-artificial-path-update}および図\ref{fig:exp-artificial-betw-update}はペア依存度を更新した頂点ペア数と実行時間の関係を表す．
 頂点数を$1000$,平均次数は$4$または$64$とし，$100$個のネットワークに対してそれぞれ$1$回の更新を行った．
 
 \begin{figure}[tb]
@@ -99,7 +96,7 @@ SNAPデータセットのいくつかの実ネットワークに対して，
   \label{fig:exp-artificial-betw-update}
 \end{figure}
 
-図\ref{fig:exp-artificial-update}より，更新した頂点ペア数が少ないと，実行時間が短くなることが分かる．
+図\ref{fig:exp-artificial-path-update}および図\ref{fig:exp-artificial-betw-update}より，更新した頂点ペア数が少ないと，実行時間が短くなることが分かる．
 さらに，次数が大きいと実行時間が長くなる．この性質は辺の数が増加すると実行時間も
 増加することを示し，理論的な解析結果と一致する．
 
@@ -117,7 +114,7 @@ SNAPデータセットのいくつかの実ネットワークに対して，
   \def\svgwidth{.45\linewidth}
   \input{redundant-traverse.pdf_tex}
   \caption{冗長な走査の例}
-  \label{fig:redundant-traversal}
+  \label{fig:redundant-traverse}
 \end{figure}
 
 実際に媒介中心性が変化した頂点の数と$\lvert V_\delta\rvert$の関係について，一般的な議論は難しい．
@@ -136,9 +133,8 @@ SNAPデータセットのいくつかの実ネットワークに対して，
   \end{figure}
 \end{example}
 
-\ref{subsect:computational-complexity-of-incremental-algorithm}と
-\ref{subsect:computational-complexity-of-decremental-algorithm}で
-行った理論解析では，媒介中心性を更新した頂点の数と実際に媒介中心性が変化した頂点の数との
+第\ref{chap:complexity-analysis}章で行った理論解析では，
+媒介中心性を更新した頂点の数と実際に媒介中心性が変化した頂点の数との
 間の関係が不明なままであった．ここでは，その関係を実験的に明らかにする．
 
 図\ref{fig:exp-artificial-phony}に，媒介中心性を更新した頂点の数と
@@ -150,22 +146,6 @@ SNAPデータセットのいくつかの実ネットワークに対して，
   \caption{媒介中心性が変化した頂点数に対する，更新した頂点の数}
   \label{fig:exp-artificial-phony}
 \end{figure}
-
-実際に媒介中心性が変化した頂点の集合を$B_\delta$とする．
-実験結果より，媒介中心性が変化した頂点数$\lvert B_\delta\rvert$と媒介中心性を
-更新した頂点数$\lvert V_\delta\rvert$の間に，$c$を定数として
-\[ \lvert V_\delta\rvert=c\lvert B_\delta\rvert \]
-が成り立つと推測すると，
-\ref{subsect:computational-complexity-of-incremental-algorithm}と
-\ref{subsect:computational-complexity-of-decremental-algorithm}で
-行った理論解析の結果は，それぞれ，
-\begin{equation*}
-  \begin{aligned}
-    &\mathcal{O}(\lvert V_\delta\rvert\lvert E_\delta\rvert+\lvert V_\delta\rvert^2\log\lvert V_\delta\rvert) \\
-    &\:=\mathcal{O}(\lvert B_\delta\rvert\sum_{v\in B_\delta}\lvert\mathcal{N}_G(v)\rvert+\lvert B_\delta\rvert^2\log\lvert B_\delta\rvert)
-  \end{aligned}
-\end{equation*}
-となる．
 
 \section{道路ネットワークを頑健にする辺操作}
 
@@ -185,11 +165,9 @@ SNAPデータセットのいくつかの実ネットワークに対して，
   \label{fig:road-okayama}
 \end{figure}
 
-図\ref{fig:exp-road-oka-correlation-insert}は，辺をひとつ追加したときの，
-図\ref{fig:exp-road-oka-correlation-delete}は，辺をひとつ削除したときの，
-媒介中心性の最大値の分布である．
+図\textcolor{red}{TODO}は辺操作後の媒介中心性の最大値の分布を表す．
 辺の追加によって，最大$0.1607$の正規化された媒介中心性を
-$0.1379$まで減少させることに成功した．
+\textcolor{red}{xxx}まで減少させることに成功した．
 また，辺の追加によって，最大$0.1607$の正規化された媒介中心性を
 \textcolor{red}{xxx}まで減少させることに成功した．
 

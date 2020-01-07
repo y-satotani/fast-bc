@@ -122,7 +122,7 @@ $s\in S(v),x\in V$について$\Delta_{s\bullet}(x)$を計算するには，$s\i
 Brandesのアルゴリズムに基づく次の手順を行う．まず，$T(s)$の各要素$t$を，その優先度を
 $d_{st}$として順位付きキュー\texttt{PQ}に挿入する．キューに要素が有る限り次を繰り返す．
 \texttt{PQ}の優先度最大の要素$x$を取り出し，$\mathcal{P}(x)$の各要素$y$について，
-$(y,x)$が$s$からの最短経路に含まれているならば，式\eqref{delta-dependency-1}を用いて
+$(y,x)$が$s$からの最短経路に含まれているならば，式\eqref{eq:delta-dependency-1}を用いて
 $\Delta_{s\bullet}(y)$に加算する．さらに，$y$が\texttt{PQ}に含まれていなければ，
 優先度を$d_{sy}$として$y$を\texttt{PQ}に追加する．
 これらの操作を優先度付きキュー\texttt{PQ}が空になるまで繰り返す．
@@ -137,12 +137,12 @@ $\Delta'_{s\bullet}(x)$についても同様の手順で計算できる．
 の分だけ媒介中心性に加算する．つまり，$B'(x):=B''(x)+\sum_{s\in S(v)}\Delta'_{s\bullet}(x)$とする．
 
 最後に，辺操作に固有の部分を除いた，全体的なアルゴリズムの詳細を
-アルゴリズム\ref{alg:update-betweenness}に示す．
+アルゴリズム\ref{alg:proposed-algorithm-full}に示す．
 以降，挿入時と削除時それぞれに対して固有の部分である，最短経路更新法について説明する．
 
 \begin{algorithm}[tb]
   \caption{Algorithm to update betweenness value of each vertex on deleting an edge $(u,v)$.}
-  \label{alg:algorithm-full}
+  \label{alg:proposed-algorithm-full}
   \begin{algorithmic}[1]\small
     \Procedure{UpdateBetweenness}{}
     \ForAll{$s\in S(v)$}
@@ -159,7 +159,7 @@ $\Delta'_{s\bullet}(x)$についても同様の手順で計算できる．
 
 \begin{algorithm}[tb]
   \caption{An algorithm to decrease betweenness value with given source $s$ on deleting an edge $(u,v)$.}
-  \label{alg:update-betweenness}
+  \label{alg:decrease-betweenness}
   \begin{algorithmic}[1]\small
     \Procedure{DecreaseBetweenness}{$s$}
     \State $\Delta_{s\bullet}(x)\gets0,\:\forall x\in V$
@@ -186,77 +186,6 @@ $\Delta'_{s\bullet}(x)$についても同様の手順で計算できる．
     \EndWhile
     \EndProcedure
   \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[tbp]
-  \caption{辺操作時の媒介中心性および最短経路を更新するアルゴリズム（一部）}
-  \label{alg:update-betweenness}
-  \begin{algorithmic}[1]\small
-    \Procedure{UpdateBetweenness}{}
-    \State $\textproc{DecreaseBetweenness}$
-    \State $\textproc{UpdateShortestPath}$
-    \hspace{.3cm}$\triangleright$操作によって内容が異なる
-    \State $\textproc{IncreaseBetweenness}$
-    \EndProcedure
-  \end{algorithmic}
-  \vspace{-.5cm}
-  \begin{multicols}{2}
-    \begin{algorithmic}[1]\small
-      \makeatletter
-      \setcounter{ALG@line}{5}
-      \makeatother
-      \Procedure{DecreaseBetweenness}{}
-      \ForAll{$s\in S(v)$}
-      \State $\Delta_{s\bullet}(x)\gets0,\:\forall x\in V$
-      \State $\texttt{PQ}\gets\varnothing$
-      \State $\forall x\in T(s)$を，優先度を$d_{sx}$として\texttt{PQ}に挿入
-      \While{$|\texttt{PQ}|>0$}
-      \State \texttt{PQ}の優先度最大の要素を取り出し$x$とする
-      \State $B(x)\gets B(x)-\Delta_{s\bullet}(x)$
-      \ForAll{$y\in\mathcal{P}(x)$}
-      \If{$y=s\lor d_{sx}<d_{sy}+l_{yx}$}
-      \State \textbf{continue}
-      \EndIf
-      \If{$x\in T(s)$}
-      \State $\Delta_{s\bullet}(y)\gets\Delta_{s\bullet}(y)+\sigma_{sy}/\sigma_{sx}\cdot(1+\Delta_{s\bullet}(x))$
-      \Else
-      \State $\Delta_{s\bullet}(y)\gets\Delta_{s\bullet}(y)+\sigma_{sy}/\sigma_{sx}\cdot\Delta_{s\bullet}(x)$
-      \EndIf
-      \If{$y\notin\texttt{PQ}$}
-      \State 優先度を$d_{sy}$として$y$を\texttt{PQ}に挿入
-      \EndIf
-      \EndFor
-      \EndWhile
-      \EndFor
-      \EndProcedure
-      \vfill\null
-      \columnbreak
-      \Procedure{IncreaseBetweenness}{}
-      \ForAll{$s\in S(v)$}
-      \State $\Delta'_{s\bullet}(x)\gets0,\:\forall x\in V$
-      \State $\texttt{PQ}\gets\varnothing$
-      \State $\forall x\in T(s)$を，優先度を$d'_{sx}$として\texttt{PQ}に挿入
-      \While{$|\texttt{PQ}|>0$}
-      \State \texttt{PQ}の優先度最大の要素を取り出し$x$とする
-      \State $B(x)\gets B(x)+\Delta'_{s\bullet}(x)$
-      \ForAll{$y\in\mathcal{P}(x)$}
-      \If{$y=s\lor d'_{sx}<d'_{sy}+l'_{yx}$}
-      \State \textbf{continue}
-      \EndIf
-      \If{$x\in T(s)$}
-      \State $\Delta'_{s\bullet}(y)\gets\Delta'_{s\bullet}(y)+\sigma'_{sy}/\sigma'_{sx}\cdot(1+\Delta'_{s\bullet}(x))$
-      \Else
-      \State $\Delta'_{s\bullet}(y)\gets\Delta'_{s\bullet}(y)+\sigma'_{sy}/\sigma'_{sx}\cdot\Delta'_{s\bullet}(x)$
-      \EndIf
-      \If{$y\notin\texttt{PQ}$}
-      \State 優先度を$d'_{sy}$として$y$を\texttt{PQ}に挿入
-      \EndIf
-      \EndFor
-      \EndWhile
-      \EndFor
-      \EndProcedure
-    \end{algorithmic}
-  \end{multicols}
 \end{algorithm}
 
 \section{一辺挿入時の最短経路更新法}
@@ -470,47 +399,4 @@ $d'_{xs}$と$\sigma'_{xs}$を計算する．
     \EndWhile
     \EndProcedure
   \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[tbp]
-  \caption{一辺削除時の最短経路を更新するアルゴリズム}
-  \label{alg:decremental-algorithm}
-  \begin{multicols}{2}
-    \begin{algorithmic}[1]\small
-      \Procedure{UpdateShortestPath}{}
-      \State $G\gets (V,E\setminus\{(u,v)\})$
-      \ForAll{$x\in S(v)$}
-      \State $\textproc{UpdatePart}(\bar{G},(v,u),x)$
-      \EndFor
-      \ForAll{$x\in T(u)$}
-      \State $\textproc{UpdatePart}(G,(u,v),x)$
-      \EndFor
-      \EndProcedure
-      \vfill\null
-      \columnbreak
-      \Procedure{UpdtatePart}{$G,(u,v),t)$}
-      \If{$d_{ut}<l_{uv}+d_{vt}$}
-      \State \textbf{return}
-      \EndIf
-      \State $\texttt{PQ}\gets\varnothing$
-      \ForAll{$x\in S(t)$}
-      \If{$\exists y\in\mathcal{S}(x),\,y\notin S(t)$}
-      \State $\hat{d}\gets\min\{l_{xy}+d_{yt}|y\in\mathcal{S}(x)\land y\notin S(t)\}$
-      \State 優先度を$\hat{d}$として$x$を\texttt{PQ}に追加
-      \EndIf
-      \EndFor
-      \While{$|\texttt{PQ}|>0$}
-      \State $\texttt{PQ}$から優先度最小の要素を取り出し$x$とする
-      \State このときの優先度を$\hat{d}_{xt}$とする
-      \State $d_{xt}\gets\hat{d}_{xt}$
-      \State $\sigma_{xt}\gets\sum_{y|y\in\mathcal{S}(x)\land d_{xt}=l_{xy}+d_{yt}}\sigma_{yt}$
-      \ForAll{$y\in\mathcal{P}(x)$}
-      \If{$y\in S(t)$}
-      \State \texttt{PQ}の$y$の優先度を$l_{yx}+d_{xt}$に設定
-      \EndIf
-      \EndFor
-      \EndWhile
-      \EndProcedure
-    \end{algorithmic}
-  \end{multicols}
 \end{algorithm}

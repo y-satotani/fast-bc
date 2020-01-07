@@ -15,7 +15,7 @@ $\left\Vert V\right\Vert$を$V$の各頂点と接続する辺の数とする．
 
 \begin{theorem}[Bergamini et.al.\cite{Bergamini2017}]
   \label{thm:decrease-betweenness-weight-complexity}
-  アルゴリズム\ref{alg:update-betweenness}の\textproc{DecreaseBetweenness}の，
+  アルゴリズム\ref{alg:decrease-betweenness}の\textproc{DecreaseBetweenness}の，
   重み付きグラフと重みなしグラフに対する計算量は，それぞれ次式で与えられる．
   \begin{align}
     &\mathcal{O}(\sum_{s\in S(v)}\left(\left\|\tau(s)\right\|+\left|\tau(s)\right|\log\left|\tau(s)\right|\right))
@@ -25,7 +25,7 @@ $\left\Vert V\right\Vert$を$V$の各頂点と接続する辺の数とする．
   \end{align}
 \end{theorem}
 \begin{proof}
-  まず，アルゴリズム\ref{alg:update-betweenness}の8行目から27行目の部分に相当する，
+  まず，アルゴリズム\ref{alg:decrease-betweenness}の8行目から27行目の部分に相当する，
   与えられた$s$に対する$\Delta_{s\bullet}(x)$を求めるアルゴリズムの計算量を示す．
   優先度付きキューとして，重み付きグラフでは二分ヒープを，重みなしグラフでは
   基数ヒープを用いると仮定する．
@@ -51,7 +51,7 @@ $\left\Vert V\right\Vert$を$V$の各頂点と接続する辺の数とする．
 
 \begin{theorem}[Bergamini et.al.\cite{Bergamini2017}]
   \label{thm:increase-betweenness-weight-complexity}
-  アルゴリズム\ref{alg:update-betweenness}の\textproc{IncreaseBetweenness}の
+  アルゴリズム\ref{alg:decrease-betweenness}の\textproc{IncreaseBetweenness}の
   重み付きグラフと重みなしグラフに対する計算量は，それぞれ次式で与えられる．
   \begin{align}
     &\mathcal{O}(\sum_{s\in S(v)}(\|\tau'(s)\|+|\tau'(s)|\log|\tau'(s)|))
@@ -62,7 +62,7 @@ $\left\Vert V\right\Vert$を$V$の各頂点と接続する辺の数とする．
 \end{theorem}
 \begin{proof}
   定理\ref{thm:decrease-betweenness-weight-complexity}と同じ要領で示すことができる．
-  まず，アルゴリズム\ref{alg:update-betweenness}の8行目から27行目の部分に相当する，
+  まず，アルゴリズム\ref{alg:decrease-betweenness}の8行目から27行目の部分に相当する，
   与えられた$s$に対する$\Delta'_{s\bullet}(x)$を求めるアルゴリズムの計算量を示す．
 
   12行目の取り出しの操作はそれぞれ対数時間と定数時間で実行でき，
