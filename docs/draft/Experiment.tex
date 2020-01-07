@@ -24,9 +24,6 @@
 実験に用いたプログラムは gcc 7.2.0 によって, -O3 最適化フラグを付与してコンパイルされた．
 プログラムのソースコードは\verb|github.com/y-satotani/dynamic-betweenness|で入手できる．
 
-\section{人工ネットワークに対する実験}
-\label{sect:exp-artificial}
-
 本節では，以下の項目について実験を行い，その結果について考察する．
 \begin{enumerate}
 \item Brandesのアルゴリズムとの比較
@@ -40,7 +37,7 @@
 \item Barab\'{a}si--Albertモデル\cite{Barabasi1999}
 \end{enumerate}
 
-\subsection{Brandesのアルゴリズムとの比較}
+\section{人工ネットワークに対する性能比較}
 
 図\ref{fig:exp-artificial-order}は各アルゴリズムの実行時間を比較したものである．
 各ネットワークの平均次数はおよそ$4$である．それぞれの頂点数について，
@@ -57,7 +54,24 @@
 頂点数が増加するとともに更新の平均実行時間が再計算のものと比べて短くなっていることが分かる．
 ペア依存度を再計算する必要がある頂点が頂点数の増加とともに比較的少なくなることが理由と考えられる．
 
-\subsection{更新の量と実行時間の関係}
+\input{exp-artificial.tex}
+
+\section{実ネットワークに対する性能比較}
+
+本節では，実ネットワークに対する実験を行う．
+SNAPデータセット\cite{Leskovec2016}から取得した実ネットワークでの性能評価および，
+頑健な道路ネットワークの構築と，媒介中心性のリアルタイム計算への応用を想定した実験を行う．
+
+SNAPデータセットのいくつかの実ネットワークに対して，
+提案手法とBrandesのアルゴリズムの比較実験を行った．
+両アルゴリズムを各ネットワークに対して10回実行し，その実行時間の平均値および最大値を求めた．
+実験結果を表\ref{tab:exp-real}に示す．
+
+\input{exp-real.tex}
+
+表\ref{tab:exp-real}より，提案手法は実ネットワークでも効率よく計算できることが確認できる．
+
+\section{導出した計算量の妥当性の検証}
 
 提案したアルゴリズムのようなオンラインアルゴリズムの性能を評価するためには，
 アルゴリズムによって更新した要素の数を考慮する必要がある．
@@ -89,36 +103,36 @@
 さらに，次数が大きいと実行時間が長くなる．この性質は辺の数が増加すると実行時間も
 増加することを示し，理論的な解析結果と一致する．
 
-\subsection{媒介中心性を更新した頂点の数と変化した頂点の数の関係}
+\section{冗長な走査の計数}
+
 \textcolor{red}{書きかけ注意}
 \begin{example}
-  \label{ex:counter-of-invariability-of-pairwise-dependency}
-  図\ref{fig:pd-invariability-counterexample}において$\delta_s(v_1)=\delta'_s(v_1)$であるが，
+  図\ref{fig:redundant-traverse}において$\delta_s(v_1)=\delta'_s(v_1)$であるが，
   $\delta_s(w_1)\neq\delta'_s(w_1)$である．
   同様に，$\delta_s(v_2)=\delta'_s(v_2)$であるが，$\sigma_{sv_2}\neq\sigma'_{sv_2}$である．
-
-  \begin{figure}[tb]
-    \centering
-    \def\svgwidth{.45\linewidth}
-    \input{pd-invariability-counterexample.pdf_tex}
-    \caption{冗長な更新の例}
-    \label{fig:pd-invariability-counterexample}
-  \end{figure}
 \end{example}
+
+\begin{figure}[tb]
+  \centering
+  \def\svgwidth{.45\linewidth}
+  \input{redundant-traverse.pdf_tex}
+  \caption{冗長な走査の例}
+  \label{fig:redundant-traversal}
+\end{figure}
 
 実際に媒介中心性が変化した頂点の数と$\lvert V_\delta\rvert$の関係について，一般的な議論は難しい．
 
 \begin{example}
-  図\ref{fig:bc-many-phony}のグラフにおいて，辺$\{V,W\}$を削除したときにアルゴリズムが
+  図\ref{fig:redundant-traverse-many}のグラフにおいて，辺$\{V,W\}$を削除したときにアルゴリズムが
   ペア依存度を更新する頂点の数は$\lvert V_\delta\rvert\sim \lvert V\rvert$であるが，
   実際に媒介中心性が変化する頂点は$T,U,V,W$の$4$個である．
 
   \begin{figure}[tb]
     \centering
     \def\svgwidth{.8\linewidth}
-    \input{bc-many-phony.pdf_tex}
+    \input{redundant-traverse-many.pdf_tex}
     \caption{媒介中心性が変化しない頂点を多く更新する例}
-    \label{fig:bc-many-phony}
+    \label{fig:redundant-traverse-many}
   \end{figure}
 \end{example}
 
@@ -153,27 +167,7 @@
 \end{equation*}
 となる．
 
-\section{実ネットワークに対する実験}
-\label{sect:exp-realnet}
-
-本節では，実ネットワークに対する実験を行う．
-SNAPデータセット\cite{Leskovec2016}から取得した実ネットワークでの性能評価および，
-頑健な道路ネットワークの構築と，媒介中心性のリアルタイム計算への応用を想定した実験を行う．
-
-\subsection{SNAPデータセットでの比較}
-\label{subsect:exp-real}
-
-SNAPデータセットのいくつかの実ネットワークに対して，
-提案手法とBrandesのアルゴリズムの比較実験を行った．
-両アルゴリズムを各ネットワークに対して10回実行し，その実行時間の平均値および最大値を求めた．
-実験結果を表\ref{tab:exp-real}に示す．
-
-\input{exp-misc.tex}
-
-表\ref{tab:exp-real}より，提案手法は実ネットワークでも効率よく計算できることが確認できる．
-
-\subsection{頑健な道路ネットワークの構築}
-\label{subsect:exp-road}
+\section{道路ネットワークを頑健にする辺操作}
 
 第\ref{chap:introduction}章でも述べたように，道路ネットワークの頑健性を
 向上するには，道路の建設によって媒介中心性の最大値を最小化する必要がある．
@@ -186,7 +180,7 @@ SNAPデータセットのいくつかの実ネットワークに対して，
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=.9\textwidth]{road-oka.eps}
+  \includegraphics[width=.6\textwidth]{road-oka-with-betweenness.eps}
   \caption{実験で用いる道路ネットワーク}
   \label{fig:road-okayama}
 \end{figure}
@@ -199,43 +193,11 @@ $0.1379$まで減少させることに成功した．
 また，辺の追加によって，最大$0.1607$の正規化された媒介中心性を
 \textcolor{red}{xxx}まで減少させることに成功した．
 
+\textcolor{red}{TODO: insert histogram of diff of min, mean, and max}
 
-また，辺追加によって媒介中心性の最大値が増加した例もある．
-具体的に道路のどの部分に挿入すると媒介中心性が大きく減少，増加するかを
-図\ref{fig:road-okayama-minmax}に示す．
+\textcolor{red}{TODO: insert figure of road indicates minimized maximum bc}
 
-図\ref{fig:exp-road-oka-correlation-insert}および図\ref{fig:exp-road-oka-correlation-delete}と
-図\ref{fig:road-okayama-minmax}より，
-媒介中心性が大きな頂点同士を結ぶと，媒介中心性の最大値が大きく変化することが分かる．
-
-\begin{figure}[tb]
-  \centering
-  \includegraphics{exp-road-oka-correlation-insert.eps}
-  \caption{辺挿入後の媒介中心性の最大値の分布}
-  \label{fig:exp-road-oka-correlation-insert}
-\end{figure}
-
-\begin{figure}[tb]
-  \centering
-  \includegraphics{exp-road-oka-correlation-delete.eps}
-  \caption{辺削除後の媒介中心性の最大値の分布}
-  \label{fig:exp-road-oka-correlation-delete}
-\end{figure}
-
-\begin{figure}[tb]
-  \centering
-  \includegraphics{road-oka-minmax.eps}
-  \caption{
-    挿入すると媒介中心性の最大値を大きく変化させる辺 \\
-    図\ref{fig:road-okayama}の拡大図である．
-    青で示した辺は，挿入後の媒介中心性の最大値の減少量が大きい辺10本である．
-    また，赤で示した辺は，挿入後の媒介中心性の最大値の増加量が大きい辺10本である．
-  }
-  \label{fig:road-okayama-minmax}
-\end{figure}
-
-\subsection{媒介中心性のリアルタイム計算}
-\label{subsect:exp-sfhh}
+\section{媒介中心性のリアルタイム計算}
 
 第\ref{chap:introduction}章で説明したように，社会ネットワーク分析に
 おいて，媒介中心性をはじめとした中心性に注目することは重要である．

@@ -20,7 +20,7 @@
 \begin{proof}
   $E_{st}=E'_{st}$ならば$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$であることは自明である．
 
-  逆は，図\ref{fig:proof-invariability-of-paths}のような$E_{st}$を，
+  逆は，図\ref{fig:general-shortest-paths-weighted}のような$E_{st}$を，
   $d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$を満たすように，$E_{st}\neq E'_{st}$にすることを考える．
   図において，同じ$L_i$に含まれる頂点$v$について$d_{sv}$および$d_{vt}$は一定とする．
 
@@ -38,9 +38,9 @@
 \begin{figure}
   \centering
   \def\svgwidth{.5\columnwidth}
-  \input{proof-invariability-of-paths.pdf_tex}
+  \input{general-shortest-paths-weighted.pdf_tex}
   \caption{$s$と$t$の一般的な最短経路}
-  \label{fig:proof-invariability-of-paths}
+  \label{fig:general-shortest-paths-weighted}
 \end{figure}
 
 頂点$t$に対して，辺操作によって$t$への最短経路が変化する頂点の集合を$S(t)$と表す．
@@ -139,6 +139,54 @@ $\Delta'_{s\bullet}(x)$についても同様の手順で計算できる．
 最後に，辺操作に固有の部分を除いた，全体的なアルゴリズムの詳細を
 アルゴリズム\ref{alg:update-betweenness}に示す．
 以降，挿入時と削除時それぞれに対して固有の部分である，最短経路更新法について説明する．
+
+\begin{algorithm}[tb]
+  \caption{Algorithm to update betweenness value of each vertex on deleting an edge $(u,v)$.}
+  \label{alg:algorithm-full}
+  \begin{algorithmic}[1]\small
+    \Procedure{UpdateBetweenness}{}
+    \ForAll{$s\in S(v)$}
+    \State $\textproc{DecreaseBetweenness}(s)$
+    \State $\textproc{UpdateSSSP}(s)$
+    \State $\textproc{IncreaseBetweenness}(s)$
+    \EndFor
+    \ForAll{$t\in T(u)$}
+    \State $\textproc{UpdateSTSP}(t)$
+    \EndFor
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[tb]
+  \caption{An algorithm to decrease betweenness value with given source $s$ on deleting an edge $(u,v)$.}
+  \label{alg:update-betweenness}
+  \begin{algorithmic}[1]\small
+    \Procedure{DecreaseBetweenness}{$s$}
+    \State $\Delta_{s\bullet}(x)\gets0,\:\forall x\in V$
+    \State $\texttt{PQ}\gets\varnothing$
+    \ForAll{$t\in T(s)$}
+    \State Enqueue $t$ to \texttt{PQ} with priority $d_{st}$.
+    \EndFor
+    \While{$|\texttt{PQ}|>0$}
+    \State Dequeue $x$ with the highest priority from \texttt{PQ}.
+    \State $B(x)\gets B(x)-\Delta_{s\bullet}(x)$
+    \ForAll{$y\in\mathcal{P}(x)$}
+    \If{$y=s\lor d_{sx}<d_{sy}+l_{yx}$}
+    \State \textbf{continue}
+    \EndIf
+    \If{$x\in T(s)$}
+    \State $\Delta_{s\bullet}(y)\gets\Delta_{s\bullet}(y)+\sigma_{sy}/\sigma_{sx}\cdot(1+\Delta_{s\bullet}(x))$
+    \Else
+    \State $\Delta_{s\bullet}(y)\gets\Delta_{s\bullet}(y)+\sigma_{sy}/\sigma_{sx}\cdot\Delta_{s\bullet}(x)$
+    \EndIf
+    \If{$y\notin\texttt{PQ}$}
+    \State Enqueue $y$ to \texttt{PQ} with priority $d_{sy}$.
+    \EndIf
+    \EndFor
+    \EndWhile
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
 
 \begin{algorithm}[tbp]
   \caption{辺操作時の媒介中心性および最短経路を更新するアルゴリズム（一部）}
@@ -393,6 +441,36 @@ $d'_{xs}$と$\sigma'_{xs}$を計算する．
 グラフ$G$上で終点$t$に関する$d'_{xt}$と$\sigma'_{xt}$を計算する．
 
 提案手法の具体的な手続きをアルゴリズム\ref{alg:decremental-algorithm}に示す．
+
+\begin{algorithm}[tb]
+  \caption{An algorithm to update $d_{st}$ and $\sigma_{st}$ for a given soure $s$ on deleting an edge $(u,v)$.}
+  \label{alg:decremental-algorithm}
+  \begin{algorithmic}[1]\small
+    \Procedure{UpdateSSSP}{$s$}
+    \If{$d_{sv}<d_{su}+l_{uv}$}
+    \State \textbf{return}
+    \EndIf
+    \State $\texttt{PQ}\gets\varnothing$
+    \ForAll{$x\in T(s)$}
+    \If{$\exists y\in\mathcal{P}(x),\,y\notin T(s)$}
+    \State $\hat{d}\gets\min\{d_{sx}+l_{xy}|y\in\mathcal{P}(x)\land y\notin T(s)\}$
+    \State Enqueue $x$ to \texttt{PQ} with priority $\hat{d}$.
+    \EndIf
+    \EndFor
+    \While{$|\texttt{PQ}|>0$}
+    \State Dequeue $x$ with the highest priority from \texttt{PQ}
+    \State and let $\hat{d}_{sx}$ be the priority of $x$.
+    \State $d_{sx}\gets\hat{d}_{sx}$
+    \State $\sigma_{sx}\gets\sum_{y|y\in\mathcal{P}(x)\land d_{sx}=d_{sy}+l_{xy}}\sigma_{sy}$
+    \ForAll{$y\in\mathcal{S}(x)$}
+    \If{$y\in T(s)$}
+    \State Update the priority of $y$ in \texttt{PQ} to $d_{sx}+l_{xy}$.
+    \EndIf
+    \EndFor
+    \EndWhile
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
 
 \begin{algorithm}[tbp]
   \caption{一辺削除時の最短経路を更新するアルゴリズム}

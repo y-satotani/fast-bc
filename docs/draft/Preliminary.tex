@@ -77,7 +77,7 @@ $\sigma_{st}=\sigma_{ts}$である．
 同様に，頂点$s$から頂点$t$へのすべての最短経路で構成される有向グラフを$G_{st}=(V_{st},E_{st})$で表す．
 
 \begin{example}
-  図\ref{fig:graph-diamond}にグラフの例を示す．記号を囲んだ円は頂点を表し，
+  図\ref{fig:example-graph}にグラフの例を示す．記号を囲んだ円は頂点を表し，
   それらを繋ぐ線分は辺を表す．頂点を識別するため，円の中に記号を入れる場合がある．
   線分の傍らにある数字は辺の重みを表す．頂点集合は
   $\{A,B,C,D,E,F,G,H\}$
@@ -89,9 +89,9 @@ $\sigma_{st}=\sigma_{ts}$である．
   \begin{figure}
     \centering
     \def\svgwidth{.45\textwidth}
-    \input{graph-diamond.pdf_tex}
+    \input{example-graph.pdf_tex}
     \caption{グラフの例}
-    \label{fig:graph-diamond}
+    \label{fig:example-graph}
   \end{figure}
 \end{example}
 
@@ -236,11 +236,11 @@ $\sigma_{st}=\sigma_{ts}$である．
   \begin{figure}
     \centering
     \def\svgwidth{.5\columnwidth}
-    \input{proof-number-of-paths.pdf_tex}
+    \input{general-shortest-paths.pdf_tex}
     \caption{$s$と$t$の一般的な最短経路}
-    \label{fig:proof-number-of-paths}
+    \label{fig:general-shortest-paths}
   \end{figure}
-  $s$と$t$の間の一般的な経路を図\ref{fig:proof-number-of-paths}に示す．
+  $s$と$t$の間の一般的な経路を図\ref{fig:general-shortest-paths}に示す．
   $s$からの距離が一定の頂点を並べて，一つの層とする．
   $d_{sv}=k$なる頂点$v$の集合を，第$k$層と定義し，$L_k$と表す．
   $L_k$に属する頂点の数を$n_k$，$L_k$に属する$l$番目の頂点を$v_{kl}$と表す．
