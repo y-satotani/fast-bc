@@ -373,18 +373,74 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
 
 である．ここで，$\delta_{s}(v)$について，次のことが知られている．
 
-\begin{theorem}[Brandes\cite{Brandes2001}]
-  \label{th:implicit-pd}
+\begin{lemma}
+  \label{lemma:implicit-dependency-part}
+  グラフ$G=(V,E)$の異なる頂点$s,t$について，$\sigma_{st}=1$ならば，
+  頂点$v$の$s$に対するペア依存度は次のようになる．
   \begin{equation}
-    \label{eq:implicit-pd}
+    \label{eq:implicit-dependency-part}
+    \delta_{s}=\sum_{(v,w)\in E_s}(1+\delta_{s}(w))
+  \end{equation}
+\end{lemma}
+\begin{proof}
+  この補題は，図\ref{fig:implicit-dependency-1}のようにすべての最短経路の辺と頂点を形成している
+  頂点$s$の木構造であることを表している．したがって，頂点$s$から頂点$t$までの
+  すべての経路もしくは，それ以外の経路上に頂点$v$は存在する．
+  例えば，頂点$v$は$w_1,w_2,w_3$の最短経路上に存在する．
+\end{proof}
+
+\begin{figure}[tb]
+  \centering
+  \def\svgwidth{.35\linewidth}
+  \input{implicit-dependency-1.pdf_tex}
+  \caption{頂点$s$の木構造}
+  \label{fig:implicit-dependency-1}
+\end{figure}
+
+さらに，\textcolor{red}{TODO: complete description of the theorem}
+
+\begin{theorem}
+  \label{th:implicit-dependency}
+  \begin{equation}
+    \label{eq:implicit-dependency}
     \delta_{s}(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_{s}(w)).
   \end{equation}
 \end{theorem}
 \begin{proof}
-  \textcolor{red}{あとでする}
+  $(v,w)\in E_s$である任意の$w$に対して，$s$から$t$への最短経路の中で
+  $v$と辺$(v,w)$を通るものの個数を$\sigma_{st}(v,(v,w))$を表すと
+  \begin{equation*}
+    \delta_{st}(v,\{v,w\})=
+    \begin{cases}
+      \cfrac{\sigma_{sv}}{\sigma_{sw}}, & t=w\text{のとき} \\
+      \cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot\cfrac{\sigma_{st}(w)}{\sigma_{st}} & t\neq w\text{のとき}
+    \end{cases}
+  \end{equation*}
+  より，
+  \[ s_{st}(v,(v,w))=\frac{\sigma_{sv}}{\sigma_{sw}}\dot\sigma_{st(w)} \]
+  がなりたち，$j=t$ならば
+  \[ \sigma_{st}(v,(v,w))=\sigma_{sv} \]
+  が成り立つ．これより，
+  \begin{align*}
+    \delta_s(v)&=\sum_{t\neq s,v}\cfrac{\sigma_{st(v)}}{\sigma_{st}} \\
+    &=\sum_{t\neq s,v}\sum_{w:(v,w)\in E_s}\cfrac{\sigma_{st}(v,(v,w))}{\sigma_{st}} \\
+    &=\sum_{w:(v,w)\in E_s}\sum_{t\neq s,v}\cfrac{\sigma_{st}(v,(v,w))}{\sigma_{st}} \\
+    &=\sum_{w:(v,w)\in E_s}\left(\sum_{t\neq s,v}\cfrac{1}{\sigma_{st}}\cdot\frac{\sigma_{sv}}{\sigma_{sw}}\cdot\sigma_{st}(w)+\cfrac{\sigma_{sv}}{\sigma_{sj}}\right) \\
+    &=\sum_{w:(v,w)\in E_s}\cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot\left(1+\sum_{t\neq s,v,w}\cfrac{\sigma_{st}(v)}{\sigma_{st}}\right) \\
+    &=\sum_{w:(v,w)\in E_s}\cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot(1+\delta_s(w))
+  \end{align*}
+  を得る．
 \end{proof}
 
-Brandesのアルゴリズムは定理\ref{th:implicit-pd}の性質を応用して媒介中心性を高速に計算している．
+\begin{figure}[tb]
+  \centering
+  \def\svgwidth{.35\linewidth}
+  \input{implicit-dependency-2.pdf_tex}
+  \caption{頂点$s$の木構造}
+  \label{fig:implicit-dependency-2}
+\end{figure}
+
+Brandesのアルゴリズムは定理\ref{th:implicit-dependency}の性質を応用して媒介中心性を高速に計算している．
 Brandesのアルゴリズムをアルゴリズム\ref{algo:brandes}に示す．
 
 このアルゴリズムの計算量を考える．まず，ある$s\in V$とすべての$v\in V$に対して
