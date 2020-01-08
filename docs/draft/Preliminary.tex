@@ -347,7 +347,7 @@ $\sigma_{st}=\sigma_{ts}$である．
 媒介中心性の効率的計算法として最も広く用いられているのは
 Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである．
 以下，Brandesのアルゴリズムについて説明する．
-まず，ペア依存度の定義を示す．
+まず，ペア依存度および依存度の定義を示す．
 
 \begin{definition}[Brandes\cite{Brandes2001}]
   \label{def:pairwise-dependency}
@@ -356,14 +356,14 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
     \label{eq:def-pairwise-dependency}
     \delta_{st}(v)=\frac{\sigma_{st}(v)}{\sigma_{st}}
   \end{equation}
-  また，頂点$s,v$と他の頂点のペア依存度は次式で定義される．
+  また，頂点$s,v$と他の頂点の依存度は次式で定義される．
   \begin{equation}
     \label{eq:def-sum-pairwise-dependency}
-    \delta_{s}(v)=\sum_{t\neq v,s}\delta_{st}(v)
+    \delta_{s\bullet}(v)=\sum_{t\neq v,s}\delta_{st}(v)
   \end{equation}
 \end{definition}
 
-ペア依存度を使って媒介中心性を表すと，
+ペア依存度および依存度を使うと，媒介中心性は次式で表される．
 \begin{equation*}
   \begin{aligned}
     B_v&=\sum_{s\neq v}\sum_{t\neq v,s}\frac{\sigma_{st}(v)}{\sigma_{st}}
@@ -371,15 +371,15 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
   \end{aligned}
 \end{equation*}
 
-である．ここで，$\delta_{s}(v)$について，次のことが知られている．
+$\delta_{s\bullet}(v)$を効率的に計算する方法について，次の性質が知られている．
 
 \begin{lemma}
   \label{lemma:implicit-dependency-part}
   グラフ$G=(V,E)$の異なる頂点$s,t$について，$\sigma_{st}=1$ならば，
-  頂点$v$の$s$に対するペア依存度は次のようになる．
+  頂点$v$の$s$に対するペア依存度は式\eqref{eq:implicit-dependency-part}で計算できる．
   \begin{equation}
     \label{eq:implicit-dependency-part}
-    \delta_{s}=\sum_{(v,w)\in E_s}(1+\delta_{s}(w))
+    \delta_{s\bullet}(v)=\sum_{(v,w)\in E_s}(1+\delta_{s\bullet}(w))
   \end{equation}
 \end{lemma}
 \begin{proof}
@@ -397,13 +397,13 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
   \label{fig:implicit-dependency-1}
 \end{figure}
 
-さらに，\textcolor{red}{TODO: complete description of the theorem}
+さらに$\sigma_{st}>1$のような一般的な場合も，次の定理の通りに計算できる．
 
 \begin{theorem}
   \label{th:implicit-dependency}
   \begin{equation}
     \label{eq:implicit-dependency}
-    \delta_{s}(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_{s}(w)).
+    \delta_{s\bullet}(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_{s\bullet}(w)).
   \end{equation}
 \end{theorem}
 \begin{proof}
@@ -422,12 +422,12 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
   \[ \sigma_{st}(v,(v,w))=\sigma_{sv} \]
   が成り立つ．これより，
   \begin{align*}
-    \delta_s(v)&=\sum_{t\neq s,v}\cfrac{\sigma_{st(v)}}{\sigma_{st}} \\
+    \delta_{s\bullet}(v)&=\sum_{t\neq s,v}\cfrac{\sigma_{st(v)}}{\sigma_{st}} \\
     &=\sum_{t\neq s,v}\sum_{w:(v,w)\in E_s}\cfrac{\sigma_{st}(v,(v,w))}{\sigma_{st}} \\
     &=\sum_{w:(v,w)\in E_s}\sum_{t\neq s,v}\cfrac{\sigma_{st}(v,(v,w))}{\sigma_{st}} \\
     &=\sum_{w:(v,w)\in E_s}\left(\sum_{t\neq s,v}\cfrac{1}{\sigma_{st}}\cdot\frac{\sigma_{sv}}{\sigma_{sw}}\cdot\sigma_{st}(w)+\cfrac{\sigma_{sv}}{\sigma_{sj}}\right) \\
     &=\sum_{w:(v,w)\in E_s}\cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot\left(1+\sum_{t\neq s,v,w}\cfrac{\sigma_{st}(v)}{\sigma_{st}}\right) \\
-    &=\sum_{w:(v,w)\in E_s}\cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot(1+\delta_s(w))
+    &=\sum_{w:(v,w)\in E_s}\cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot(1+\delta_{s\bullet}(w))
   \end{align*}
   を得る．
 \end{proof}
@@ -446,53 +446,51 @@ Brandesのアルゴリズムをアルゴリズム\ref{algo:brandes}に示す．
 このアルゴリズムの計算量を考える．まず，ある$s\in V$とすべての$v\in V$に対して
 $\sigma_{sv}$を計算するときの計算量は，Dijkstra法より$\mathcal{O}(|V|\log |V|+|E|)$である．
 ペア依存度の積算についても，$G$のすべての頂点$v$を$s$からの最短経路の逆向きに一度だけ辿ることにより
-$\delta_s(v)$の値を更新できるため，$\mathcal{O}(|E|)$の時間で実行できる\cite{Brandes2001}．
+$\delta_{s\bullet}(v)$の値を更新できるため，$\mathcal{O}(|E|)$の時間で実行できる\cite{Brandes2001}．
 したがって，すべての$s\in V$に対するアルゴリズムの計算量は$\mathcal{O}(|V|^2\log |V|+|V||E|)$であり，
 それは$\mathcal{O}(|V|^3)$よりも小さい．
 
 \begin{algorithm}[H]
   \caption{Brandesのアルゴリズム}
   \label{algo:brandes}
-  \begin{multicols}{2}
-    \begin{algorithmic}[1]\small
-      \Procedure{Brandes}{$G$}
-      \State $B_x\gets 0,\:\forall x\in V$
-      \ForAll{$s\in V$}
-      \State $S\gets()$ \Comment スタック
-      \State $P_w\gets (),\:\forall w\in V$ \Comment リスト
-      \State $\sigma_t\gets 0,\:\forall t\in V;\:\sigma_s\gets 1$
-      \State $d_t\gets -1,\:\forall t\in V;\:d_s\gets 0$
-      \State $Q\gets ()$ \Comment 順位キュー
-      \State $\mathrm{push}(Q, s)$
-      \While{$\lvert Q\rvert>0$}
-      \State $v\gets\mathrm{pop}(Q)$
-      \State $\mathrm{push}(S, v)$
-      \ForAll{$w\in\mathcal{N}_G(v)$}
-      \If{$d_w<0\lor d_v+l_{vw}<d_w$}
-      \State $d_w\gets d_v+l_{vw}$
-      \State $\sigma_w\gets\sigma_v$
-      \State $P_w\gets(v)$
-      \State $\mathrm{updatekey}(Q, w, d_w)$
-      \EndIf
-      \If{$d_w=d_v+l_{vw}$}
-      \State $\sigma_w\gets\sigma_w+\sigma_v$
-      \State $\mathrm{append}(P_w, v)$
-      \EndIf
-      \EndFor
-      \EndWhile
-      \State $\delta_v\gets 0,\:v\in V$
-      \While{$\lvert S\rvert>0$}
-      \State $w\gets\mathrm{pop}(S)$
-      \ForAll{$v\in P_w$}
-      \State $\delta_v\gets\delta_v+\frac{\sigma_v}{\sigma_w}(1+\delta_w)$
-      \EndFor
-      \If{$w\neq s$}
-      \State $B_w\gets B_w+\delta_w$
-      \EndIf
-      \EndWhile
-      \EndFor
-      \EndProcedure
-    \end{algorithmic}
-  \end{multicols}
+  \begin{algorithmic}[1]\small
+    \Procedure{Brandes}{$G$}
+    \State $B_x\gets 0,\:\forall x\in V$
+    \ForAll{$s\in V$}
+    \State $S\gets()$ \Comment スタック
+    \State $P_w\gets (),\:\forall w\in V$ \Comment リスト
+    \State $\sigma_t\gets 0,\:\forall t\in V;\:\sigma_s\gets 1$
+    \State $d_t\gets -1,\:\forall t\in V;\:d_s\gets 0$
+    \State $Q\gets ()$ \Comment 順位キュー
+    \State $\mathrm{push}(Q, s)$
+    \While{$\lvert Q\rvert>0$}
+    \State $v\gets\mathrm{pop}(Q)$
+    \State $\mathrm{push}(S, v)$
+    \ForAll{$w\in\mathcal{N}_G(v)$}
+    \If{$d_w<0\lor d_v+l_{vw}<d_w$}
+    \State $d_w\gets d_v+l_{vw}$
+    \State $\sigma_w\gets\sigma_v$
+    \State $P_w\gets(v)$
+    \State $\mathrm{updatekey}(Q, w, d_w)$
+    \EndIf
+    \If{$d_w=d_v+l_{vw}$}
+    \State $\sigma_w\gets\sigma_w+\sigma_v$
+    \State $\mathrm{append}(P_w, v)$
+    \EndIf
+    \EndFor
+    \EndWhile
+    \State $\delta_{s\bullet}(v)\gets 0,\:v\in V$
+    \While{$\lvert S\rvert>0$}
+    \State $w\gets\mathrm{pop}(S)$
+    \ForAll{$v\in P_w$}
+    \State $\delta_{s\bullet}(v)\gets\delta_{s\bullet}(v)+\frac{\sigma_v}{\sigma_w}(1+\delta_{s\bullet}(w))$
+    \EndFor
+    \If{$w\neq s$}
+    \State $B_w\gets B_w+\delta_{s\bullet}(w)$
+    \EndIf
+    \EndWhile
+    \EndFor
+    \EndProcedure
+  \end{algorithmic}
 \end{algorithm}
 
