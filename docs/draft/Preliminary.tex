@@ -407,8 +407,18 @@ $\delta_{s\bullet}(v)$を効率的に計算する方法について，次の性�
   \end{equation}
 \end{theorem}
 \begin{proof}
-  $(v,w)\in E_s$である任意の$w$に対して，$s$から$t$への最短経路の中で
-  $v$と辺$(v,w)$を通るものの個数を$\sigma_{st}(v,(v,w))$を表すと
+  $E_{st}$の上に$v$があるような$t$についてのみ$\delta_{st}(v)>0$が成り立ち，このような
+  最短経路は$v\in\mathcal{P}_{E_{st}}(w)$を満たす辺$(v,w)$をただひとつもつ．
+  このような状況は，図\ref{fig:implicit-dependency-2}のように，先のものより少し複雑である．
+
+  辺$e\in E$を含むように拡張したペア依存度を$\delta_{st}(v,e)=\sigma_{st}(v,e)/\sigma_{st}$で定義する．
+  ただし，$\sigma_{st}(v,e)$は$s$から$t$への最短経路の中で$v$と$e$を通るものの個数とする．
+  つまり，
+  \[ \delta_{s\bullet}(v)=\sum_{t\in V}\delta_{st}(v)=\sum_{t\in V}\sum_{(v,w)\in E_s}\delta_{st}(v,\{v,w\})=\sum_{(v,w)\in E_s}\sum_{t\in V}\delta_{st}(v,(v,w)). \]
+
+  頂点$w$は$\mathcal{P}_{E_s}(w)$を満たすとする．すると，$s$から$w$への
+  $\sigma_{sw}$個の最短経路のうち，$\sigma_{sv}$個の最短経路は$s$から$v$を通り，
+  $(v,w)$を通る．つまり，$s$と$t$と$v$と$(v,w)$のペア依存度は，次で求められる．
   \begin{equation*}
     \delta_{st}(v,\{v,w\})=
     \begin{cases}
@@ -416,18 +426,15 @@ $\delta_{s\bullet}(v)$を効率的に計算する方法について，次の性�
       \cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot\cfrac{\sigma_{st}(w)}{\sigma_{st}} & t\neq w\text{のとき}
     \end{cases}
   \end{equation*}
-  より，
-  \[ s_{st}(v,(v,w))=\frac{\sigma_{sv}}{\sigma_{sw}}\dot\sigma_{st(w)} \]
-  がなりたち，$j=t$ならば
-  \[ \sigma_{st}(v,(v,w))=\sigma_{sv} \]
-  が成り立つ．これより，
+
+  これを上式に代入すると，
   \begin{align*}
     \delta_{s\bullet}(v)&=\sum_{t\neq s,v}\cfrac{\sigma_{st(v)}}{\sigma_{st}} \\
-    &=\sum_{t\neq s,v}\sum_{w:(v,w)\in E_s}\cfrac{\sigma_{st}(v,(v,w))}{\sigma_{st}} \\
-    &=\sum_{w:(v,w)\in E_s}\sum_{t\neq s,v}\cfrac{\sigma_{st}(v,(v,w))}{\sigma_{st}} \\
-    &=\sum_{w:(v,w)\in E_s}\left(\sum_{t\neq s,v}\cfrac{1}{\sigma_{st}}\cdot\frac{\sigma_{sv}}{\sigma_{sw}}\cdot\sigma_{st}(w)+\cfrac{\sigma_{sv}}{\sigma_{sj}}\right) \\
-    &=\sum_{w:(v,w)\in E_s}\cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot\left(1+\sum_{t\neq s,v,w}\cfrac{\sigma_{st}(v)}{\sigma_{st}}\right) \\
-    &=\sum_{w:(v,w)\in E_s}\cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot(1+\delta_{s\bullet}(w))
+    &=\sum_{t\neq s,v}\sum_{(v,w)\in E_s}\cfrac{\sigma_{st}(v,(v,w))}{\sigma_{st}} \\
+    &=\sum_{(v,w)\in E_s}\sum_{t\neq s,v}\cfrac{\sigma_{st}(v,(v,w))}{\sigma_{st}} \\
+    &=\sum_{(v,w)\in E_s}\left(\sum_{t\neq s,v}\cfrac{1}{\sigma_{st}}\cdot\frac{\sigma_{sv}}{\sigma_{sw}}\cdot\sigma_{st}(w)+\cfrac{\sigma_{sv}}{\sigma_{sj}}\right) \\
+    &=\sum_{(v,w)\in E_s}\cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot\left(1+\sum_{t\neq s,v,w}\cfrac{\sigma_{st}(v)}{\sigma_{st}}\right) \\
+    &=\sum_{(v,w)\in E_s}\cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot(1+\delta_{s\bullet}(w))
   \end{align*}
   を得る．
 \end{proof}
@@ -441,7 +448,10 @@ $\delta_{s\bullet}(v)$を効率的に計算する方法について，次の性�
 \end{figure}
 
 Brandesのアルゴリズムは定理\ref{th:implicit-dependency}の性質を応用して媒介中心性を高速に計算している．
-Brandesのアルゴリズムをアルゴリズム\ref{algo:brandes}に示す．
+Brandesのアルゴリズムの具体的な手順を説明する．まず，Dijkstra法に基づいて，始点$s$から各頂点$t$への距離$d_{st}$および最短経路数$\sigma_{st}$を求める．
+この際，距離$d_{st}$の昇順に頂点$t$をプッシュしたスタック$\texttt{S}$および，各頂点$t$に対する$E_{s}$上の先行$\mathcal{P}_{E_s}(t)$である$\texttt{P}_t$を計算する．
+最短経路の計算後，$\texttt{S}$から要素を取り出し定理\ref{th:implicit-dependency}による$\delta_{s\bullet}(v)$の計算を，$\texttt{S}$が空になるまで繰り返す．
+Brandesのアルゴリズムをアルゴリズム\ref{alg:brandes}に示す．
 
 このアルゴリズムの計算量を考える．まず，ある$s\in V$とすべての$v\in V$に対して
 $\sigma_{sv}$を計算するときの計算量は，Dijkstra法より$\mathcal{O}(|V|\log |V|+|E|)$である．
@@ -452,38 +462,38 @@ $\delta_{s\bullet}(v)$の値を更新できるため，$\mathcal{O}(|E|)$の時�
 
 \begin{algorithm}[H]
   \caption{Brandesのアルゴリズム}
-  \label{algo:brandes}
+  \label{alg:brandes}
   \begin{algorithmic}[1]\small
-    \Procedure{Brandes}{$G$}
+    \Procedure{Betweenness}{$G$}
     \State $B_x\gets 0,\:\forall x\in V$
     \ForAll{$s\in V$}
-    \State $S\gets()$ \Comment スタック
-    \State $P_w\gets (),\:\forall w\in V$ \Comment リスト
-    \State $\sigma_t\gets 0,\:\forall t\in V;\:\sigma_s\gets 1$
-    \State $d_t\gets -1,\:\forall t\in V;\:d_s\gets 0$
-    \State $Q\gets ()$ \Comment 順位キュー
-    \State $\mathrm{push}(Q, s)$
-    \While{$\lvert Q\rvert>0$}
-    \State $v\gets\mathrm{pop}(Q)$
-    \State $\mathrm{push}(S, v)$
-    \ForAll{$w\in\mathcal{N}_G(v)$}
-    \If{$d_w<0\lor d_v+l_{vw}<d_w$}
-    \State $d_w\gets d_v+l_{vw}$
-    \State $\sigma_w\gets\sigma_v$
-    \State $P_w\gets(v)$
-    \State $\mathrm{updatekey}(Q, w, d_w)$
+    \State $\texttt{S}\gets\varnothing$
+    \State $\texttt{P}_w\gets\varnothing,\:\forall w\in V$
+    \State $\sigma_{st}\gets 0,\:\forall t\in V;\:\sigma_{ss}\gets 1$
+    \State $d_{st}\gets\infty,\:\forall t\in V;\:d_{st}\gets 0$
+    \State $\texttt{PQ}\gets\varnothing$
+    \State $s$を優先度を$0$として$\texttt{PQ}$にプッシュ
+    \While{$\lvert\texttt{PQ}\rvert>0$}
+    \State 優先度最大の要素$v$を$\texttt{PQ}$からポップ
+    \State $v$を$\texttt{S}$にプッシュ
+    \ForAll{$w\in\mathcal{S}_G(v)$}
+    \If{$d_{sv}+l_{vw}<d_{sw}$}
+    \State $d_{sw}\gets d_{sv}+l_{vw}$
+    \State $\sigma_{sw}\gets\sigma_{sv}$
+    \State $\texttt{P}_w\gets\{v\}$
+    \State $\texttt{PQ}$の$w$の優先度を$d_{sw}$に変更
     \EndIf
-    \If{$d_w=d_v+l_{vw}$}
-    \State $\sigma_w\gets\sigma_w+\sigma_v$
-    \State $\mathrm{append}(P_w, v)$
+    \If{$d_{sw}=d_{sv}+l_{vw}$}
+    \State $\sigma_{sw}\gets\sigma_{sw}+\sigma_{sv}$
+    \State $\texttt{P}_w\gets\texttt{P}_w\cup\{v\}$
     \EndIf
     \EndFor
     \EndWhile
     \State $\delta_{s\bullet}(v)\gets 0,\:v\in V$
-    \While{$\lvert S\rvert>0$}
-    \State $w\gets\mathrm{pop}(S)$
-    \ForAll{$v\in P_w$}
-    \State $\delta_{s\bullet}(v)\gets\delta_{s\bullet}(v)+\frac{\sigma_v}{\sigma_w}(1+\delta_{s\bullet}(w))$
+    \While{$\lvert\texttt{S}\rvert>0$}
+    \State $\texttt{S}$から要素$w$をポップする
+    \ForAll{$v\in \texttt{P}_w$}
+    \State $\delta_{s\bullet}(v)\gets\delta_{s\bullet}(v)+\sigma_{sv}/\sigma_{sw}(1+\delta_{s\bullet}(w))$
     \EndFor
     \If{$w\neq s$}
     \State $B_w\gets B_w+\delta_{s\bullet}(w)$
