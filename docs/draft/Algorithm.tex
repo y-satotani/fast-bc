@@ -158,7 +158,7 @@ $\Delta'_{s\bullet}(x)$についても同様の手順で計算できる．
 \end{algorithm}
 
 \begin{algorithm}[tb]
-  \caption{An algorithm to decrease betweenness value with given source $s$ on deleting an edge $(u,v)$.}
+  \caption{辺$(u,v)$の挿入/削除時に媒介中心性の値$B_x$を寄与$\Delta_{s\bullet}(x)$だけ減少させるアルゴリズム}
   \label{alg:decrease-betweenness}
   \begin{algorithmic}[1]\small
     \Procedure{DecreaseBetweenness}{$s$}
@@ -181,6 +181,37 @@ $\Delta'_{s\bullet}(x)$についても同様の手順で計算できる．
     \EndIf
     \If{$y\notin\texttt{PQ}$}
     \State Enqueue $y$ to \texttt{PQ} with priority $d_{sy}$.
+    \EndIf
+    \EndFor
+    \EndWhile
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[tb]
+  \caption{辺$(u,v)$の挿入/削除時に媒介中心性の値$B_x$を寄与$\Delta'_{s\bullet}(x)$だけ増加させるアルゴリズム}
+  \label{alg:increase-betweenness}
+  \begin{algorithmic}[1]\small
+    \Procedure{IncreaseBetweenness}{$s$}
+    \State $\Delta'_{s\bullet}(x)\gets0,\:\forall x\in V$
+    \State $\texttt{PQ}\gets\varnothing$
+    \ForAll{$t\in T(s)$}
+    \State Enqueue $t$ to \texttt{PQ} with priority $d'_{st}$.
+    \EndFor
+    \While{$|\texttt{PQ}|>0$}
+    \State Dequeue $x$ with the highest priority from \texttt{PQ}.
+    \State $B(x)\gets B(x)-\Delta'_{s\bullet}(x)$
+    \ForAll{$y\in\mathcal{P}(x)$}
+    \If{$y=s\lor d'_{sx}<d'_{sy}+l'_{yx}$}
+    \State \textbf{continue}
+    \EndIf
+    \If{$x\in T(s)$}
+    \State $\Delta'_{s\bullet}(y)\gets\Delta'_{s\bullet}(y)+\sigma'_{sy}/\sigma'_{sx}\cdot(1+\Delta'_{s\bullet}(x))$
+    \Else
+    \State $\Delta'_{s\bullet}(y)\gets\Delta'_{s\bullet}(y)+\sigma'_{sy}/\sigma'_{sx}\cdot\Delta'_{s\bullet}(x)$
+    \EndIf
+    \If{$y\notin\texttt{PQ}$}
+    \State Enqueue $y$ to \texttt{PQ} with priority $d'_{sy}$.
     \EndIf
     \EndFor
     \EndWhile
@@ -255,42 +286,29 @@ $d'_{xs}$と$\sigma'_{xs}$を計算する．
 
 提案手法の具体的な手続きをアルゴリズム\ref{alg:incremental-algorithm}に示す．
 
-\begin{algorithm}[tbp]
-  \caption{一辺挿入時の最短経路を更新するアルゴリズム}
+\begin{algorithm}[tb]
+  \caption{辺$(u,v)$の挿入後の，頂点$s$に対する$d_{st}$と$\sigma_{st}$を計算するアルゴリズム}
   \label{alg:incremental-algorithm}
-  \begin{multicols}{2}
-    \begin{algorithmic}[1]\small
-      \Procedure{UpdateShortestPath}{}
-      \State $G'\gets (V,E\cup\{(u,v)\})$
-      \ForAll{$x\in S(v)$}
-      \State $\textproc{UpdatePart}(\bar{G},(v,u),x)$
-      \EndFor
-      \ForAll{$x\in T(u)$}
-      \State $\textproc{UpdatePart}(G,(u,v),x)$
-      \EndFor
-      \EndProcedure
-      \vfill\null
-      \columnbreak
-      \Procedure{UpdtatePart}{$G,(u,v),t)$}
-      \If{$d_{u,t}<l_{u,v}+d_{v,t}$}
-      \State \textbf{return}
-      \EndIf
-      \State $\texttt{PQ}\gets\varnothing$
-      \State 優先度を$l_{uv}+d_{vt}$として$u$を$\texttt{PQ}$に挿入
-      \While{$|\texttt{PQ}|>0$}
-      \State $\texttt{PQ}$から優先度最小の要素を取り出し$x$とする
-      \State このときの優先度を$\hat{d}_{xt}$とする
-      \State $d_{xt}\gets\hat{d}_{xt}$
-      \State $\sigma_{xt}\gets\sum_{y|y\in\mathcal{S}(x)\land d_{xt}=l_{xy}+d_{yt}}\sigma_{yt}$
-      \ForAll{$y\in\mathcal{P}(x)$}
-      \If{$d_{yt}\geq l_{yx}+d_{xt}$}
-      \State \texttt{PQ}の$y$の優先度を$l_{yx}+d_{xt}$に設定
-      \EndIf
-      \EndFor
-      \EndWhile
-      \EndProcedure
-    \end{algorithmic}
-  \end{multicols}
+  \begin{algorithmic}[1]\small
+    \Procedure{UpdateSSSP}{$s$}
+    \If{$d_{u,t}<l_{u,v}+d_{v,t}$}
+    \State \textbf{return}
+    \EndIf
+    \State $\texttt{PQ}\gets\varnothing$
+    \State 優先度を$l_{uv}+d_{vt}$として$u$を$\texttt{PQ}$に挿入
+    \While{$|\texttt{PQ}|>0$}
+    \State $\texttt{PQ}$から優先度最小の要素を取り出し$x$とする
+    \State このときの優先度を$\hat{d}_{xt}$とする
+    \State $d_{xt}\gets\hat{d}_{xt}$
+    \State $\sigma_{xt}\gets\sum_{y|y\in\mathcal{S}(x)\land d_{xt}=l_{xy}+d_{yt}}\sigma_{yt}$
+    \ForAll{$y\in\mathcal{P}(x)$}
+    \If{$d_{yt}\geq l_{yx}+d_{xt}$}
+    \State \texttt{PQ}の$y$の優先度を$l_{yx}+d_{xt}$に設定
+    \EndIf
+    \EndFor
+    \EndWhile
+    \EndProcedure
+  \end{algorithmic}
 \end{algorithm}
 
 \section{一辺削除時の最短経路更新法}
@@ -372,7 +390,7 @@ $d'_{xs}$と$\sigma'_{xs}$を計算する．
 提案手法の具体的な手続きをアルゴリズム\ref{alg:decremental-algorithm}に示す．
 
 \begin{algorithm}[tb]
-  \caption{An algorithm to update $d_{st}$ and $\sigma_{st}$ for a given soure $s$ on deleting an edge $(u,v)$.}
+  \caption{辺$(u,v)$の削除後の，頂点$s$に対する$d_{st}$と$\sigma_{st}$を計算するアルゴリズム}
   \label{alg:decremental-algorithm}
   \begin{algorithmic}[1]\small
     \Procedure{UpdateSSSP}{$s$}
