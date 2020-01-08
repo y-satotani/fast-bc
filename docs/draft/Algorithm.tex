@@ -1,57 +1,57 @@
 \chapter{提案アルゴリズム}
 \label{chap:algorithm}
 
-本章では，アルゴリズムを提案する．
-まず，挿入と削除に共通した部分を説明する．
-その後，挿入と削除それぞれのアルゴリズムを説明する．
+本章では，グラフ$G=(V,E)$に辺$(u,v)$が挿入または削除された後の最短経路および
+媒介中心性を更新するアルゴリズムを提案する．
+挿入操作について$(u,v)\notin E$が，
+削除操作については$(u,v)\in E$が成り立っていると仮定する．
+記号について，挿入または削除の操作後であることを明示するため，記号$'$をつける．
+例えば，操作後のグラフは$G'$と表す．
 
-\section{最短経路とペア依存度の変化に関する条件}
-\label{sect:condition-of-variability}
-
-ここでは，グラフ$G=(V,E)$に辺$(u,v)$が挿入または削除されたあとの最短経路および依存度が変化する条件について述べる．
-挿入操作について$(u,v)\notin E$が，削除操作については$(u,v)\in E$が成り立っていると仮定する．
-記号について，挿入または削除の操作後であることを明示するため，記号$'$をつける．例えば，操作後のグラフは$G'$と表す．
-
-次の定理は，最短経路の変化が最短距離および最短経路数の変化につながることを示す．
-\begin{theorem}
-  \label{thm:condition-of-invariability-of-shortest-path}
-  $E_{st}=E'_{st}$であることの必要十分条件は，$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$である．
-\end{theorem}
-\begin{proof}
-  $E_{st}=E'_{st}$ならば$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$であることは自明である．
-
-  逆は，図\ref{fig:general-shortest-paths-weighted}のような$E_{st}$を，
-  $d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$を満たすように，$E_{st}\neq E'_{st}$にすることを考える．
-  図において，同じ$L_i$に含まれる頂点$v$について$d_{sv}$および$d_{vt}$は一定とする．
-
-  挿入時，長さが$L_i$間の距離より長い辺を挿入すると，$E_{st}=E'_{st}$を満たす．
-  また，長さが$L_i$間の距離と等しい辺を挿入すると，$\sigma_{st}\neq\sigma'_{st}$となる．
-  また，長さが$L_i$間の距離より短い辺を挿入すると$d_{st}\neq d'_{st}$となる．
-
-  削除時，$e\notin E_{st}$である辺を削除すると，$E_{st}=E'_{st}$である．
-  また，$e\in E_{st}$である辺を削除すると，$d_{st}\neq d'_{st}$または$\sigma_{st}\neq\sigma'_{st}$となる．
-
-  したがって$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$を満たすように，
-  $E_{st}\neq E'_{st}$とすることは不可能で，逆も成り立つ．
-
-\end{proof}
-\begin{figure}
-  \centering
-  \def\svgwidth{.5\columnwidth}
-  \input{general-shortest-paths-weighted.pdf_tex}
-  \caption{$s$と$t$の一般的な最短経路}
-  \label{fig:general-shortest-paths-weighted}
-\end{figure}
+\section{提案アルゴリズムの概要}
 
 頂点$t$に対して，辺操作によって$t$への最短経路が変化する頂点の集合を$S(t)$と表す．
 同様に，頂点$s$に対して，辺操作によって$s$からの最短経路が変化する頂点の集合を$T(s)$と表す．
 $S(t)$および$T(s)$に属する頂点は，それぞれ$t$および$s$について，辺更新の影響を受ける頂点集合と言える．
 後述するが，$S(t)$および$T(s)$具体的な式は，操作によって異なる．
 さらに，頂点$s,x\in V$に対して，$T(s)$に含まれる頂点$t$についてペア依存度$\delta_{st}(x)$の総和を
-$\Delta_{s\bullet}(x)$で表す\cite{Bergamini2017}．
+$\Delta_{s\bullet}(x)$で表し，頂点$s$と$x$の\textbf{寄与}と呼ぶ\cite{Bergamini2017}．
 つまり，$\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x)$である．
 同様に，$\Delta'_{s\bullet}(x)=\sum_{t\in T(s)}\delta'_{st}(x)$とする．
 
+挿入と削除共通のアルゴリズムの流れは以下である．
+まず，$T(u)$および$S(v)$を計算する．
+次に計算した$S(v)$および式\eqref{eq:delta-dependency-1}を用いて，上書きされる最短経路の上にあるペア依存度
+の分だけ媒介中心性から減算する．つまり，$B''(x):=B(x)-\sum_{s\in S(v)}\Delta_{s\bullet}(x)$とする．
+次に，操作に応じたアルゴリズムによって最短距離および最短経路長を更新する．
+最後に，式\eqref{eq:delta-dependency-2}を用いて，新しい最短経路の上にあるペア依存度
+の分だけ媒介中心性に加算する．つまり，$B'(x):=B''(x)+\sum_{s\in S(v)}\Delta'_{s\bullet}(x)$とする．
+
+最後に，全体的なアルゴリズムをアルゴリズム\ref{alg:proposed-algorithm-full}に示す．
+以降，媒介中心性を減少/増加させるアルゴリズムを説明した後，
+挿入/削除それぞれに操作対する最短経路更新アルゴリズムを説明する．
+
+\begin{algorithm}[tb]
+  \caption{Algorithm to update betweenness value of each vertex on deleting an edge $(u,v)$.}
+  \label{alg:proposed-algorithm-full}
+  \begin{algorithmic}[1]\small
+    \Procedure{UpdateBetweenness}{}
+    \ForAll{$s\in S(v)$}
+    \State $\textproc{DecreaseBetweenness}(s)$
+    \State $\textproc{UpdateSSSP}(s)$
+    \State $\textproc{IncreaseBetweenness}(s)$
+    \EndFor
+    \ForAll{$t\in T(u)$}
+    \State $\textproc{UpdateSTSP}(t)$
+    \EndFor
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+\section{媒介中心性を増加/減少させるアルゴリズム}
+\label{sect:update-betweenness}
+
+本節では，$\Delta_{s\bullet}(x)$および$\Delta_{s\bullet}'(x)$を計算する方法を説明する．
 次の定理は，更新による依存度の変化量と$\Delta_{s\bullet}(x)$が一致することを示す．
 \begin{theorem}
   任意の$s,x\in V$に対して，式\eqref{eq:change-amount-dependency}が成り立つ．
@@ -128,35 +128,6 @@ $\Delta_{s\bullet}(y)$に加算する．さらに，$y$が\texttt{PQ}に含ま�
 これらの操作を優先度付きキュー\texttt{PQ}が空になるまで繰り返す．
 $\Delta'_{s\bullet}(x)$についても同様の手順で計算できる．
 
-挿入と削除共通のアルゴリズムの流れは以下である．
-まず，$T(u)$および$S(v)$を計算する．
-次に計算した$S(v)$および式\eqref{eq:delta-dependency-1}を用いて，上書きされる最短経路の上にあるペア依存度
-の分だけ媒介中心性から減算する．つまり，$B''(x):=B(x)-\sum_{s\in S(v)}\Delta_{s\bullet}(x)$とする．
-次に，操作に応じたアルゴリズムによって最短距離および最短経路長を更新する．
-最後に，式\eqref{eq:delta-dependency-2}を用いて，新しい最短経路の上にあるペア依存度
-の分だけ媒介中心性に加算する．つまり，$B'(x):=B''(x)+\sum_{s\in S(v)}\Delta'_{s\bullet}(x)$とする．
-
-最後に，辺操作に固有の部分を除いた，全体的なアルゴリズムの詳細を
-アルゴリズム\ref{alg:proposed-algorithm-full}に示す．
-以降，挿入時と削除時それぞれに対して固有の部分である，最短経路更新法について説明する．
-
-\begin{algorithm}[tb]
-  \caption{Algorithm to update betweenness value of each vertex on deleting an edge $(u,v)$.}
-  \label{alg:proposed-algorithm-full}
-  \begin{algorithmic}[1]\small
-    \Procedure{UpdateBetweenness}{}
-    \ForAll{$s\in S(v)$}
-    \State $\textproc{DecreaseBetweenness}(s)$
-    \State $\textproc{UpdateSSSP}(s)$
-    \State $\textproc{IncreaseBetweenness}(s)$
-    \EndFor
-    \ForAll{$t\in T(u)$}
-    \State $\textproc{UpdateSTSP}(t)$
-    \EndFor
-    \EndProcedure
-  \end{algorithmic}
-\end{algorithm}
-
 \begin{algorithm}[tb]
   \caption{辺$(u,v)$の挿入/削除時に媒介中心性の値$B_x$を寄与$\Delta_{s\bullet}(x)$だけ減少させるアルゴリズム}
   \label{alg:decrease-betweenness}
@@ -218,6 +189,41 @@ $\Delta'_{s\bullet}(x)$についても同様の手順で計算できる．
     \EndProcedure
   \end{algorithmic}
 \end{algorithm}
+
+\section{最短経路の変化に関する条件}
+本節では，グラフ$G=(V,E)$に辺$(u,v)$が挿入または削除されたあとの最短経路が変化する条件について述べる．
+次の定理は，最短経路の変化が最短距離および最短経路数の変化につながることを示す．
+\begin{theorem}
+  \label{thm:condition-of-invariability-of-shortest-path}
+  $E_{st}=E'_{st}$であることの必要十分条件は，$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$である．
+\end{theorem}
+\begin{proof}
+  $E_{st}=E'_{st}$ならば$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$であることは自明である．
+
+  逆は，図\ref{fig:general-shortest-paths-weighted}のような$E_{st}$を，
+  $d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$を満たすように，$E_{st}\neq E'_{st}$にすることを考える．
+  図において，同じ$L_i$に含まれる頂点$v$について$d_{sv}$および$d_{vt}$は一定とする．
+
+  挿入時，長さが$L_i$間の距離より長い辺を挿入すると，$E_{st}=E'_{st}$を満たす．
+  また，長さが$L_i$間の距離と等しい辺を挿入すると，$\sigma_{st}\neq\sigma'_{st}$となる．
+  また，長さが$L_i$間の距離より短い辺を挿入すると$d_{st}\neq d'_{st}$となる．
+
+  削除時，$e\notin E_{st}$である辺を削除すると，$E_{st}=E'_{st}$である．
+  また，$e\in E_{st}$である辺を削除すると，$d_{st}\neq d'_{st}$または$\sigma_{st}\neq\sigma'_{st}$となる．
+
+  したがって$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$を満たすように，
+  $E_{st}\neq E'_{st}$とすることは不可能で，逆も成り立つ．
+
+\end{proof}
+\begin{figure}
+  \centering
+  \def\svgwidth{.5\columnwidth}
+  \input{general-shortest-paths-weighted.pdf_tex}
+  \caption{$s$と$t$の一般的な最短経路}
+  \label{fig:general-shortest-paths-weighted}
+\end{figure}
+
+以下，辺挿入と辺削除それぞれの操作に対する最短経路更新法を説明する．
 
 \section{一辺挿入時の最短経路更新法}
 \label{sect:update-apsp-on-insert}
@@ -291,19 +297,19 @@ $d'_{xs}$と$\sigma'_{xs}$を計算する．
   \label{alg:incremental-algorithm}
   \begin{algorithmic}[1]\small
     \Procedure{UpdateSSSP}{$s$}
-    \If{$d_{u,t}<l_{u,v}+d_{v,t}$}
+    \If{$d_{sv}<d_{su}+l_{uv}$}
     \State \textbf{return}
     \EndIf
     \State $\texttt{PQ}\gets\varnothing$
-    \State 優先度を$l_{uv}+d_{vt}$として$u$を$\texttt{PQ}$に挿入
+    \State 優先度を$d_{su}+l_{uv}$として$v$を$\texttt{PQ}$に挿入
     \While{$|\texttt{PQ}|>0$}
     \State $\texttt{PQ}$から優先度最小の要素を取り出し$x$とする
-    \State このときの優先度を$\hat{d}_{xt}$とする
-    \State $d_{xt}\gets\hat{d}_{xt}$
-    \State $\sigma_{xt}\gets\sum_{y|y\in\mathcal{S}(x)\land d_{xt}=l_{xy}+d_{yt}}\sigma_{yt}$
-    \ForAll{$y\in\mathcal{P}(x)$}
-    \If{$d_{yt}\geq l_{yx}+d_{xt}$}
-    \State \texttt{PQ}の$y$の優先度を$l_{yx}+d_{xt}$に設定
+    \State このときの優先度を$\hat{d}_{sx}$とする
+    \State $d_{sx}\gets\hat{d}_{sx}$
+    \State $\sigma_{sx}\gets\sum_{y|y\in\mathcal{P}(x)\land d_{sx}=d_{sy}+l_{yx}}\sigma_{sy}$
+    \ForAll{$y\in\mathcal{S}(x)$}
+    \If{$d_{sy}\geq d_{sx}+l_{xy}$}
+    \State \texttt{PQ}の$y$の優先度を$d_{sx}+l_{xy}$に設定
     \EndIf
     \EndFor
     \EndWhile
