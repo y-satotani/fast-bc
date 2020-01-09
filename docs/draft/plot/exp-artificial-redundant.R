@@ -38,13 +38,6 @@ max_slope <- data %>%
     group_by(topology, order, degree, query, `is-weighted`) %>%
     summarise(slope = max(`tau-hat` / `tau-ast`, na.rm = TRUE)) %>%
     ungroup() %>%
-    mutate(
-        `line-label` = as.character(TeX(paste0(
-            '$\\mathit{\\hat{\\tau}}=',
-            sprintf('%.3e', slope),
-            '\\mathit{\\tau *}',
-            '$'), output = 'expression'))
-    ) %>%
     left_join(
         data %>%
         group_by(topology, order, degree, query, `is-weighted`) %>%
@@ -52,6 +45,7 @@ max_slope <- data %>%
         ungroup(),
         by = c("topology", "order", "degree", "query", "is-weighted")
     )
+max_slope
 
 make_gp = function(topology_, is_weighted_, query_) {
     gp <- ggplot(
