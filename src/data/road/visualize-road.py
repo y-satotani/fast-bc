@@ -19,19 +19,25 @@ pos = dict(
     for node in G.nodes
 )
 
-ebc = nx.edge_betweenness_centrality(G, weight='distance')
-edgelist = edgelist=sorted(G.edges, key=lambda e: ebc[e])
-edge_color = [ebc[e] for e in edgelist]
+bc = nx.betweenness_centrality(G, weight='distance')
+nodelist = sorted(G.nodes, key=lambda n: bc[n])
+node_color = [bc[n] for n in nodelist]
 
 fig, (ax_road, ax_bar) = plt.subplots(2, 1, figsize=(7, 7.5), gridspec_kw={'height_ratios': [7, 0.5]})
-ecol = nx.draw_networkx_edges(
+nx.draw_networkx_edges(
     G, pos,
-    edgelist=edgelist,
-    edge_color=edge_color,
-    edge_cmap=plt.cm.YlGnBu,
+    width=0.1,
     ax=ax_road
 )
-col = plt.colorbar(ecol, cax=ax_bar, orientation='horizontal')
+ncol = nx.draw_networkx_nodes(
+    G, pos,
+    nodelist=nodelist,
+    node_color=node_color,
+    node_size=1,
+    cmap=plt.cm.YlGnBu,
+    ax=ax_road
+)
+col = plt.colorbar(ncol, cax=ax_bar, orientation='horizontal')
 col.set_label('Normalized betweenness value')
 
 ax_road.set_title(G.name)
