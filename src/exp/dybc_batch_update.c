@@ -31,5 +31,18 @@ void batch_update(igraph_t* G,
     else if(VECTOR(*queries)[i] == QUERY_DELETE)
       decremental_update(G, D, S, B, u, v, weights, weight, 0);
     else assert(0 && "invalid query\n");
+    // update
+    if(VECTOR(*queries)[i] == QUERY_INSERT) {
+      igraph_add_edge(G, u, v);
+      if(weights)
+        igraph_vector_push_back(weights, weight);
+    } else if(VECTOR(*queries)[i] == QUERY_DELETE) {
+      // delete the edge
+      igraph_integer_t eid;
+      igraph_get_eid(G, &eid, u, v, 1, 1);
+      igraph_delete_edges(G, igraph_ess_1(eid));
+      if(weights)
+        igraph_vector_remove(weights, eid);
+    }
   }
 }
