@@ -9,18 +9,17 @@
 \label{sect:graph-theory}
 
 \textbf{グラフ}とは，二つの集合$V$と$E$の組$G=(V,E)$で，
-$E\subseteq V\times V$を満たす，つまり，$V$から元を2個取り出した集合の部分集合である．
+$E\subset V^2$を満たす．つまり，$V$から元を2個取り出した集合の部分集合である．
 $V$を\textbf{頂点集合}とよび，その元を\textbf{頂点}とよぶ．
 また，頂点集合の要素数$|V|$を\textbf{頂点数}とよぶ．
 $E$を\textbf{辺集合}とよび，その元を\textbf{辺}とよぶ．
-また，辺集合の要素数$|E|$を\textbf{辺数}とよぶ．
-辺が非順序対ならば$G$は\textbf{無向グラフ}と呼ばれ，その辺を$\{v,w\}$のように表す．．
-また，辺が順序対ならば，$G$は\textbf{有向グラフ}と呼ばれ，その辺を$(v,w)$のように表す．
-無効グラフの辺$e=\{v,w\}$について，頂点$v$と$w$を\textbf{端点}と呼ぶ．
-また，有向グラフの辺$e=(v,w)$について，頂点$v$を\textbf{始点}，頂点$w$を\textbf{終点}と呼ぶ．
+また，辺集合の要素数$|E|$を\textbf{頂点数}とよぶ．
+$E$の要素が順序対ならば，$G$は\textbf{有向グラフ}と呼ばれ，
+非順序対ならば$G$は\textbf{無向グラフ}と呼ばれる．
+有向グラフの辺$e=(v,w)$において，頂点$v$を始点，頂点$w$を終点と呼ぶ．
 グラフ$G=(V,E)$と$G'=(V',E')$に対して，$V'\subseteq V$かつ$E'\subseteq E$
 を満たすとき，$G'$は$G$の\textbf{部分グラフ}であるといい，$G'\subseteq G$と記す．
-有向グラフ$G$について，各辺$(v,w)$を逆順にしたグラフを$G$の\textbf{逆}と呼び，$\bar{G}$で表す．
+有向グラフ$G$について，各辺$(v,w)$を逆向きにしたグラフを$G$の逆と呼び，$\bar{G}$で表す．
 すなわち，$G=(V,E)$のとき，$\bar{G}=(V,\{(w,v)|(v,w)\in E\})$である．
 
 \textbf{重み付きグラフ}とは，すべての辺$(v,w)$もしくは$\{v,w\}$に対して，
@@ -29,7 +28,7 @@ $E$を\textbf{辺集合}とよび，その元を\textbf{辺}とよぶ．
 また，重み付きグラフでないグラフを\textbf{重みなしグラフ}と呼ぶ．
 
 無向グラフにおいて，頂点$v$と辺$e$が\textbf{接続する}とは，$v\in e$つまり，
-$e$の端点のどちらかが$v$であることをいう．
+$e$の端点に$v$が属することをいう．
 頂点$v$と頂点$w$が\textbf{隣接する}とは，$\{v,w\}$が辺集合$E$に属することをいう．
 無向グラフ$G$の頂点$v$について，$v$と隣接する頂点の集合を頂点$v$の\textbf{近傍}と
 呼び，$\mathcal{N}_G(v)$で表す．また，無向グラフ$G$について$v$の近傍の数
@@ -41,8 +40,8 @@ $|\mathcal{N}_G(v)|$を\textbf{次数}と呼び，$k(v)$あるいは$k_G(v)$と�
 \begin{equation*}
   a_{ij}=
   \begin{cases}
-    1 & (i\text{と}j\text{が隣接する}), \\
-    0 & (i\text{と}j\text{が隣接しない}),
+    1 & (i\text{と}j\text{が隣接する}) \\
+    0. & (i\text{と}j\text{が隣接しない})
   \end{cases}
 \end{equation*}
 
@@ -60,34 +59,131 @@ $\mathcal{S}_G(v)$と記す．すなわち，$\mathcal{S}_G(v)=\{w|(v,w)\in E\}$
   \end{aligned}
 \end{equation*}
 を満たすものである．道グラフ$P=(\{v_i\},\{e_i\})$の頂点および辺の並びを
-示すために，次のように頂点と辺を交互に記す．
+示すために，次の表記を用いる．
 \[ v_1,e_1,v_2,\ldots,v_{n-1},e_n,v_n \]
 重み付き経路グラフに対して，その重みの総和を経路の長さと呼ぶ．
 
-重み付きグラフ$G$上の頂点$s$と頂点$t$について，それらを結ぶ道$P\subseteq G$のうち，
+重み付きグラフ$G$上の頂点$s$と頂点$t$について，それらを結ぶ道$P\subset G$のうち，
 長さが最小のものを\textbf{最短経路}と呼ぶ．$G$の頂点$s$と頂点$t$の最短経路のうち，
 ひとつの長さを$s$と$t$の\textbf{最短距離}あるいは\textbf{距離}と呼び，$d_{st}$と表す．
-重みなしグラフの距離は，重みをすべて$1$と仮定して計算することが多く，
-本稿でも，特に断りがない限りそのように計算する．
-$s$と$t$を結ぶ最短経路の数を\textbf{最短経路数}と呼び，$\sigma_{st}$と記す．
-$G$が無向グラフであるならば，すべての$s,t\in V$に対して$d_{st}=d_{ts}$かつ
+重みなしグラフの距離は，重みをすべて$1$と仮定して計算することが多い．
+距離と同様に，$s$と$t$を結ぶ最短経路の数を\textbf{最短経路数}と呼び，$\sigma_{st}$と記す．
+$G$が無向グラフであるならば，すべての$s,t\in S$に対して$d_{st}=d_{ts}$かつ
 $\sigma_{st}=\sigma_{ts}$である．
 以下の議論では，便宜上，すべての$s\in V$に対し$d_{ss}=0$, $\sigma_{ss}=1$とする．
 
 また，$s$から$t$への最短経路の中で頂点$v$を通るものの個数を$\sigma_{st}(v)$で表す．
-頂点$s$から他のすべての頂点への最短経路で構成される有向グラフを$G_s=(V_s,E_s)$で表す．
+頂点$s$から他の頂点へのすべての最短経路で構成される有向グラフを$G_s=(V_s,E_s)$で表す．
 同様に，頂点$s$から頂点$t$へのすべての最短経路で構成される有向グラフを$G_{st}=(V_{st},E_{st})$で表す．
-さらに，頂点$s$と頂点$v$について，$G_s$のトポロジカルソートにおいて$v$より後に位置する頂点集合と$v$で
-構成される部分グラフを$G_s(v)=(V_s(v),E_s(v))$で表す．すなわち，
-$V_s(v)=\{w|w\in V_s,d_{sw}=d_{sv}+d_{vw}\}, E_s(v)=\{(w,x)|(w,x)\in E_s,d_{sx}=d_{sv}+d_{vw}+l_{wx}\}$
-である．
 
-最短経路及び最短経路数について，以下の性質が知られている．
-この補題は，最短距離および最短経路数の陰な表現を示している．
+\section{最短経路長および最短経路数の性質}
+\label{sect:shortest-paths}
+
+最短経路の長さと個数について，いくつかの補題を示す．
+まず，ある頂点が最短経路に含まれる条件を示す．
+
+\begin{lemma}[Brandes~\cite{Brandes2001}]
+  \label{lemma:inclusion-v}
+  $G=(V,E)$の異なる2頂点$s,t \in V$に対して，$s$から$t$への最短経路
+  $G_{st}=(V_{st},E_{st})$が$i \in V$を含む，すなわち$i \in V_{st}$であるための
+  必要十分条件は
+  \begin{equation}
+    d_{st}=d_{si}+d_{it}
+    \label{eq:inclusion-v}
+  \end{equation}
+  が成り立つことである．
+\end{lemma}
+\begin{proof}
+  はじめに$i=s$の場合を考える．このとき明らかに$i \in V_{st}$であり，
+  かつ$d_{si}+d_{it}=d_{ss}+d_{st}=d_{st}$より\eqref{eq:inclusion-v}もつねに成り立つ．
+  $i=t$の場合も同様である．そこで以下では$i \not\in \{s,t\}$と仮定する．
+
+  $G_{st}$が頂点$i$を含むならば，$G_{st}$の中に
+  $s \rightarrow \cdots \rightarrow i \rightarrow \cdots \rightarrow t$の順に
+  頂点を通る有向道が存在する．この有向道の長さは$d_{si}+d_{it}$で与えられるので
+  \eqref{eq:inclusion-v}が成り立つ．
+
+  次に\eqref{eq:inclusion-v}が成り立つと仮定する．頂点$s$を出発して$s$から$i$への
+  最短経路の一つを通って$i$に行き，次に$i$から$t$への最短経路の一つを通って$t$に行く有向道を考える．
+  この有向道は$s$から$t$への最短経路の一つである．
+  なぜなら，その長さは$d_{si}+d_{it}$で与えられ，\eqref{eq:inclusion-v}より
+  $s$から$t$への最短経路長$d_{st}$に等しいからである．
+  したがって$i \in V_{st}$が成り立つ．
+\end{proof}
+
+補題\ref{lemma:inclusion-v}の証明の考え方を用いれば，ある頂点を通過する最短経路数を導出できる．
+
+\begin{lemma}[Brandes\cite{Brandes2001}]
+  $G=(V,E)$の異なる2頂点$s,t \in V$に対して，
+  $s$から$t$への最短経路の中で$i$を通るものの個数$\sigma_{st}(i)$は
+  次式で与えられる．
+  \begin{equation}
+    \sigma_{st}(i)=
+    \begin{cases}
+      \sigma_{si} \sigma_{it}, & d_{st}=d_{si}+d_{it}\,\text{のとき} \\
+      0, & \text{それ以外のとき}
+    \end{cases}
+  \end{equation}
+\end{lemma}
+
+次の補題は，ある辺が最短経路上にあることの必要十分条件を示すものである．
+
+\begin{lemma}
+  \label{lemma:inclusion-e}
+  $G=(V,E)$の異なる2頂点$s,t\in V$と辺$\{i,j\} \in E$を考える．$s$から$t$への最短経路
+  $G_{st}=(V_{st},E_{st})$が有向辺$(i,j)$を含む，すなわち$(i,j) \in E_{st}$が成り立つための
+  必要十分条件は
+  \begin{equation}
+    d_{st}=d_{si}+l_{ij}+d_{jt}
+    \label{eq:inclusion-e}
+  \end{equation}
+  が成り立つことである．
+\end{lemma}
+\begin{proof}
+  はじめに$i=s$, $j=t$の場合を考える．このとき明らかに$G_{st}$は
+  有向辺$(i,j)$を含み，かつ$d_{si}+l_{ij}+d_{jt}=d_{ss}+l_{st}+d_{tt}=l_{st}=d_{st}$
+  より\eqref{eq:inclusion-e}も成り立つ．
+
+  次に$i=s$, $j \neq t$の場合を考える．このとき$(i,j)\in E_{st}$であるための
+  必要十分条件は$G_{st}$が$j$を含むことである．これは補題~\ref{lemma:inclusion-v}より
+  $d_{st}=d_{sj}+d_{jt}$と等価であり，さらに右辺$d_{sj}+d_{jt}$は\eqref{eq:inclusion-e}の右辺と等しい．
+  $i\neq s$, $j=t$の場合も同様である．
+
+  そこで以下では$s,t,i,j$がすべて異なると仮定する．
+  $G_{st}$が有向辺$(i,j)$を含むならば，$G_{st}$の中に
+  $s \rightarrow \cdots \rightarrow i \rightarrow j \rightarrow \cdots \rightarrow t$
+  の順に頂点を通る有向道が存在する．
+  この有向道の長さは$d_{si}+l_{ij}+d_{jt}$で与えられるので\eqref{eq:inclusion-e}が成り立つ．
+
+  次に\eqref{eq:inclusion-e}が成り立つと仮定する．
+  頂点$s$を出発して$s$から$i$への最短経路の一つを通って$i$に行き，次に辺$\{i,j\}$を通って$j$に行き，
+  最後に$j$から$t$への最短経路の一つを通って$t$に行く有向道が存在する．
+  この有向道は$s$から$t$への最短経路の一つである．なぜなら，その長さは$d_{si}+l_{ij}+d_{jt}$で与えられ，
+  \eqref{eq:inclusion-e}より$s$から$t$への最短経路長$d_{st}$に等しいからである．
+  したがって，$(i,j) \in E_{st}$が成り立つ．
+\end{proof}
+
+補題\ref{lemma:inclusion-e}の証明の考え方を用いれば，ある辺を通る最短経路数を導出できる．
+
+\begin{lemma}
+  $G=(V,E)$の異なる2頂点$s,t \in V$に対して，
+  $s$から$t$への最短経路の中で有向辺$(i,j)$を通るものの個数を
+  $\sigma_{st}(i,j)$とおくと，それは次式で与えられる．
+  \begin{equation*}
+    \sigma_{st}(i,j)=
+    \begin{cases}
+      \sigma_{si} \sigma_{jt}, & d_{st}=d_{si}+l_{ij}+d_{jt}\,\text{のとき} \\
+      0, & \text{それ以外のとき}
+    \end{cases}
+  \end{equation*}
+\end{lemma}
+
+次の補題は，最短距離および最短経路数を，ほかの頂点とのもので陰に表すことができる
+ことを示している．
 
 \begin{lemma}
   \label{lemma:distance-and-geodesics}
-  $G=(V,E)$の異なる二頂点$s,t\in V$について，次が成り立つ．
+  $G=(V,E)$の異なるに頂点$s,t\in V$について，次が成り立つ．
   \begin{equation*}
     \begin{aligned}
       d_{st}&=\min\{l_{si}+d_{it}|i\in\mathcal{N}_G(s)\} \\
@@ -95,116 +191,202 @@ $V_s(v)=\{w|w\in V_s,d_{sw}=d_{sv}+d_{vw}\}, E_s(v)=\{(w,x)|(w,x)\in E_s,d_{sx}=
     \end{aligned}
   \end{equation*}
 \end{lemma}
+\begin{proof}
+  すべての辺の重みは正であるため，頂点$s$から頂点$v$までの最短経路の最後の辺は，
+  $d_{su}<d_{su}$が成立する辺集合に含まれる辺$(u,v)$である．これは，補題1
+  \par $G=(V,E$の互いに異なる3頂点$s,t,v$に対して，$s$から$t$への最短経路の集合
+  $G_{st}=(V_{st},E_{st})$が$v$を含む，すなわち，$v\in E_{st}$が成り立つための
+  必要十分条件は$d_{st}=d_{sv}+d_{vt}$である．
+
+  より頂点$s$から頂点$v$までの最短経路の数は，頂点$s$から頂点$u$までの
+  最短経路の数と等しいと言える．
+\end{proof}
 
 \section{媒介中心性とペア依存度}
 \label{sect:pairwise-dependency}
 
-本節では，媒介中心性の定義を示した後，効率的な媒介中心性計算アルゴリズムであるBrandesのアルゴリズムを説明する．
-媒介中心性の定義は次の通り．
+本説では，媒介中心性の定義からその効率的な計算方法を説明する．
 
 \begin{definition}[Freeman\cite{Freeman1977}]
   \label{def:betweenness-centrality}
-  頂点$i$の媒介中心性$B_v$は式\eqref{eq:betweenness-centrality}で定義される．
+  頂点$i$の媒介中心性$B_v$は
   \begin{equation}
     B_v=\sum_{s\neq v}\sum_{t\neq {v,s}}\frac{\sigma_{st}(v)}{\sigma_{st}}
     \label{eq:betweenness-centrality}
   \end{equation}
+  で定義される．
 \end{definition}
 
 すなわち，頂点$v$の媒介中心性は$s$から$t$への最短経路の個数とその中で
 頂点$v$を通るものの個数の比を$s,t$のすべての組について足し合わせたものである．
 したがって，媒介中心性の大きな頂点は多くの最短経路上にあり，この意味で重要度が高いと言える．
 
-すべての頂点の媒介中心性を求める単純な方法は次の通りである．
+すべての頂点の媒介中心性を求める単純な方法は以下の通りである．
 まず，$s\in V$に対して，Dijkstra法を用いて$s$から他のすべての頂点への最短経路を求める．
 その過程で，$s$から他のすべての頂点への最短距離と最短経路数も同時に求める．
 次に，互いに異なる3頂点の組$\{s,t,v\}$のすべてに対して，$\sigma_{st}(v)$の値を計算する．
 最後に媒介中心性$B_v$ $(v\in V)$を定義の式により計算する．
-この方法の計算量は$\mathcal{O}(|V|^3)$であり，大規模なネットワークでは膨大な計算時間が必要になる．
+しかしながら，この方法の計算量は$\mathcal{O}(|V|^3)$であり，大規模なネットワークでは膨大な計算時間が必要になる．
 
-媒介中心性の効率的計算法として広く用いられているのは
-Brandes\cite{Brandes2001}によって提案されたアルゴリズムである．
-以下，このアルゴリズムについて説明する．
-まず，ペア依存度の定義を示す．
+媒介中心性の効率的計算法として最も広く用いられているのは
+Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである．
+以下，Brandesのアルゴリズムについて説明する．
+まず，ペア依存度および依存度の定義を示す．
 
 \begin{definition}[Brandes\cite{Brandes2001}]
   \label{def:pairwise-dependency}
-  頂点$s,t,v$のペア依存度および頂点$s,v$の依存度はそれぞれ
-  式\eqref{eq:def-pairwise-dependency}および式\eqref{eq:def-dependency}で定義される．
-  \begin{align}
-      \delta_{st}(v)&=\frac{\sigma_{st}(v)}{\sigma_{st}}
-      \label{eq:def-pairwise-dependency} \\
-      \delta_{s\bullet}(v)&=\sum_{t\neq v,s}\delta_{st}(v)
-      \label{eq:def-dependency}
-  \end{align}
+  頂点$s,t,v$のペア依存度は次式で定義される．
+  \begin{equation}
+    \label{eq:def-pairwise-dependency}
+    \delta_{st}(v)=\frac{\sigma_{st}(v)}{\sigma_{st}}
+  \end{equation}
+  また，頂点$s,v$と他の頂点の依存度は次式で定義される．
+  \begin{equation}
+    \label{eq:def-sum-pairwise-dependency}
+    \delta_{s\bullet}(v)=\sum_{t\neq v,s}\delta_{st}(v)
+  \end{equation}
 \end{definition}
 
-依存度を使うと媒介中心性は$B_v=\sum_{s\neq v}\delta_{s\bullet}(v)$と変形できる．
+ペア依存度および依存度を使うと，媒介中心性は次式で表される．
+\begin{equation*}
+  \begin{aligned}
+    B_v&=\sum_{s\neq v}\sum_{t\neq v,s}\frac{\sigma_{st}(v)}{\sigma_{st}}
+    &=\sum_{s\neq v}\sum_{t\neq v,s}\delta_{st}(v)
+  \end{aligned}
+\end{equation*}
 
-$\delta_{s\bullet}(v)$について，次のことが知られている．
-\begin{theorem}[Brandes\cite{Brandes2001}]
-  \label{th:implicit-pd}
+$\delta_{s\bullet}(v)$を効率的に計算する方法について，次の性質が知られている．
+
+\begin{lemma}
+  \label{lemma:implicit-dependency-part}
+  グラフ$G=(V,E)$の異なる頂点$s,t$について，$\sigma_{st}=1$ならば，
+  頂点$v$の$s$に対するペア依存度は式\eqref{eq:implicit-dependency-part}で計算できる．
   \begin{equation}
-    \label{eq:implicit-pd}
+    \label{eq:implicit-dependency-part}
+    \delta_{s\bullet}(v)=\sum_{(v,w)\in E_s}(1+\delta_{s\bullet}(w))
+  \end{equation}
+\end{lemma}
+\begin{proof}
+  この補題は，図\ref{fig:implicit-dependency-1}のようにすべての最短経路の辺と頂点を形成している
+  頂点$s$の木構造であることを表している．したがって，頂点$s$から頂点$t$までの
+  すべての経路もしくは，それ以外の経路上に頂点$v$は存在する．
+  例えば，頂点$v$は$w_1,w_2,w_3$の最短経路上に存在する．
+\end{proof}
+
+\begin{figure}[tb]
+  \centering
+  \def\svgwidth{.35\linewidth}
+  \input{implicit-dependency-1.pdf_tex}
+  \caption{頂点$s$の木構造}
+  \label{fig:implicit-dependency-1}
+\end{figure}
+
+さらに$\sigma_{st}>1$のような一般的な場合も，次の定理の通りに計算できる．
+
+\begin{theorem}
+  \label{th:implicit-dependency}
+  \begin{equation}
+    \label{eq:implicit-dependency}
     \delta_{s\bullet}(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_{s\bullet}(w)).
   \end{equation}
 \end{theorem}
+\begin{proof}
+  $E_{st}$の上に$v$があるような$t$についてのみ$\delta_{st}(v)>0$が成り立ち，このような
+  最短経路は$v\in\mathcal{P}_{E_{st}}(w)$を満たす辺$(v,w)$をただひとつもつ．
+  このような状況は，図\ref{fig:implicit-dependency-2}のように，先のものより少し複雑である．
 
-定理\ref{th:implicit-pd}は，$s$と$v$の依存度$\delta_{s\bullet}(v)$は
-$s$と$w\in\mathcal{S}_{G_s}(v)$の依存度$\delta_{s\bullet}(w)$を用いて陰に計算できることを示している．
-Brandesのアルゴリズムは定理\ref{th:implicit-pd}の性質を応用して媒介中心性を高速に計算している．
-Brandesのアルゴリズムをアルゴリズム\ref{algo:brandes}に示す．
+  辺$e\in E$を含むように拡張したペア依存度を$\delta_{st}(v,e)=\sigma_{st}(v,e)/\sigma_{st}$で定義する．
+  ただし，$\sigma_{st}(v,e)$は$s$から$t$への最短経路の中で$v$と$e$を通るものの個数とする．
+  つまり，
+  \[ \delta_{s\bullet}(v)=\sum_{t\in V}\delta_{st}(v)=\sum_{t\in V}\sum_{(v,w)\in E_s}\delta_{st}(v,\{v,w\})=\sum_{(v,w)\in E_s}\sum_{t\in V}\delta_{st}(v,(v,w)). \]
+
+  頂点$w$は$\mathcal{P}_{E_s}(w)$を満たすとする．すると，$s$から$w$への
+  $\sigma_{sw}$個の最短経路のうち，$\sigma_{sv}$個の最短経路は$s$から$v$を通り，
+  $(v,w)$を通る．つまり，$s$と$t$と$v$と$(v,w)$のペア依存度は，次で求められる．
+  \begin{equation*}
+    \delta_{st}(v,\{v,w\})=
+    \begin{cases}
+      \cfrac{\sigma_{sv}}{\sigma_{sw}}, & t=w\text{のとき} \\
+      \cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot\cfrac{\sigma_{st}(w)}{\sigma_{st}} & t\neq w\text{のとき}
+    \end{cases}
+  \end{equation*}
+
+  これを上式に代入すると，
+  \begin{align*}
+    \delta_{s\bullet}(v)&=\sum_{t\neq s,v}\cfrac{\sigma_{st(v)}}{\sigma_{st}} \\
+    &=\sum_{t\neq s,v}\sum_{(v,w)\in E_s}\cfrac{\sigma_{st}(v,(v,w))}{\sigma_{st}} \\
+    &=\sum_{(v,w)\in E_s}\sum_{t\neq s,v}\cfrac{\sigma_{st}(v,(v,w))}{\sigma_{st}} \\
+    &=\sum_{(v,w)\in E_s}\left(\sum_{t\neq s,v}\cfrac{1}{\sigma_{st}}\cdot\frac{\sigma_{sv}}{\sigma_{sw}}\cdot\sigma_{st}(w)+\cfrac{\sigma_{sv}}{\sigma_{sj}}\right) \\
+    &=\sum_{(v,w)\in E_s}\cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot\left(1+\sum_{t\neq s,v,w}\cfrac{\sigma_{st}(v)}{\sigma_{st}}\right) \\
+    &=\sum_{(v,w)\in E_s}\cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot(1+\delta_{s\bullet}(w))
+  \end{align*}
+  を得る．
+\end{proof}
+
+\begin{figure}[tb]
+  \centering
+  \def\svgwidth{.35\linewidth}
+  \input{implicit-dependency-2.pdf_tex}
+  \caption{頂点$s$の木構造}
+  \label{fig:implicit-dependency-2}
+\end{figure}
+
+Brandesのアルゴリズムは定理\ref{th:implicit-dependency}の性質を応用して媒介中心性を高速に計算している．
+Brandesのアルゴリズムの具体的な手順を説明する．まず，Dijkstra法に基づいて，始点$s$から各頂点$t$への距離$d_{st}$および最短経路数$\sigma_{st}$を求める．
+この際，距離$d_{st}$の昇順に頂点$t$をプッシュしたスタック$\texttt{S}$および，各頂点$t$に対する$E_{s}$上の先行$\mathcal{P}_{E_s}(t)$である$\texttt{P}_t$を計算する．
+最短経路の計算後，$\texttt{S}$から要素を取り出し定理\ref{th:implicit-dependency}による$\delta_{s\bullet}(v)$の計算を，$\texttt{S}$が空になるまで繰り返す．
+Brandesのアルゴリズムをアルゴリズム\ref{alg:brandes}に示す．
 
 このアルゴリズムの計算量を考える．まず，ある$s\in V$とすべての$v\in V$に対して
 $\sigma_{sv}$を計算するときの計算量は，Dijkstra法より$\mathcal{O}(|V|\log |V|+|E|)$である．
-依存度の計算についても，$G$のすべての頂点$v$を$s$からの最短経路の逆向きに一度だけ辿ることにより
+ペア依存度の積算についても，$G$のすべての頂点$v$を$s$からの最短経路の逆向きに一度だけ辿ることにより
 $\delta_{s\bullet}(v)$の値を更新できるため，$\mathcal{O}(|E|)$の時間で実行できる\cite{Brandes2001}．
-したがって，Brandesのアルゴリズムの計算量は$\mathcal{O}(|V|^2\log |V|+|V||E|)$であり，
-それは単純な方法の計算量$\mathcal{O}(|V|^3)$よりも小さい．
+したがって，すべての$s\in V$に対するアルゴリズムの計算量は$\mathcal{O}(|V|^2\log |V|+|V||E|)$であり，
+それは$\mathcal{O}(|V|^3)$よりも小さい．
 
 \begin{algorithm}[H]
   \caption{Brandesのアルゴリズム}
-  \label{algo:brandes}
-  \begin{multicols}{2}
+  \label{alg:brandes}
+  \begin{multicols*}{2}
     \begin{algorithmic}[1]\small
-      \Procedure{Brandes}{$G$}
+      \Procedure{Betweenness}{$G$}
       \State $B_x\gets 0,\:\forall x\in V$
       \ForAll{$s\in V$}
-      \State $S\gets()$ \Comment スタック
-      \State $P_w\gets (),\:\forall w\in V$ \Comment リスト
-      \State $\sigma_t\gets 0,\:\forall t\in V;\:\sigma_s\gets 1$
-      \State $d_t\gets -1,\:\forall t\in V;\:d_s\gets 0$
-      \State $Q\gets ()$ \Comment 順位キュー
-      \State $\mathrm{push}(Q, s)$
-      \While{$\lvert Q\rvert>0$}
-      \State $v\gets\mathrm{pop}(Q)$
-      \State $\mathrm{push}(S, v)$
-      \ForAll{$w\in\mathcal{N}_G(v)$}
-      \If{$d_w<0\lor d_v+l_{vw}<d_w$}
-      \State $d_w\gets d_v+l_{vw}$
-      \State $\sigma_w\gets\sigma_v$
-      \State $P_w\gets(v)$
-      \State $\mathrm{updatekey}(Q, w, d_w)$
+      \State $\texttt{S}\gets\varnothing$
+      \State $\texttt{P}_w\gets\varnothing,\:\forall w\in V$
+      \State $\sigma_{st}\gets 0,\:\forall t\in V;\:\sigma_{ss}\gets 1$
+      \State $d_{st}\gets\infty,\:\forall t\in V;\:d_{st}\gets 0$
+      \State $\texttt{PQ}\gets\varnothing$
+      \State $s$を優先度を$0$として$\texttt{PQ}$にプッシュ
+      \While{$\lvert\texttt{PQ}\rvert>0$}
+      \State 優先度最大の要素$v$を$\texttt{PQ}$からポップ
+      \State $v$を$\texttt{S}$にプッシュ
+      \ForAll{$w\in\mathcal{S}_G(v)$}
+      \If{$d_{sv}+l_{vw}<d_{sw}$}
+      \State $d_{sw}\gets d_{sv}+l_{vw}$
+      \State $\sigma_{sw}\gets\sigma_{sv}$
+      \State $\texttt{P}_w\gets\{v\}$
+      \State $\texttt{PQ}$の$w$の優先度を$d_{sw}$に変更
       \EndIf
-      \If{$d_w=d_v+l_{vw}$}
-      \State $\sigma_w\gets\sigma_w+\sigma_v$
-      \State $\mathrm{append}(P_w, v)$
+      \If{$d_{sw}=d_{sv}+l_{vw}$}
+      \State $\sigma_{sw}\gets\sigma_{sw}+\sigma_{sv}$
+      \State $\texttt{P}_w\gets\texttt{P}_w\cup\{v\}$
       \EndIf
       \EndFor
       \EndWhile
-      \State $\delta_v\gets 0,\:v\in V$
-      \While{$\lvert S\rvert>0$}
-      \State $w\gets\mathrm{pop}(S)$
-      \ForAll{$v\in P_w$}
-      \State $\delta_v\gets\delta_v+\frac{\sigma_v}{\sigma_w}(1+\delta_w)$
+      \State $\delta_{s\bullet}(v)\gets 0,\:v\in V$
+      \While{$\lvert\texttt{S}\rvert>0$}
+      \State $\texttt{S}$から要素$w$をポップする
+      \ForAll{$v\in \texttt{P}_w$}
+      \State $\delta_{s\bullet}(v)\gets\delta_{s\bullet}(v)+\sigma_{sv}/\sigma_{sw}(1+\delta_{s\bullet}(w))$
       \EndFor
       \If{$w\neq s$}
-      \State $B_w\gets B_w+\delta_w$
+      \State $B_w\gets B_w+\delta_{s\bullet}(w)$
       \EndIf
       \EndWhile
       \EndFor
       \EndProcedure
     \end{algorithmic}
-  \end{multicols}
+  \end{multicols*}
 \end{algorithm}
 

@@ -1,29 +1,210 @@
 \chapter{提案アルゴリズム}
 \label{chap:algorithm}
 
-本章では，アルゴリズムを提案する．
-まず，挿入と削除に共通した部分を説明する．
-その後，挿入と削除それぞれのアルゴリズムを説明する．
-
-\section{最短経路とペア依存度の変化に関する条件}
-\label{sect:condition-of-variability}
-
-ここでは，一辺が挿入または削除されたあとの最短経路および依存度が変化する条件について述べる．
-グラフや頂点間距離などに対して挿入または削除の操作後であることを明示するため，記号$'$をつける．
+本章では，グラフ$G=(V,E)$に辺$(u,v)$が挿入または削除された後の最短経路および
+媒介中心性を更新するアルゴリズムを提案する．
+挿入操作について$(u,v)\notin E$が，
+削除操作については$(u,v)\in E$が成り立っていると仮定する．
+記号について，挿入または削除の操作後であることを明示するため，記号$'$をつける．
 例えば，操作後のグラフは$G'$と表す．
 
-\begin{lemma}
-  \label{lemma:condition-of-invariability-of-shortest-path}
+\section{提案アルゴリズムの概要}
+
+頂点$t$に対して，辺操作によって$t$への最短経路が変化する頂点の集合を$S(t)$と表す．
+同様に，頂点$s$に対して，辺操作によって$s$からの最短経路が変化する頂点の集合を$T(s)$と表す．
+$S(t)$および$T(s)$に属する頂点は，それぞれ$t$および$s$について，辺更新の影響を受ける頂点集合と言える．
+後述するが，$S(t)$および$T(s)$具体的な式は，操作によって異なる．
+さらに，頂点$s,x\in V$に対して，$T(s)$に含まれる頂点$t$についてペア依存度$\delta_{st}(x)$の総和を
+$\Delta_{s\bullet}(x)$で表し，頂点$s$と$x$の\textbf{寄与}と呼ぶ\cite{Bergamini2017}．
+つまり，$\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x)$である．
+同様に，$\Delta'_{s\bullet}(x)=\sum_{t\in T(s)}\delta'_{st}(x)$とする．
+
+挿入と削除共通のアルゴリズムの流れは以下である．
+まず，$T(u)$および$S(v)$を計算する．
+次に計算した$S(v)$および式\eqref{eq:delta-dependency-1}を用いて，上書きされる最短経路の上にあるペア依存度
+の分だけ媒介中心性から減算する．つまり，$B''(x):=B(x)-\sum_{s\in S(v)}\Delta_{s\bullet}(x)$とする．
+次に，操作に応じたアルゴリズムによって最短距離および最短経路長を更新する．
+最後に，式\eqref{eq:delta-dependency-2}を用いて，新しい最短経路の上にあるペア依存度
+の分だけ媒介中心性に加算する．つまり，$B'(x):=B''(x)+\sum_{s\in S(v)}\Delta'_{s\bullet}(x)$とする．
+
+最後に，全体的なアルゴリズムをアルゴリズム\ref{alg:proposed-algorithm-full}に示す．
+以降，媒介中心性を減少/増加させるアルゴリズムを説明した後，
+挿入/削除それぞれに操作対する最短経路更新アルゴリズムを説明する．
+
+\begin{algorithm}[tb]
+  \caption{Algorithm to update betweenness value of each vertex on deleting an edge $(u,v)$.}
+  \label{alg:proposed-algorithm-full}
+  \begin{algorithmic}[1]\small
+    \Procedure{UpdateBetweenness}{}
+    \ForAll{$s\in S(v)$}
+    \State $\textproc{DecreaseBetweenness}(s)$
+    \State $\textproc{UpdateSSSP}(s)$
+    \State $\textproc{IncreaseBetweenness}(s)$
+    \EndFor
+    \ForAll{$t\in T(u)$}
+    \State $\textproc{UpdateSTSP}(t)$
+    \EndFor
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+\section{媒介中心性を増加/減少させるアルゴリズム}
+\label{sect:update-betweenness}
+
+本節では，$\Delta_{s\bullet}(x)$および$\Delta_{s\bullet}'(x)$を計算する方法を説明する．
+次の定理は，更新による依存度の変化量と$\Delta_{s\bullet}(x)$が一致することを示す．
+\begin{theorem}
+  任意の$s,x\in V$に対して，式\eqref{eq:change-amount-dependency}が成り立つ．
+  \begin{equation}
+    \delta'_{s\bullet}(x)-\delta_{s\bullet}(x)=\Delta'_{s\bullet}(x)-\Delta_{s\bullet}(x)
+    \label{eq:change-amount-dependency}
+  \end{equation}
+\end{theorem}
+\begin{proof}
+  定理\ref{thm:condition-of-invariability-of-shortest-path}により，任意の$t\notin T(s)$に対して，
+  $\sigma_{st}=\sigma'_{st}$である．さらに，$t\notin T(s)$の条件下で，任意の$x\in V$について
+  $\sigma_{st}(x)=\sigma'_{st}(x)$が成り立つ．したがって，次が成り立つ．
+  \begin{equation*}
+    \begin{aligned}
+      \delta'_{s\bullet}(x)-\delta_{s\bullet}(x)
+      &=\sum_{t\neq x}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right) \\
+      &=\sum_{t\in T(s)}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right)
+      +\sum_{t\notin T(s)}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right) \\
+      &=\sum_{t\in T(s)}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right) \\
+      &=\Delta'_{s\bullet}(x)-\Delta_{s\bullet}(x)
+    \end{aligned}
+  \end{equation*}
+\end{proof}
+
+次の定理は，$\Delta_{s\bullet}$および$\Delta'_{s\bullet}$を効率的に計算する指針を与える．
+\begin{theorem}[Bergamini et.al.\cite{Bergamini2017}]
+  任意の$s\in S(v)$と$x\in V$について，次式が成り立つ．
+  \begin{align}
+    \Delta_{s\bullet}(x)
+    &=\sum_{y|y\in\mathcal{S}_G(x)\land y\in T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}(1+\Delta_{s\bullet}(y))
+    +\sum_{y|y\in\mathcal{S}_G(x)\land y\notin T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\Delta_{s\bullet}(y)
+    \label{eq:delta-dependency-1} \\
+    \Delta'_{s\bullet}(x)
+    &=\sum_{y|y\in\mathcal{S}_G(x)\land y\in T(s)}\frac{\sigma'_{sx}}{\sigma'_{sy}}(1+\Delta'_{s\bullet}(y))
+    +\sum_{y|y\in\mathcal{S}_G(x)\land y\notin T(s)}\frac{\sigma'_{sx}}{\sigma'_{sy}}\Delta'_{s\bullet}(y)
+    \label{eq:delta-dependency-2}
+  \end{align}
+\end{theorem}
+\begin{proof}
+  $t\in T(s)$とする．ただし，$t\neq x$とする．すると，$\sigma_{st}(x)/\sigma_{st}=\sum_{y\in\mathcal{S}_{G_s}(x)}\sigma_{st}(x,y)/\sigma_{st}$が成り立つ．したがって，式\ref{eq:delta-dependency-1}の左辺は，次のように書き換えられる．
+  \begin{equation*}
+    \begin{aligned}
+      \Delta_{s\bullet}(x)=\sum_{t\in T(s)}\frac{\sigma_{st}(x)}{\sigma_{st}}
+      &=\sum_{t\in T(s)}\sum_{y\in\mathcal{S}_{G_s}(x)}\frac{\sigma_{st}(x,y)}{\sigma_{st}}\\
+      &=\sum_{y\in\mathcal{S}_{G_s}(x)}\sum_{t\in T(s)}\frac{\sigma_{st}(x,y)}{\sigma_{st}}
+    \end{aligned}
+  \end{equation*}
+  ここで，$\sigma_{sy}$個の$s-y$間の最短経路の中に，$\sigma_{sx}$個は$x$を通る．
+  したがって，$t\neq x$に対して，$s-t$間の最短経路の内，$\sigma_{sx}/\sigma_{sy}\cdot\sigma_{st}(y)$個は
+  $x$と$y$を通る．つまり，$\sigma_{st}(x,y)=\sigma_{sx}/\sigma_{sy}\cdot\sigma_{st}(y)$である．
+
+  一方，$t=x$に対して，$\sigma_{st}(x,y)$は単に$\sigma_{st}$である．
+  したがって，次が成り立つ．
+  \begin{equation*}
+    \begin{aligned}
+      &\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\in T(s)}\left(\frac{\sigma_{sx}}{\sigma_{sy}}+\sum_{t\in T(s)-\{y\}}\frac{\sigma_{st}(y,x)}{\sigma_{st}}\right)
+      +\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\notin T(s)}\sum_{t\in T(s)-\{y\}}\frac{\sigma_{st}(y,x)}{\sigma_{st}} \\
+      &\quad=\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\in T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\left(1+\sum_{t\in T(s)-\{y\}}\frac{\sigma_{st}(y)}{\sigma_{st}}\right)
+      +\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\notin T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\sum_{t\in T(s)-\{y\}}\frac{\sigma_{st}(y)}{\sigma_{st}} \\
+      &\quad=\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\in T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\left(1+\Delta_{s\bullet}(y)\right)
+      +\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\notin T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\Delta_{s\bullet}(y) \\
+    \end{aligned}
+  \end{equation*}
+  $\Delta'_{s\bullet}(x)$に対しても同様に証明できる．
+\end{proof}
+
+$s\in S(v),x\in V$について$\Delta_{s\bullet}(x)$を計算するには，$s\in S(v)$に対して
+Brandesのアルゴリズムに基づく次の手順を行う．まず，$T(s)$の各要素$t$を，その優先度を
+$d_{st}$として順位付きキュー\texttt{PQ}に挿入する．キューに要素が有る限り次を繰り返す．
+\texttt{PQ}の優先度最大の要素$x$を取り出し，$\mathcal{P}(x)$の各要素$y$について，
+$(y,x)$が$s$からの最短経路に含まれているならば，式\eqref{eq:delta-dependency-1}を用いて
+$\Delta_{s\bullet}(y)$に加算する．さらに，$y$が\texttt{PQ}に含まれていなければ，
+優先度を$d_{sy}$として$y$を\texttt{PQ}に追加する．
+これらの操作を優先度付きキュー\texttt{PQ}が空になるまで繰り返す．
+$\Delta'_{s\bullet}(x)$についても同様の手順で計算できる．
+
+\begin{algorithm}[tb]
+  \caption{辺$(u,v)$の挿入/削除時に媒介中心性の値$B_x$を寄与$\Delta_{s\bullet}(x)$だけ減少させるアルゴリズム}
+  \label{alg:decrease-betweenness}
+  \begin{algorithmic}[1]\small
+    \Procedure{DecreaseBetweenness}{$s$}
+    \State $\Delta_{s\bullet}(x)\gets0,\:\forall x\in V$
+    \State $\texttt{PQ}\gets\varnothing$
+    \ForAll{$t\in T(s)$}
+    \State Enqueue $t$ to \texttt{PQ} with priority $d_{st}$.
+    \EndFor
+    \While{$|\texttt{PQ}|>0$}
+    \State Dequeue $x$ with the highest priority from \texttt{PQ}.
+    \State $B(x)\gets B(x)-\Delta_{s\bullet}(x)$
+    \ForAll{$y\in\mathcal{P}(x)$}
+    \If{$y=s\lor d_{sx}<d_{sy}+l_{yx}$}
+    \State \textbf{continue}
+    \EndIf
+    \If{$x\in T(s)$}
+    \State $\Delta_{s\bullet}(y)\gets\Delta_{s\bullet}(y)+\sigma_{sy}/\sigma_{sx}\cdot(1+\Delta_{s\bullet}(x))$
+    \Else
+    \State $\Delta_{s\bullet}(y)\gets\Delta_{s\bullet}(y)+\sigma_{sy}/\sigma_{sx}\cdot\Delta_{s\bullet}(x)$
+    \EndIf
+    \If{$y\notin\texttt{PQ}$}
+    \State Enqueue $y$ to \texttt{PQ} with priority $d_{sy}$.
+    \EndIf
+    \EndFor
+    \EndWhile
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[tb]
+  \caption{辺$(u,v)$の挿入/削除時に媒介中心性の値$B_x$を寄与$\Delta'_{s\bullet}(x)$だけ増加させるアルゴリズム}
+  \label{alg:increase-betweenness}
+  \begin{algorithmic}[1]\small
+    \Procedure{IncreaseBetweenness}{$s$}
+    \State $\Delta'_{s\bullet}(x)\gets0,\:\forall x\in V$
+    \State $\texttt{PQ}\gets\varnothing$
+    \ForAll{$t\in T(s)$}
+    \State Enqueue $t$ to \texttt{PQ} with priority $d'_{st}$.
+    \EndFor
+    \While{$|\texttt{PQ}|>0$}
+    \State Dequeue $x$ with the highest priority from \texttt{PQ}.
+    \State $B(x)\gets B(x)-\Delta'_{s\bullet}(x)$
+    \ForAll{$y\in\mathcal{P}(x)$}
+    \If{$y=s\lor d'_{sx}<d'_{sy}+l'_{yx}$}
+    \State \textbf{continue}
+    \EndIf
+    \If{$x\in T(s)$}
+    \State $\Delta'_{s\bullet}(y)\gets\Delta'_{s\bullet}(y)+\sigma'_{sy}/\sigma'_{sx}\cdot(1+\Delta'_{s\bullet}(x))$
+    \Else
+    \State $\Delta'_{s\bullet}(y)\gets\Delta'_{s\bullet}(y)+\sigma'_{sy}/\sigma'_{sx}\cdot\Delta'_{s\bullet}(x)$
+    \EndIf
+    \If{$y\notin\texttt{PQ}$}
+    \State Enqueue $y$ to \texttt{PQ} with priority $d'_{sy}$.
+    \EndIf
+    \EndFor
+    \EndWhile
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+\section{最短経路の変化に関する条件}
+本節では，グラフ$G=(V,E)$に辺$(u,v)$が挿入または削除されたあとの最短経路が変化する条件について述べる．
+次の定理は，最短経路の変化が最短距離および最短経路数の変化につながることを示す．
+\begin{theorem}
+  \label{thm:condition-of-invariability-of-shortest-path}
   $E_{st}=E'_{st}$であることの必要十分条件は，$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$である．
-\end{lemma}
+\end{theorem}
 \begin{proof}
   $E_{st}=E'_{st}$ならば$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$であることは自明である．
 
-  逆は，図\ref{fig:proof-invariability-of-paths}のような$E_{st}$を，
-  $d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$を満たしつつ$E_{st}\neq E'_{st}$にすることが
-  不可能であることを示すことで証明する．
+  逆は，図\ref{fig:general-shortest-paths-weighted}のような$E_{st}$を，
+  $d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$を満たすように，$E_{st}\neq E'_{st}$にすることを考える．
+  図において，同じ$L_i$に含まれる頂点$v$について$d_{sv}$および$d_{vt}$は一定とする．
 
-  挿入時，長さが$L_i$間の距離より長い辺を挿入すると，$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$かつ$E_{st}=E'_{st}$を満たす．
+  挿入時，長さが$L_i$間の距離より長い辺を挿入すると，$E_{st}=E'_{st}$を満たす．
   また，長さが$L_i$間の距離と等しい辺を挿入すると，$\sigma_{st}\neq\sigma'_{st}$となる．
   また，長さが$L_i$間の距離より短い辺を挿入すると$d_{st}\neq d'_{st}$となる．
 
@@ -33,444 +214,213 @@
   したがって$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$を満たすように，
   $E_{st}\neq E'_{st}$とすることは不可能で，逆も成り立つ．
 
-  \begin{figure}
-    \centering
-    \def\svgwidth{.5\columnwidth}
-    \input{proof-invariability-of-paths.pdf_tex}
-    \caption{$s$と$t$の一般的な最短経路．同じ$L_i$に含まれる頂点$v$について$d_{sv}$および$d_{vt}$はそれぞれ一定とする．}
-    \label{fig:proof-invariability-of-paths}
-  \end{figure}
 \end{proof}
+\begin{figure}
+  \centering
+  \def\svgwidth{.5\columnwidth}
+  \input{general-shortest-paths-weighted.pdf_tex}
+  \caption{$s$と$t$の一般的な最短経路}
+  \label{fig:general-shortest-paths-weighted}
+\end{figure}
 
-\begin{lemma}
-  \label{lemma:condition-of-invariability-of-pairwise-dependency}
-  頂点$s,v$について，$E_s(v)=E'_s(v)$かつすべての$w\in V_s$に対して
-  $\sigma_{sw}=\sigma'_{sw}$ならば$\delta_{s\bullet}(v)=\delta'_{s\bullet}(v)$.
-\end{lemma}
-\begin{proof}
-  定理\ref{th:implicit-pd}に従って$\delta_{s\bullet}(v)$を展開する．
-  \begin{equation}
-    \begin{aligned}
-      \delta_{s\bullet}(v)
-      &=\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_{s\bullet}(w)) \nonumber \\
-      &=\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+
-      \sum_{w'\in\mathcal{S}_{G_s}(w)}\cfrac{\sigma_{sw}}{\sigma_{sw'}}(1+\delta_{s\bullet}(w'))
-      \right) \nonumber \\
-      &\mathrel{\makebox[\widthof{=}]{\vdots}} \nonumber \\
-      &=\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+\cdots
-      \sum_{w^{\ast\ast}\in\mathcal{S}_{G_s}(w^{\ast})}\cfrac{\sigma_{sw^{\ast}}}{\sigma_{sw^{\ast\ast}}}(1+\delta_{s\bullet}(w^{\ast\ast}))
-      \cdots\right)
-      \label{eq:condition-of-invariability-of-pairwise-dependency}
-    \end{aligned}
-  \end{equation}
-  式\eqref{eq:condition-of-invariability-of-pairwise-dependency}について，
-  $G_s$は有限で閉路を含まない有向グラフなので，$\delta_{s\bullet}(v)$は無限に展開されることはない．
-  また，$\mathcal{S}_{G_s}(w)=\varnothing$を満たす$w$について，$\delta_{s\bullet}(w)=0$である．
-  さらに，$E_s(v)=E'_s(v)$ならば，$V_s(v)=V'_s(v)$かつ
-  すべての$w\in V_s(v)$に対して$\mathcal{S}_{G_s}(v)=\mathcal{S}_{G'_s}(v)$である．
-  よって，$E_s(v)=E'_s(v)$かつすべての$w\in V_s$に対して
-  $\sigma_{sw}=\sigma'_{sw}$ならば，
-  \begin{equation*}
-    \begin{aligned}
-      \delta_{s\bullet}(v)
-      &=\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+\cdots
-      \sum_{w^{\ast\ast}\in\mathcal{S}_{G_s}(w^{\ast})}\cfrac{\sigma_{sw^{\ast}}}{\sigma_{sw^{\ast\ast}}}(1+\delta_{s\bullet}(w^{\ast\ast}))
-      \cdots\right) \\
-      &=\sum_{w\in\mathcal{S}_{G_s}(v)}\cfrac{\sigma_{sv}}{\sigma_{sw}}\left(1+\cdots
-      +\sum_{w^{\ast\ast}\in\mathcal{S}_{G_s}(w^{\ast})}\cfrac{\sigma_{sw^{\ast}}}{\sigma_{sw^{\ast\ast}}}+
-      \cdots\right) \\
-      &=\sum_{w\in\mathcal{S}_{G'_s}(v)}\cfrac{\sigma'_{sv}}{\sigma'_{sw}}\left(1+\cdots
-      +\sum_{w^{\ast\ast}\in\mathcal{S}_{G'_s}(w^{\ast})}\cfrac{\sigma'_{sw^{\ast}}}{\sigma'_{sw^{\ast\ast}}}+
-      \cdots\right) \\
-      &=\sum_{w\in\mathcal{S}_{G'_s}(v)}\cfrac{\sigma'_{sv}}{\sigma'_{sw}}\left(1+
-      \sum_{w'\in\mathcal{S}_{G'_s}(w)}\cfrac{\sigma'_{sw}}{\sigma'_{sw'}}(1+\delta'_{s\bullet}(w'))
-      \right) \\
-      &=\sum_{w\in\mathcal{S}_{G'_s}(v)}\cfrac{\sigma'_{sv}}{\sigma'_{sw}}(1+\delta'_{s\bullet}(w)) \\
-      &=\delta'_{s\bullet}(v).
-    \end{aligned}
-  \end{equation*}
-\end{proof}
+以下，辺挿入と辺削除それぞれの操作に対する最短経路更新法を説明する．
 
-補題\ref{lemma:condition-of-invariability-of-pairwise-dependency}の逆は成り立たない．
-
-\begin{example}
-  \label{ex:counter-of-invariability-of-pairwise-dependency}
-  図\ref{fig:pd-invariability-counterexample}において$\delta_{s\bullet}(v_1)=\delta'_{s\bullet}(v_1)$であるが，
-  $\delta_{s\bullet}(w_1)\neq\delta'_{s\bullet}(w_1)$である．
-  同様に，$\delta_{s\bullet}(v_2)=\delta'_{s\bullet}(v_2)$であるが，$\sigma_{sv_2}\neq\sigma'_{sv_2}$である．
-
-  \begin{figure}[tb]
-    \centering
-    \def\svgwidth{.45\linewidth}
-    \input{pd-invariability-counterexample.pdf_tex}
-    \caption{補題\ref{lemma:condition-of-invariability-of-pairwise-dependency}の逆の反例}
-    \label{fig:pd-invariability-counterexample}
-  \end{figure}
-\end{example}
-
-\begin{lemma}
-  \label{lemma:transformation-of-invariability-of-pairwise-dependency}
-  頂点$s,v$に関して，次の\ref{item:explicit-invariability-of-pairwise-dependency}と
-  \ref{item:implicit-invariability-of-pairwise-dependency-1}と
-  \ref{item:implicit-invariability-of-pairwise-dependency-2}は同値である．
-  \begin{enumerate}[label=(\alph*)]
-  \item $E_s(v)=E'_s(v)$かつすべての$w\in V_s(v)$に対して$\sigma_{sw}=\sigma'_{sw}$.
-    \label{item:explicit-invariability-of-pairwise-dependency}
-  \item $V_s(v)=V'_s(v)$かつすべての$w\in V_s(v)$に対して
-    $\sigma_{sw}=\sigma'_{sw}\land\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)$.
-    \label{item:implicit-invariability-of-pairwise-dependency-1}
-  \item すべての$w\in V_s(v)$と$x\in\mathcal{N}_G(w)$に対して
-    $x\in\mathcal{S}_{G_s}(w)\land x\in\mathcal{S}_{G'_s}$
-    $\lor x\notin\mathcal{S}_{G_s}(w)\land x\notin\mathcal{S}_{G'_s}$.
-    \label{item:implicit-invariability-of-pairwise-dependency-2}
-  \end{enumerate}
-\end{lemma}
-\begin{proof}
-  まず，\ref{item:explicit-invariability-of-pairwise-dependency}$\iff$
-  \ref{item:implicit-invariability-of-pairwise-dependency-1}を証明する.
-  $\bigcup_{(w,x)\in E_s(v)}\{w,x\}=V_s(v)$なので，$E_s(v)=E'_s(v)$ならば$V_s(v)=V'_s(v)$．
-  また，$E_s(v)=E'_s(v)$ならばすべての$w\in V_s(v)$に対して
-  $\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)$である．よって
-  \ref{item:explicit-invariability-of-pairwise-dependency}$\implies$
-  \ref{item:implicit-invariability-of-pairwise-dependency-1}.
-  逆に，$V_s(v)=V'_s(v)$かつすべての$w\in V_s(v)$に対して
-  $\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)$ならば，$E_s(v)=E'_s(v)$なので
-  \ref{item:implicit-invariability-of-pairwise-dependency-1}$\implies$
-  \ref{item:explicit-invariability-of-pairwise-dependency}.
-  よって\ref{item:explicit-invariability-of-pairwise-dependency}$\iff$
-  \ref{item:implicit-invariability-of-pairwise-dependency-1}.
-
-  次に\ref{item:implicit-invariability-of-pairwise-dependency-1}$\iff$
-  \ref{item:implicit-invariability-of-pairwise-dependency-2}を証明する.
-  \begin{equation*}
-    \begin{aligned}
-      &\forall w\in V_s(v),\,\mathcal{S}_{G_s}(w)=\mathcal{S}_{G'_s}(w)\\
-      \iff&\forall w\in V_s(v),\,\mathcal{S}_{G_s}(w)\subset\mathcal{S}_{G'_s}(w)
-      \land\mathcal{S}_{G_s}(w)\supset\mathcal{S}_{G'_s}(w)\\
-      \iff&\forall w\in V_s(v),\,\left(\forall x\in\mathcal{S}_{G_s}(w),\,x\in\mathcal{S}_{G'_s}(w)\right)
-      \land\left(\forall x\in\mathcal{S}_{G'_s}(w),\,x\in\mathcal{S}_{G_s}(w)\right)\\
-      \iff&\forall w\in V_s(v),\,\left(\forall x\in\mathcal{N}_{G_s}(w),\,
-      x\in\mathcal{S}_{G_s}(w),x\in\mathcal{S}_{G'_s}(w)
-      \lor x\notin\mathcal{S}_{G_s}(w),x\notin\mathcal{S}_{G'_s}(w)\right)\\
-      &\land\left(\forall x\in\mathcal{N}_{G_s}(w),\,
-      x\in\mathcal{S}_{G'_s}(w),x\in\mathcal{S}_{G_s}(w)
-      \lor x\notin\mathcal{S}_{G'_s}(w),x\notin\mathcal{S}_{G_s}(w)\right)\\
-      \iff&\forall w\in V_s(v),\,\left(\forall x\in\mathcal{N}_{G_s}(w),\,
-      x\in\mathcal{S}_{G_s}(w),x\in\mathcal{S}_{G'_s}(w)
-      \lor x\notin\mathcal{S}_{G_s}(w),x\notin\mathcal{S}_{G'_s}(w)\right)\\
-      \iff&\forall w\in V_s(v),\,\left(\forall x\in\mathcal{N}_{G_s}(w),\,
-      x\in\mathcal{S}_{G_s}(w)\land x\in\mathcal{S}_{G'_s}(w)
-      \lor x\notin\mathcal{S}_{G_s}(w)\land x\notin\mathcal{S}_{G'_s}(w)\right)
-    \end{aligned}
-  \end{equation*}
-\end{proof}
-
-裏をとると，補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}の
-\ref{item:implicit-invariability-of-pairwise-dependency-2}が成り立たないような
-$(s,v)\in V\times V$を見つけてペア依存度$\delta_{s\bullet}(v)$を更新することによって，
-空振りがあり得るが見逃しなく更新することが可能である．
-以降，本章では挿入時と削除時それぞれに対する媒介中心性更新法を説明する．
-
-\section{一辺挿入時の媒介中心性更新法}
-\label{sect:update-bc-on-insert}
-本節では，グラフに辺が挿入されたときの媒介中心性を更新するアルゴリズムを提案する．
+\section{一辺挿入時の最短経路更新法}
+\label{sect:update-apsp-on-insert}
+本節では，グラフに辺が挿入されたときの最短経路を更新する方法を説明する．
 $G=(V,E)$に辺$e=\{v,w\} \not\in E$を挿入して得られるグラフを$G'=(V,E')$とする．
-提案アルゴリズムをアルゴリズム\ref{algo:incremental-algorithm}に示す．
-以降，アルゴリズムの構成について説明する．
-
-\subsection{最短経路の更新}
-\label{subsect:update-augdist-on-insert}
+まず，ある頂点ペア$x,t$の間の最短経路が削除によって変化するための条件を示す．
 
 \begin{lemma}
-  \label{lemma:update-augdist-on-insert}
-  $x,z\in V$に対して，$E_{xz}'\neq E_{xz}$であるための必要十分条件は次の通り．
+  \label{lmm:update-augdist-on-insert}
+  $x,t\in V$が$E'_{xt}\neq E_{xt}$を満たすための必要十分条件は，次の式が成り立つことである．
   \begin{equation}
-    \begin{cases}
-      d_{xz}\geq l_{xw}+d_{wz} & (x=v) \\
-      \exists y\in\mathcal{N}_{G'}(x) \text{s.t.} d_{yz}\geq l_{vw}+d_{wz}\land\text{式\ref{eq:update-augdist-on-insert}を満たす},\,d_{xz}\geq l_{xy}+d'_{yz} & (x\neq v)
-    \end{cases}
+    d_{xt}\geq d_{xu}+l'_{uv}+d_{vt}
     \label{eq:update-augdist-on-insert}
   \end{equation}
 \end{lemma}
 \begin{proof}
-  $x=v$の場合と$x\neq v$の場合に分けて考える．
-  \begin{enumerate}
-  \item $x=v$のとき
-    \par $(v,w)$が挿入されたので，$E'_{vz}\neq E_{vz}$ならば$(v,w)\notin E_{vxz}$かつ$(v,w)\in E'_{vz}$である．
-    つまり，$(v,w)$が新たに$E'_{vz}$に追加されたので，$E'_{vz}$のうち少なくともひとつは
-    \[ v,(v,w),w,\ldots,z \]
-    である．
-    したがって，$E_{vz}'\neq E_{vz}$ならば$d_{vz}\geq l_{vw}+d_{wz}$である．
-    \par 逆に，$d_{vz}\geq l_{vw}+d_{wz}$ならば，$(v,w)\notin E_{vz}$が新たに$E'_{vz}$に追加される．
-    よって，$E'_{vz}\neq E_{vz}$である．
-  \item $x\neq v$のとき
-    \par $E'_{xz}\neq E_{xz}$ならば，$(v,w)\notin E_{xz}$である．このとき，$E'_{xz}$のうち
-    ひとつは
-    \[ x,(x,y),y,\ldots,v,(v,w),w,\ldots,z \]
-    の形で，$(v,w)\in E'_{yz}$である．
-    よって$E'_{yz}\neq E_{yz}$かつ$d_{xz}\geq l_{xy}+d'_{yz}$を満たす$y\in\mathcal{N}_{G'}(x)$が存在する．
-    \par 逆を証明するため，式中の$d'_{yz}$を展開する．
-    \begin{equation*}
-      \begin{aligned}
-          d_{xz}&\geq l_{xy}+d'_{yz} \\
-          &=l_{xy}+l_{yy'}d'_{y'z} \\
-          &\mathrel{\makebox[\widthof{=}]{\vdots}} \\
-          &=l_{xy}+l_{yy'}+\cdots+l_{vw}+d'_{wz} \\
-          &=l_{xy}+l_{yy'}+\cdots+l_{vw}+d_{wz}
-      \end{aligned}
-    \end{equation*}
-    このとき，$d_{vz}\geq l_{vw}+d_{wz}$を満たすならば$(v,w)\in E'_{vz}$なので，$(v,w)\in E'_{xz}$を満たす．
-    ゆえに$E'_{xz}\neq E_{xz}$．
-  \end{enumerate}
+  $E_{xt}'\neq E_{xt}$が成り立つならば，定理
+  \ref{thm:condition-of-invariability-of-shortest-path}より，
+  $d'_{xt}\neq d_{xt}$または$\sigma'_{xt}\neq\sigma_{xt}$が成り立つ，
+  このとき，新たに挿入された辺は$(u,v)$のひとつで，これが新たな最短経路に含まれるので，
+  $d_{xt}\geq d'_{xt}=d_{xu}+l'_{uv}+d_{vt}$が成り立つ．
+
+  逆に，式\eqref{eq:update-augdist-on-insert}が成り立つならば，
+  辺$(u,v)\notin E_{xt}$が新たな最短経路に含まれることになるので，
+  $(u,v)\in E'_{xt}$が成り立つ．したがって，$E'_{xt}\neq E_{xt}$である．
 \end{proof}
 
-補題\ref{lemma:update-augdist-on-insert}を満たす$x$について，
-補題\ref{lemma:distance-and-geodesics}の通りに計算する．
-計算式より，$d'_{xz}$を計算するには，$d'_{xz}>d'_{yz}$であるすべての$y$について$d'_{yz}$を
-計算する必要がある．したがって$d'_{xz}$の昇順に計算することとなる．
-$E'_{xz}\neq E_{xz}$を満たす$x$のうち，最小の$d'_{xz}$である$x$は$x=v$である．
-そのため，$v$から計算を開始し，補題\ref{lemma:update-augdist-on-insert}を満たすような
-近傍を順次順位キューに追加する．
+次の定理は，挿入時の$T(x)$および$S(x)$の具体的な内容を示している．
+\begin{theorem}
+  \label{thm:affected-vertices-on-insert}
+  挿入時の$T(x)$および$S(x)$はそれぞれ式\eqref{eq:affected-targets-on-insert}と
+  \eqref{eq:affected-sources-on-insert}で表される．
+  \begin{align}
+    T(x)&=\{t|t\in V\land d_{xt}\geq d_{xu}+l'_{uv}+d_{vt}\}
+    \label{eq:affected-targets-on-insert} \\
+    S(x)&=\{s|s\in V\land d_{sx}\geq d_{su}+l'_{uv}+d_{vx}\}
+    \label{eq:affected-sources-on-insert}
+  \end{align}
+\end{theorem}
 
-\subsection{ペア依存度の更新}
-\label{subsect:update-delta-on-insert}
-
-挿入後のペア依存度$\delta'_{z\bullet}(x)$をBrandesのアルゴリズムによって求める．
-具体的には，補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}の
-\ref{item:implicit-invariability-of-pairwise-dependency-2}を満たさない頂点から，
-$d'_{xz}$の降順となるように次式を計算しながら走査する．
-
-\begin{algorithm}[tbp]
-  \caption{一辺挿入時に依存度を更新するアルゴリズム}
-  \label{algo:incremental-algorithm}
-  \begin{algorithmic}[1]\scriptsize
-    \Procedure{Incremental}{$G,(v,w),c$}
-    \State $d'_{xz}\gets d_{xz},\:\sigma'_{xz}\gets \sigma_{xz},\:\delta'_{z\bullet}(x)\gets \delta_{z\bullet}(x)\quad\forall x,z\in V(G)$
-    \State $G'\gets(V(G),E(G)\cup\{(v,w)\}),\quad l_{vw}\gets c$
-    \ForAll{$z\in V(G)$}
-    \If{$l_{vz}>l_{wz}$}
-    \State $\textsc{IncrementalPart}(G',(v,w),z)$
-    \Else
-    \State $\textsc{IncrementalPart}(G',(w,v),z)$
-    \EndIf
-    \EndFor
-    \EndProcedure
-  \end{algorithmic}
-  \vspace{-.5cm}
-  \begin{multicols}{2}
-    \begin{algorithmic}[1]\scriptsize
-      \makeatletter
-      \setcounter{ALG@line}{11}
-      \makeatother
-      \Procedure{IncrementalPart}{$G',(v,w),z$}
-      \If{$d_{wz}=\infty\lor d_{vz}<l_{vw}+d_{wz}$}
-      \State \textbf{return}
-      \EndIf
-      \State \LeftComment 最短経路長および最短経路数の更新
-      \State \LeftComment 第二要素をキーとする順位キュー
-      \State $Q\gets((v,l_{vw}+d_{wz}))$
-      \State \LeftComment $\delta_{z\bullet}(x)$を更新する頂点集合
-      \State $S\gets\{\}$
-      \While{$\lvert Q\rvert>0$}
-      \State $x,\hat{d}_{xz}\gets\mathrm{popmin}(Q)$
-      \State $d'_{xz}\gets\hat{d}_{xz},\:\sigma'_{xz}\gets 0$
-      \ForAll{$y\in\mathcal{N}_{G'}(x)$}
-      \If{$d'_{yz}\geq l_{yx}+d'_{xz}$}
-      \State $\mathrm{updatekey}(Q,y,l_{yx}+d_{xz})$
-      \EndIf
-      \If{$d'_{xz}=l_{xy}+d'_{yz}$}
-      \State $\sigma'_{xz}\gets\sigma'_{xz}+\sigma'_{yz}$
-      \EndIf
-      \If{$(d_{xz}=l_{xy}+d_{yz})\veebar(d'_{xz}=l_{xy}+d'_{yz})$}
-      \State $S\gets S\cup\{y\}$
-      \EndIf
-      \EndFor
-      \If{$\sigma'_{xz}\neq\sigma_{xz}$}
-      \State $S\gets S\cup\{x\}$
-      \EndIf
-      \EndWhile
-      \State \LeftComment ペア依存度の更新
-      \State \LeftComment 第二要素をキーとする順位キュー
-      \State $R\gets((x,d'_{xz})\vert x\in S)$
-      \While{$\lvert R\rvert>0$}
-      \State $x,\_\gets\mathrm{popmax}(R)$
-      \State $\delta'_{z\bullet}(x)\gets 0$
-      \If{$x=z$}
-      \State \textbf{continue}
-      \EndIf
-      \ForAll{$y\in\mathcal{N}_G(x)$}
-      \If{$d'_{yz}=l_{yx}+d'_{xz}$}
-      \State $\delta'_{z\bullet}(x)\gets\delta'_{z\bullet}(x)$
-      $+\frac{\sigma'_{xz}}{\sigma'_{yz}}(1+\delta'_{z\bullet}(y)$
-      \ElsIf{$d_{zx}=l_{xy}+d_{yz}$}
-      \State $\mathrm{updatekey}(R, y, d'_{yz})$
-      \EndIf
-      \EndFor
-      \EndWhile
-      \EndProcedure
-    \end{algorithmic}
-  \end{multicols}
-\end{algorithm}
-
-\section{一辺削除時の媒介中心性更新法}
-\label{sect:update-bc-on-delete}
-本節では，$G=(V,E)$に辺$e=\{v,w\}\in E$を削除して得られるグラフを$G'=(V,E')$とする．
-アルゴリズムをアルゴリズム\ref{algo:decremental-algorithm}に示す．
-以下，アルゴリズムの構成について説明する．
-
-\subsection{最短経路の更新}
-\label{subsect:update-augdist-on-delete}
-
-\begin{lemma}
-  \label{lemma:update-augdist-on-delete}
-  $x,z\in V$に対して，$E_{xz}'\neq E_{xz}$であるための必要十分条件は
-  \[ d_{xv}+l_{vw}+d_{wz}=d_{vz} \]
-  である．
-\end{lemma}
-\begin{proof}
-  $d_{xv}+l_{vw}+d_{wz}=d_{vz}$ならば，道グラフ
-  \[ x,\ldots,v,(v,w),\ldots,w,\ldots,z \]
-  は$E_{xz}$に含まれる．よって，$(v,w)\in E_{xz}$かつ$(v,w)\notin E'_{xz}$が成り立ち
-  $E'_{xz}\neq E_{xz}$である．
-
-  逆に$E'_{xz}\neq E_{xz}$ならば，$(v,w)\in E_{xz}$かつ$(v,w)\neq E_{xz}$である．
-  よって，$E_{xz}$には道グラフ
-  \[ x,\ldots,v,(v,w),\ldots,w,\ldots,z \]
-  が含まれる．したがって$d_{xv}+l_{vw}+d_{wz}$が成り立つ．
-\end{proof}
-
-\ref{lemma:update-augdist-on-delete}を満たす$x$について，補題\ref{lemma:distance-and-geodesics}に
-示した計算式によって計算する．
-挿入時と同様に，$d'_{xz}$を計算するには$d'_{xz}>d'_{yz}$であるすべての$y$について$d'_{yz}$を
-計算する必要がある．したがって$d'_{xz}$の昇順に計算することとなる．
-一方，挿入時と違い，$d'_{xz}$が最小となる$x$は直ちに求めることはできない．
-例えば，
+以下，終点$t$が与えられたときにすべての$x$に対して$d'_{xt}$および
+$\sigma'_{xt}$を計算する方法を説明する．
+この方法は，RamalingamとRepsの方法に倣って優先度付きキューを用いることによって探索を行う．
+まず，優先度付きキューに$u$を挿入する．このとき，優先度は$l'_{uv}+d_{vt}$とする．
+キューに要素が存在する限り，以下を繰り返す．
+キューから優先度最小の要素を取り出し，これを$x$とする．このとき，
+優先度を$\hat{d}_{xt}$とする．
+次式にしたがって，$d_{xt}$および$\sigma_{xt}$を更新する．
 \begin{equation*}
   \begin{aligned}
-    G=&(\{v,w,x,z\},\{\{x,v\},\{v,w\},\{w,z\},\{x,z\}\})\\
-    l_{xv}=&l_{vw}=l_{wz}=1,\,l_{xz}=100
+    d'_{xt}&=\hat{d}_{xt},\\
+    \sigma'_{xt}&=\sum_{y|y\in\mathcal{S}(x)\land d'_{xt}=l'_{xy}+d'_{yt}}\sigma'_{yt}
   \end{aligned}
 \end{equation*}
-において，$\{v,w\}$が削除されたとき，削除の影響を受ける頂点のうち$d'_{sz}$が最小となる
-$s$は$v$ではなく$x$である．
+さらに，$y\in\mathcal{P}(x)$のうち，式\eqref{eq:update-augdist-on-insert}を満たす，
+つまり，$d_{yt}\geq d_{yu}+l'_{uv}+d_{vt}=l_{yx}+d'_{xt}$を満たす$y$を，優先度付きキューに
+挿入する．このとき，その優先度を$l_{yx}+d'_{xt}$とする．
+以上の手順をキューに要素が存在する限り繰り返す．
 
-正しい順序で$d'_{xz}$および$\sigma'_{xz}$を計算するため，次の手順で計算を行う．
-\begin{enumerate}
-\item 補題\ref{lemma:update-augdist-on-delete}が成り立つ頂点を，$v$を始点として探索する
-\item その頂点の内，補題\ref{lemma:update-augdist-on-delete}を満たさない頂点と隣接する頂点について，
-  $d'_{xz}$と$\sigma'_{xz}$を計算する
-\item $d'_{xz}$と$\sigma'_{xz}$を計算した頂点を始点として，更新対象となる頂点のみを対象として，
-  Dijkstra法の要領で探索を進める
-\end{enumerate}
+全頂点ペア$x,y\in V\times V$に対する$d'_{xy}$および$\sigma'_{xy}$を計算する方法は
+次のとおり．
+すべての$s\in S(v)$に対して，グラフ$\bar{G}$上で終点$s$に関する
+$d'_{xs}$と$\sigma'_{xs}$を計算する．
+同様に，$T(u)$の各要素$t$に対して，
+グラフ$G$上で終点$t$に関する$d'_{xt}$と$\sigma'_{xt}$を計算する．
 
-\subsection{ペア依存度の更新}
-\label{subsect:update-delta-on-delete}
+提案手法の具体的な手続きをアルゴリズム\ref{alg:incremental-algorithm}に示す．
 
-削除後のペア依存度$\delta'_{z\bullet}(x)$をBrandesのアルゴリズムによって求める．
-具体的には，補題\ref{lemma:transformation-of-invariability-of-pairwise-dependency}の
-\ref{item:implicit-invariability-of-pairwise-dependency-2}を満たさない頂点から，
-$d'_{xz}$の降順となるように次式を計算しながら走査する．
-
-\begin{algorithm}[tbp]
-  \caption{一辺削除時に依存度を更新するアルゴリズム}
-  \label{algo:decremental-algorithm}
-  \begin{algorithmic}[1]\scriptsize
-    \Procedure{Decremental}{$G,(v,w),c$}
-    \State $d'_{xz}\gets d_{xz},\:\sigma'_{xz}\gets \sigma_{xz},\:\delta'_{z\bullet}(x)\gets \delta_{z\bullet}(x)\quad\forall x,z\in V(G)$
-    \State $G'\gets(V(G),E(G)\cup\{(v,w)\}),\quad l_{vw}\gets c$
-    \ForAll{$z\in V(G)$}
-    \If{$l_{vz}>l_{wz}$}
-    \State $\textsc{DecrementalPart}(G',(v,w),z)$
-    \Else
-    \State $\textsc{DecrementalPart}(G',(w,v),z)$
+\begin{algorithm}[tb]
+  \caption{辺$(u,v)$の挿入後の，頂点$s$に対する$d_{st}$と$\sigma_{st}$を計算するアルゴリズム}
+  \label{alg:incremental-algorithm}
+  \begin{algorithmic}[1]\small
+    \Procedure{UpdateSSSP}{$s$}
+    \If{$d_{sv}<d_{su}+l_{uv}$}
+    \State \textbf{return}
+    \EndIf
+    \State $\texttt{PQ}\gets\varnothing$
+    \State 優先度を$d_{su}+l_{uv}$として$v$を$\texttt{PQ}$に挿入
+    \While{$|\texttt{PQ}|>0$}
+    \State $\texttt{PQ}$から優先度最小の要素を取り出し$x$とする
+    \State このときの優先度を$\hat{d}_{sx}$とする
+    \State $d_{sx}\gets\hat{d}_{sx}$
+    \State $\sigma_{sx}\gets\sum_{y|y\in\mathcal{P}(x)\land d_{sx}=d_{sy}+l_{yx}}\sigma_{sy}$
+    \ForAll{$y\in\mathcal{S}(x)$}
+    \If{$d_{sy}\geq d_{sx}+l_{xy}$}
+    \State \texttt{PQ}の$y$の優先度を$d_{sx}+l_{xy}$に設定
     \EndIf
     \EndFor
+    \EndWhile
     \EndProcedure
   \end{algorithmic}
-  \vspace{-1em}
-  \begin{multicols}{2}
-    \begin{algorithmic}[1]\scriptsize
-      \makeatletter
-      \setcounter{ALG@line}{11}
-      \makeatother
-      \Procedure{DecrementalPart}{$G',(v,w),z$}
-      \If{$d_{wz}=\infty\lor d_{vz}<l_{vw}+d_{wz}$}
-      \State \textbf{return}
-      \EndIf
-      \State $\mathrm{WorkSet}\gets\{v\}$
-      \State $\mathrm{Affected}\gets\{v\}$
-      \State
-      \State \LeftComment 最短経路が変化する頂点の探索
-      \While{$\lvert\mathrm{WorkSet}\rvert>0$}
-      \State $x\gets\mathrm{pop}(\mathrm{WorkSet})$
-      \ForAll{$y\in\mathcal{N}_{G'}(x)$}
-      \If{$d_{yz}=l_{yx}+d_{xz}\land y\notin\mathrm{Affected}$}
-      \State $\mathrm{Affected}\gets\mathrm{Affected}\cup\{y\}$
-      \State $\mathrm{WorkSet}\gets\mathrm{WorkSet}\cup\{y\}$
-      \EndIf
-      \EndFor
-      \EndWhile
-      \State
-      \State \LeftComment 最短経路長，最短経路数の更新
-      \State $Q\gets()$ \Comment 第二要素をキーとする順位キュー
-      \ForAll{$x\in\mathrm{Affected}$}
-      \If{$\exists y\in\mathcal{N}_{G'}(x),\:y\notin\mathrm{Affected}$}
-      \State $\hat{d}_{xz}\gets\min(\{l_{xy}+d_{yz}\vert y\in\mathcal{N}_{G'}(x),y\notin\mathrm{Affected}\})$
-      \Else
-      \State $\hat{d}_{xz}\gets\infty$
-      \EndIf
-      \If{$\hat{d}_{xz}=\infty$}
-      \State $d'_{xz}\gets\infty,\quad\sigma'_{xz}\gets 0$
-      \Else
-      \State $\mathrm{updatekey}(Q, x, \hat{d}_{xz})$
-      \EndIf
-      \EndFor
-      \State
-      \State $S\gets\{w\}$ \Comment $\delta_{z\bullet}(x)$を更新する頂点集合
-      \While{$\lvert Q\rvert>0$}
-      \State $x,\hat{d}_{xz}\gets\mathrm{popmin}(Q)$
-      \State $\mathrm{Affected}\gets\mathrm{Affected}\setminus\{x\}$
-      \State $d'_{xz}\gets\hat{d}_{xz},\quad\sigma'_{xz}\gets 0$
-      \ForAll{$y\in\mathrm{Affected}$}
-      \If{$d'_{yz}\geq l_{yx}+d'_{xz}$}
-      \State $\mathrm{updatekey}(Q,y,l_{yx}+d_{xz})$
-      \EndIf
-      \If{$d'_{xz}=l_{xy}+d'_{yz}$}
-      \State $\sigma'_{xz}\gets\sigma'_{xz}+\sigma'_{yz}$
-      \EndIf
-      \If{$d_{xz}=l_{xy}+d_{yz}\veebar d'_{xz}=l_{xy}+d'_{yz}$}
-      \State $S\gets S\cup\{y\}$
-      \EndIf
-      \If{$d_{yz}=l_{yx}+d_{xz}\veebar d'_{yz}=l_{yx}+d'_{xz}$}
-      \State $S\gets S\cup\{x\}$
-      \EndIf
-      \EndFor
-      \If{$\sigma'_{xz}\neq\sigma_{xz}$}
-      \State $S\gets S\cup\{x\}$
-      \EndIf
-      \EndWhile
-      \State
-      \State \LeftComment 依存度の更新
-      \State $S\gets S\cup\mathrm{Affected}$
-      \State $\mathrm{Affected}\gets\varnothing$
-      \State \LeftComment 各要素の第二要素をキーとする順位キュー
-      \State $R\gets((x,d'_{xz})\vert x\in S)$
-      \While{$\lvert R\rvert>0$}
-      \State $x,\_\gets\mathrm{popmax}(R)$
-      \State $\delta'_{z\bullet}(x)\gets 0$
-      \If{$x=z$}
-      \State \textbf{continue}
-      \EndIf
-      \ForAll{$y\in\mathcal{N}_G(x)$}
-      \If{$d'_{yz}=l_{yx}+d'_{xz}$}
-      \State $\delta'_{z\bullet}(x)\gets\delta'_{z\bullet}(x)$
-      $+\frac{\sigma'_{xz}}{\sigma'_{yz}}(1+\delta'_{z\bullet}(y)$
-      \ElsIf{$d_{zx}=l_{xy}+d_{yz}$}
-      \State $\mathrm{updatekey}(R, y, d'_{yz})$
-      \EndIf
-      \EndFor
-      \EndWhile
-      \EndProcedure
-    \end{algorithmic}
-  \end{multicols}
+\end{algorithm}
+
+\section{一辺削除時の最短経路更新法}
+\label{sect:update-apsp-on-delete}
+本節では，$G=(V,E)$に辺$(u,v)\in E$を削除して得られるグラフを$G'=(V,E')$とする．
+まず，ある頂点ペア$x,t$の間の最短経路が削除によって変化するための条件を示す．
+
+\begin{lemma}
+  \label{lmm:update-augdist-on-delete}
+  $x,t\in V$に対して，$E_{xt}'\neq E_{xt}$であるための必要十分条件は
+  $x,t$が式\eqref{eq:update-augdist-on-delete}を満たすことである．
+  \begin{equation}
+    d_{xv}+l_{vw}+d_{wt}=d_{vt}
+    \label{eq:update-augdist-on-delete}
+  \end{equation}
+\end{lemma}
+\begin{proof}
+  $E_{xt}'\neq E_{xt}$が成り立つならば，定理
+  \ref{thm:condition-of-invariability-of-shortest-path}より，
+  $d'_{xt}\neq d_{xt}$または$\sigma'_{xt}\neq\sigma_{xt}$が成り立つ，
+  このとき，削除された辺は$(u,v)$のひとつで，これが削除前の最短経路に含まれていたので，
+  $d_{xt}=d_{xu}+l_{uv}+d_{vt}$が成り立つ．
+
+  逆に，式\eqref{eq:update-augdist-on-delete}が成り立つならば，
+  辺$(u,v)\in E_{xt}$が成り立つので，削除後の最短経路は
+  $(u,v)\notin E'_{xt}$を満たす．したがって，$E'_{xt}\neq E_{xt}$である．
+\end{proof}
+
+次の定理は，削除時の$T(x)$および$S(x)$の具体的な内容を示している．
+\begin{theorem}
+  \label{thm:affected-vertices-on-delete}
+  削除時の$T(x)$および$S(x)$はそれぞれ式\eqref{eq:affected-targets-on-delete}と
+  \eqref{eq:affected-sources-on-delete}で表される．
+  \begin{align}
+    T(x)&=\{t|t\in V\land d_{xt}=d_{xu}+l_{uv}+d_{vt}\}
+    \label{eq:affected-targets-on-delete} \\
+    S(x)&=\{s|s\in V\land d_{sx}=d_{su}+l_{uv}+d_{vx}\}
+    \label{eq:affected-sources-on-delete}
+  \end{align}
+\end{theorem}
+
+この方法は，RamalingamとRepsの方法に倣って優先度付きキューを用いることによって探索を行う．
+まず，優先度付きキューに$u$を挿入する．このとき，優先度は$l'_{uv}+d_{vt}$とする．
+キューに要素が存在する限り，以下を繰り返す．
+キューから優先度最小の要素を取り出し，これを$x$とする．このとき，
+優先度を$\hat{d}_{xt}$とする．
+次式にしたがって，$d_{xt}$および$\sigma_{xt}$を更新する．
+\begin{equation*}
+  \begin{aligned}
+    d'_{xt}&=\hat{d}_{xt},\\
+    \sigma'_{xt}&=\sum_{y|y\in\mathcal{S}(x)\land d'_{xt}=l'_{xy}+d'_{yt}}\sigma'_{yt}
+  \end{aligned}
+\end{equation*}
+さらに，$y\in\mathcal{P}(x)$のうち，式\eqref{eq:update-augdist-on-insert}を満たす，
+つまり，$d_{yt}\geq d_{yu}+l'_{uv}+d_{vt}=l_{yx}+d'_{xt}$を満たす$y$を，優先度付きキューに
+挿入する．このとき，その優先度を$l_{yx}+d'_{xt}$とする．
+以上の手順をキューに要素が存在する限り繰り返す．
+
+以後，終点$t$が与えられたときにすべての$x$に対して$d'_{xt}$および
+$\sigma'_{xt}$を計算する方法を説明する．
+挿入時と同様に，$\sigma'_{xt}$は$d'_{xt}$の昇順に計算する必要がある．
+しかし，挿入時と違い，$d'_{xt}$が最小となる$x$を直ちに求めることはできない．
+正しい順序で$d'_{xz}$および$\sigma'_{xz}$を計算するため，
+次に示すような，RamalingamとRepsの方法に基づく手順で計算を行う．
+まず，式\eqref{eq:update-augdist-on-delete}が成り立つ頂点を，$u$を始点として探索する．
+ただし，有向グラフについて，探索は後継$\mathcal{P}$を用いる．
+その頂点の内，式\eqref{eq:update-augdist-on-delete}を満たさない頂点と隣接する頂点について，
+$d'_{xt}$と$\sigma'_{xt}$を計算する．
+その後，$d'_{xt}$と$\sigma'_{xt}$を計算した頂点を始点として，更新対象となる頂点のみを対象として，
+RamalingamとRepsの方法の要領で探索を進める．
+
+全頂点ペア$x,y\in V\times V$に対する$d'_{xy}$および$\sigma'_{xy}$を計算する方法は
+挿入時の更新方法と同じく次のとおり．
+すべての$s\in S(v)$に対して，グラフ$\bar{G}$上で終点$s$に関する
+$d'_{xs}$と$\sigma'_{xs}$を計算する．
+同様に，$T(u)$の各要素$t$に対して，
+グラフ$G$上で終点$t$に関する$d'_{xt}$と$\sigma'_{xt}$を計算する．
+
+提案手法の具体的な手続きをアルゴリズム\ref{alg:decremental-algorithm}に示す．
+
+\begin{algorithm}[tb]
+  \caption{辺$(u,v)$の削除後の，頂点$s$に対する$d_{st}$と$\sigma_{st}$を計算するアルゴリズム}
+  \label{alg:decremental-algorithm}
+  \begin{algorithmic}[1]\small
+    \Procedure{UpdateSSSP}{$s$}
+    \If{$d_{sv}<d_{su}+l_{uv}$}
+    \State \textbf{return}
+    \EndIf
+    \State $\texttt{PQ}\gets\varnothing$
+    \ForAll{$x\in T(s)$}
+    \If{$\exists y\in\mathcal{P}(x),\,y\notin T(s)$}
+    \State $\hat{d}\gets\min\{d_{sx}+l_{xy}|y\in\mathcal{P}(x)\land y\notin T(s)\}$
+    \State Enqueue $x$ to \texttt{PQ} with priority $\hat{d}$.
+    \EndIf
+    \EndFor
+    \While{$|\texttt{PQ}|>0$}
+    \State Dequeue $x$ with the highest priority from \texttt{PQ}
+    \State and let $\hat{d}_{sx}$ be the priority of $x$.
+    \State $d_{sx}\gets\hat{d}_{sx}$
+    \State $\sigma_{sx}\gets\sum_{y|y\in\mathcal{P}(x)\land d_{sx}=d_{sy}+l_{xy}}\sigma_{sy}$
+    \ForAll{$y\in\mathcal{S}(x)$}
+    \If{$y\in T(s)$}
+    \State Update the priority of $y$ in \texttt{PQ} to $d_{sx}+l_{xy}$.
+    \EndIf
+    \EndFor
+    \EndWhile
+    \EndProcedure
+  \end{algorithmic}
 \end{algorithm}

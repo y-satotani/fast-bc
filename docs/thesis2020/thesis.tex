@@ -12,7 +12,7 @@
 \usepackage{calc}
 \usepackage{enumitem}
 \usepackage[
-  style=ieee,backend=biber,
+  style=ieee,backend=bibtex,
   texencoding=utf8,bibencoding=utf8,
   dashed=false,
   isbn=false,url=false,doi=false,eprint=false,
@@ -38,7 +38,7 @@
 %
 % algorithm setting
 \algnewcommand{\LeftComment}[1]{\(\triangleright\) #1}
-\algrenewcommand\algorithmicindent{.5em}
+\algrenewcommand\algorithmicindent{1em}
 \renewcommand{\listalgorithmname}{アルゴリズムリスト}
 %\renewcommand{\thealgorithm}{\arabic{chapter}.\arabic{algorithm}}
 \renewcommand{\thealgorithm}{\arabic{algorithm}}
@@ -48,11 +48,11 @@
 \makeatother
 %
 % path setting
-\graphicspath{{../res/figure/}{./plot/}}
+\graphicspath{{./figure/}{./plot/}}
 \makeatletter
-\def\input@path{{../res/figure/}{./table/}}
+\def\input@path{{./figure/}{./table/}}
 \makeatother
-\addbibresource{../res/MyCollection.bib}
+\addbibresource{./References.bib}
 %
 % toc level setting
 \setcounter{tocdepth}{1}
@@ -85,8 +85,6 @@
 \maketitle
 
 \include{Introduction}
-%\include{NetworkScience}
-%\include{RelatedWork}
 \include{Preliminary}
 \include{Algorithm}
 \include{ComplexityAnalysis}

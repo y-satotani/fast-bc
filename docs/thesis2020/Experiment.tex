@@ -2,54 +2,37 @@
 \label{chap:experiment}
 
 本章では，提案したアルゴリズムの有効性を検証するための実験を行う．
-実験で比較するアルゴリズムは次の通り．
-\begin{enumerate}
-\item Brandesのアルゴリズム（再計算）
-  \par 辺が挿入または削除される度にBrandesのアルゴリズム(アルゴリズム\ref{algo:brandes})で媒介中心性を再計算する
-\item 提案手法（更新）
-  \par 辺が挿入された場合アルゴリズム\ref{algo:incremental-algorithm}で，削除された場合アルゴリズム\ref{algo:decremental-algorithm}で媒介中心性を更新する
-\end{enumerate}
-
-まず，人工ネットワークに対する実験を行う．具体的には，両アルゴリズムの実行時間の
-比較を行う．また，提案手法について，更新したペア依存度の数と実行時間の関係および
-媒介中心性を更新した頂点数と実際に媒介中心性が変化した頂点数の関係を明らかにすることで，
-\ref{subsect:computational-complexity-of-incremental-algorithm}と
-\ref{subsect:computational-complexity-of-decremental-algorithm}で
-行った理論的な解析にさらなる根拠を与える．
-
-次に，実ネットワークに対する実験を行う．実ネットワークに対する両アルゴリズムの実行時間の
-比較を行う．さらに，実用上の観点から，頑健な道路ネットワークの構築と，
-媒介中心性のリアルタイム計算への応用を想定した実験を行う．
-
-なお，すべての実験は Intel (R) Xeon (R) CPU E-2620 v4 , 64GB RAM 上で行われた．
+すべての実験は Intel (R) Xeon (R) CPU E-2620 v4, 64GB RAM 上で行われた．
 実験に用いたプログラムは gcc 7.2.0 によって, -O3 最適化フラグを付与してコンパイルされた．
-プログラムのソースコードは\url{https://github.com/y-satotani/dynamic-betweenness}
-にて入手可能である．
+プログラムのソースコードは\verb|github.com/y-satotani/dynamic-betweenness|で入手できる．
 
-\section{人工ネットワークに対する実験}
-\label{sect:exp-artificial}
+実験は人工ネットワークと実ネットワーク両方に対して行われた．
+人工ネットワークとして，ランダム正則グラフ(RRG)とBarab{\'{a}}si-Albertモデル(BA)を用いた．
+人工ネットワークに対して，$1$から$5$までの整数をランダムに辺に付与することで重み付きグラフとした．
+実ネットワークとして，Stanford large network dataset collection\cite{Leskovec2016}から
+取得したネットワークを用いた．
 
-本節では，以下の項目について実験を行い，その結果について考察する．
-\begin{enumerate}
-\item 両アルゴリズムの実行時間の比較
-\item ペア依存度を更新した頂点ペアの数と実行時間の関係
-\item 媒介中心性が実際に変化した頂点の数と更新した頂点の数の関係
-\end{enumerate}
+\section{Brandes法との性能比較}
+はじめに，Brandes法と提案手法の性能を，人工ネットワークと実ネットワーク両方で比較する．
+性能比較のため，Brandes法に対してアルゴリズム\ref{alg:brandes}を用いた辺操作後の媒介中心性を計算する際の実行時間を計測した．
+また，提案手法に対してはアルゴリズム\ref{alg:proposed-algorithm-full}を用いた辺操作の際に
+媒介中心性の更新に要した実行時間を計測した．
 
-人工ネットワークとして次の二種類のネットワークモデルを用いる．
-\begin{enumerate}
-\item Erd\H{o}s--R\'{e}nyiモデル\cite{Erdos1959}
-\item Barab\'{a}si--Albertモデル\cite{Barabasi1999}
-\end{enumerate}
+まず，人工ネットワークでの性能比較について説明する．
+人工ネットワークとして，RRGとBA両方を用いた．
+ネットワークのノード数$n$は$n\in\{100,200,\ldots,1000\}$である．
+各ネットワークの平均次数$k$は$k\in\{4,8\}$とした．
+それぞれのネットワークの設定（ネットワークモデル，ノード数$n$，平均次数$k$の組合せ）に対して，
+ネットワークを$50$個生成し，
+ランダムに選択した辺の挿入および削除を$100$回繰り返した．
+ここで，両アルゴリズムの終了後にネットワークは元に戻る，つまり，操作が取り消されるとする．
 
-\subsection{両アルゴリズムの実行時間の比較}
-この実験ではBrandesのアルゴリズムと提案手法の実行時間を比較する．
-ネットワークの平均次数は$4$，頂点数は$100,200,\ldots,1000$とした．
-それぞれのネットワークモデルのネットワークを100個生成して実験を行った．
-
-図\ref{fig:exp-artificial-order}は各アルゴリズムの実行時間を比較したものである．
-各ネットワークの平均次数はおよそ$4$である．それぞれの頂点数について，
-100個のネットワークに対する実行時間の最大値および平均値を計算している．
+図\ref{fig:exp-artificial-order}はネットワークのノード数に対する
+各アルゴリズムの実行時間の平均を比較したものである．
+簡単のため，$k=4$の結果のみを示している．
+図\ref{fig:exp-artificial-order}より，全てのネットワークモデルと辺操作に対して，
+頂点数が増加するとともに提案手法の平均実行時間がBrandes法のものと比べて短くなっていることが分かる．
+依存度を再計算する必要がある頂点ペアが頂点数の増加とともに比較的少なくなることが理由と考えられる．
 
 \begin{figure}[tb]
   \centering
@@ -58,141 +41,211 @@
   \label{fig:exp-artificial-order}
 \end{figure}
 
-図\ref{fig:exp-artificial-order}より，二種類のネットワークモデル両方に対して，
-頂点数が増加するとともに更新の平均実行時間が再計算のものと比べて短くなっていることが分かる．
-理由として，依存度を再計算する必要がある頂点が頂点数の増加とともに比較的少なくなることが考えられる．
+表\ref{tab:exp-artificial}は様々な設定の人工ネットワークでの性能比較の結果を示す．
+表\ref{tab:exp-artificial}より，重みなしBAネットワークなどの
+いくつかのネットワークの設定において，提案手法よりBrandes法の方が実行時間が短いことがわかる．
+依存度を再計算する必要がある頂点ペアが比較的少ない場合，提案手法はBrandes法に比べて，
+リストのために小さなメモリ領域を割当て，解放する必要があるためと考えられる．
 
-\subsection{更新の量と実行時間の関係}
+\input{exp-artificial.tex}
 
-提案したアルゴリズムのようなオンラインアルゴリズムの性能を評価するためには，
-アルゴリズムによって更新した要素の数を考慮する必要がある
-\cite{Ramalingam1996,Lee2012,Pontecorvi2014}．
-この実験によって，依存度を更新した頂点ペア数と実行時間の関係を明らかにする．さらに，
-\ref{subsect:computational-complexity-of-incremental-algorithm}と
-\ref{subsect:computational-complexity-of-decremental-algorithm}で
-行った理論的な解析結果と，実験データが矛盾しないかを検証する．
+次に，実ネットワークにおける性能比較を説明する．
+SNAPデータセット\cite{Leskovec2016}から取得した実ネットワークを用いて性能比較を行った．
+このデータセットには，社会ネットワークや通信ネットワーク，Wikipediaのトークネットワークなど，
+多種多様なネットワークが含まれている．
+この中で，この実験では，コラボレーションネットワーク（次表で`ca-'から始まる）と，
+GEMSECプロジェクト\cite{Rozemberczki2019a}にて取得されたネットワーク（`gemsec-'から始まる）と，
+MUSAEプロジェクト\cite{Rozemberczki2019b}にて取得されたネットワーク（`musae-'から始まる）と，
+ビットコインプラットフォームでの信頼ネットワーク（`soc-sign-bitcoin'から始まる）と
+Wikipediaに関連するネットワーク（`wiki-'から始まる）を用いた．
 
-依存度$\delta_{s\bullet}(v)$を更新した頂点ペア$(s,v)$を計数し，全体の更新に要した時間を計測した．
-頂点数を$1000$,平均次数は$4$または$64$とし，$100$個のネットワークに対して更新を行った．
+各ネットワークに対して，ランダムに選択した辺の挿入および削除を$20$回繰り返した．
+ここで，両アルゴリズムの終了後にネットワークは元に戻る，つまり，操作が取り消されるとする．
+実ネットワークに対する性能比較の実験結果を表\ref{tab:exp-real}に示す．
+表\ref{tab:exp-real}より，提案手法は実ネットワークでも効率よく計算でき，
+およそ$8.7$倍の性能をもつことが確認できる．
 
-\begin{figure}[tb]
+\input{exp-real.tex}
+
+\section{導出された計算量の検証}
+
+第\ref{chap:complexity-analysis}章で導出した計算量が，実際の実行時間と相違がないか検証する．
+第\ref{chap:complexity-analysis}章で導出した計算量によると，実行時間は走査された頂点数や辺数に
+依存する．
+この主張を検証するため，この実験では各アルゴリズムのステップ数を概算する．
+提案手法の実行において，$S(v)$と$T(u)$の要素数を計数した．
+また，最短経路更新アルゴリズムにおいて，式\eqref{eq:average-number-of-verts-path}
+で示される，影響を受ける頂点数の平均を計算する．
+\begin{equation}
+  \bar{A}=\frac{\sum_{s\in S(v)}|T(s)|+\sum_{t\in T(u)}|S(t)|}{|S(v)|+|T(u)|}
+  \label{eq:average-number-of-verts-path}
+\end{equation}
+また，媒介中心性減少/増加アルゴリズムにおいて，式\eqref{eq:average-number-of-verts-betw}
+で示される，アルゴリズムで走査された頂点数の平均値を計算する．
+\begin{equation}
+  \bar{\tau}=\frac{\sum_{s\in S(v)}|\tau(s)|+|\tau’(s)|}{2|S(v)|}
+  \label{eq:average-number-of-verts-betw}
+\end{equation}
+
+これらの定義と，ネットワークの次数$k$と各アルゴリズムの計算量から，
+最短経路更新アルゴリズムのステップ数を概算できる．
+重みなしグラフおよび重み付きグラフにおいて，最短経路を更新するアルゴリズムのステップ数の概算は，
+式\eqref{eq:full-decremental-shortest-path-update-weighted}
+と\eqref{eq:full-decremental-shortest-path-update-unweighted}から，それぞれ，
+\begin{align}
+  &(|S(v)|+|T(u)|)(k\bar{A}+\bar{A}\log\bar{A}),
+  \label{eq:pred-path-steps-weighted} \\
+  &(|S(v)|+|T(u)|)k\bar{A}.
+  \label{eq:pred-path-steps-unweighted}
+\end{align}
+で求められる．
+
+図\ref{fig:exp-artificial-path-update}は最短経路更新アルゴリズムの概算ステップ数と実行時間の
+関係を示している．
+概算の式の性質から，全ての頂点の次数が一定であることが望ましいため，この実験ではRRGモデルを用いた．
+ネットワークのノード数は$1000$，次数は$4$とした．
+この設定のネットワークを$50$個生成し，それぞれのネットワークに対して辺操作を$100$回繰り返した．
+ただし，アルゴリズムの実行が完了した後，操作が取り消されネットワークが元に戻るとする．
+図\ref{fig:exp-artificial-path-update}から，実行時間は概算ステップ数に線形に依存していることが
+確認でき，計算量と実際の実行時間に乖離がないことが分かる．
+
+\begin{figure}
   \centering
-  \includegraphics{exp-artificial-update.pdf}
-  \caption{更新した頂点ペアの数に対する実行時間}
-  \label{fig:exp-artificial-update}
+  \includegraphics{exp-artificial-path-update.eps}
+  \caption{
+    最短経路更新アルゴリズムの概算ステップ数と実行時間の関係．
+    (a)は重み付きグラフでの挿入操作，(b)は重み付きグラフでの削除操作，
+    (c)は重みなしグラフでの挿入操作，(d)は重みなしグラフでの削除操作の結果を示す．
+    回帰直線の傾きはそれぞれ(a):$2.08\times10^{-7}$,(b):$1.59\times10^{-7}$,
+    (c):$3.30\times10^{-7}$,(d):$1.26\times10^{-6}$である．
+    RMSEはそれぞれ(a):$5.84\times10^{-4}$,(b):$1.85\times10^{-3}$,
+    (c):$2.16\times10^{-3}$,(d):$2.81\times10^{-3}$である．
+  }
+  \label{fig:exp-artificial-path-update}
 \end{figure}
 
-図\ref{fig:exp-artificial-update}は依存度を更新した頂点ペア数と実行時間の関係を表す．
-図\ref{fig:exp-artificial-update}より，更新した頂点ペア数が少ないと，実行時間が短くなることが分かる．
-さらに，次数が大きいと実行時間が長くなる．つまり，この性質は辺の数が増加すると実行時間も
-増加することを示している．
-また，この結果は理論的な解析結果と矛盾しない．
+最短経路更新アルゴリズムの時と同様に，媒介中心性減少/増加アルゴリズムに対しても
+ステップ数を概算できる．
+重みなしグラフおよび重み付きグラフにおいて，媒介中心性を更新するアルゴリズムのステップ数の概算は，
+式\eqref{eq:full-decremental-betweenness-weighted-complexity}
+と\eqref{eq:full-decremental-betweenness-unweighted-complexity}から，それぞれ，
+\begin{align}
+  &|S(v)|(k\bar{\tau}+\bar{\tau}\log\bar{\tau})
+  \label{eq:pred-betw-steps-weighted} \\
+  &|S(v)|k\bar{\tau}
+  \label{eq:pred-betw-steps-unweighted}
+\end{align}
+で求められる．
 
-\subsection{媒介中心性を更新した頂点の数と変化した頂点の数の関係}
-\ref{subsect:computational-complexity-of-incremental-algorithm}と
-\ref{subsect:computational-complexity-of-decremental-algorithm}で
-理論解析では，媒介中心性を更新した頂点の数と実際に媒介中心性が変化した頂点の数との
-具体的な関係が不明なままであった．そのため，この実験によってその関係を明らかにする．
+図\ref{fig:exp-artificial-betw-update}は媒介中心性更新アルゴリズムの概算ステップ数と実行時間の
+関係を示している．
+最短経路更新の時と同じ理由で，この実験ではRRGモデルを用いた．
+ネットワークのノード数は$1000$，次数は$4$とした．
+この設定のネットワークを$50$個生成し，それぞれのネットワークに対して辺操作を$100$回繰り返した．
+ただし，アルゴリズムの実行が完了した後，操作が取り消されネットワークが元に戻るとする．
+図\ref{fig:exp-artificial-betw-update}から，実行時間は概算ステップ数に線形に依存していることが
+確認でき，計算量と実際の実行時間に乖離がないことが分かる．
 
-実際に媒介中心性が変化した頂点の数と，依存度$\delta_{s\bullet}(v)$を更新したような$s$が
-存在する頂点$v$の数を計数する実験を行った．
-両ネットワークモデルにおいて，頂点数を$1000$，平均次数を$4$として実験した．
-
-\begin{figure}[tb]
+\begin{figure}
   \centering
-  \includegraphics{exp-artificial-phony.pdf}
-  \caption{媒介中心性が変化した頂点数に対する，更新した頂点の数}
-  \label{fig:exp-artificial-phony}
+  \includegraphics{exp-artificial-betw-update.eps}
+  \caption{
+    媒介中心性更新の概算ステップ数と実行時間の関係．
+    (a)は重み付きグラフでの挿入操作，(b)は重み付きグラフでの削除操作，
+    (c)は重みなしグラフでの挿入操作，(d)は重みなしグラフでの削除操作の結果を示す．
+    回帰直線の傾きはそれぞれ(a):$4.94\times10^{-7}$,(b):$4.73\times10^{-7}$,
+    (c):$4.98\times10^{-7}$,(d):$5.38\times10^{-7}$である．
+    RMSEはそれぞれ(a):$2.62\times10^{-3}$,(b):$2.85\times10^{-3}$,
+    (c):$1.79\times10^{-3}$,(d):$2.53\times10^{-3}$である．
+  }
+  \label{fig:exp-artificial-betw-update}
 \end{figure}
 
-図\ref{fig:exp-artificial-phony}に，媒介中心性を更新した頂点の数と
-実際に媒介中心性が変化した頂点の数の関係を示す．
-結果より，トポロジによって不要な更新の数が変化することがわかる．
-特に，そのような更新はBarab\'{a}si--Albertモデルで顕著である．
+\section{道路ネットワークを頑健にする辺操作}
 
-\section{実ネットワークに対する実験}
-\label{sect:exp-realnet}
-前節の実験は人工的なネットワークの上のものであったが，
-応用の観点から，実ネットワークに対するアルゴリズムの性能を知ることも重要である．
-そこで，本節では実ネットワークに対する実験を行う．
-まず，Stanford Large Network Dataset Collection\cite{Leskovec2016}から取得した実ネットワークでの性能評価を行い，
-次に頑健な道路ネットワークの構築と，媒介中心性のリアルタイム計算への応用を想定した実験を行う．
-
-\subsection{Stanford Large Network Dataset Collectionでの性能比較}
-\label{subsect:exp-real}
-Stanford Large Network Dataset Collectionのいくつかの実ネットワークに対して
-両アルゴリズムの性能比較を行った．
-両アルゴリズムを各ネットワークに対して10回実行し，その実行時間の平均値および最大値を求めた．
-実験結果を表\ref{tab:exp-real}に示す．
-
-\input{exp-misc.tex}
-
-結果より，提案手法は実ネットワークでも高速に計算できることが確認できる．
-
-\subsection{頑健な道路ネットワークの構築}
-\label{subsect:exp-road}
-
-第\ref{chap:introduction}章でも述べたように，道路ネットワークの頑健性を
-向上するには，道路の建設によって媒介中心性の最大値を最小化する必要がある．
-そこで，この実験では，実際の道路ネットワークに辺を挿入することによって，
-媒介中心性の最大値を最小化させる．
+以降，本研究で提案したアルゴリズムの応用例を示す．
+第\ref{chap:introduction}章でも述べたように，道路ネットワークの頑健性を向上するには，
+道路の建設や取り壊しによって媒介中心性の最大値を最小化する問題が適用できる．
+そこで，この実験では，実際の道路ネットワークに対して一辺挿入や一辺削除を行うことによって，
+媒介中心性の最大値を最小化させ，もとの道路ネットワークの頑健性を向上させる．
 
 道路ネットワークはOpenStreetMap\cite{OpenStreetMap}を利用して独自に構築した．
 実験で用いる道路ネットワークを図\ref{fig:road-okayama}に示す．
 このネットワークは$12165$個の頂点と$14820$本の辺を有する．
-
-このネットワークに$9067$本の辺から一辺選んで追加したときの，媒介中心性が変化する様子を
-調査する．同時に，$14820$本の辺から一辺選んで削除したときの様子も調査する．
-なお，追加する辺について，図\ref{fig:road-okayama}において既にあるどの辺とも
-交わらないような辺を選択した．
+正規化された媒介中心性の値とは，媒介中心性の値$B_x$を$(|V|-1)(|V|-2)$で割った値である．
+図\ref{fig:road-okayama}の正規化された媒介中心性の最小値は$0$で，最大値は$0.1607$である．
 
 \begin{figure}[tb]
   \centering
-  \includegraphics[width=.9\textwidth]{road-oka.eps}
-  \caption{実験で用いる道路ネットワーク}
+  \includegraphics[width=.6\textwidth]{road-oka-with-betweenness.eps}
+  \caption{
+    実験で用いる道路ネットワーク
+  }
   \label{fig:road-okayama}
 \end{figure}
 
-図\ref{fig:exp-road-oka-correlation}は，一辺を挿入または削除したときの，
-正規化された媒介中心性の最大値の分布である．
-正規化された媒介中心性とは，媒介中心性を$2/\{(|V|-1)(|V|-2)\}$倍した値である．
-辺の追加によって，最大$0.1607$の正規化された媒介中心性は$0.1379$まで減少し，
-削除によって，$0.1225$まで減少させることに成功した．
-また，辺追加によって媒介中心性の最大値が増加した例もある．
-図\ref{fig:exp-road-oka-correlation}より，
-媒介中心性が大きな頂点同士を結ぶと，媒介中心性の最大値が大きく変化することが分かる．
+図\ref{fig:road-okayama}のネットワークのひとつの辺を操作することによって各頂点の
+媒介中心性を変化させる．ネットワークから削除する辺は全ての辺$14820$本が対象で，挿入する辺は
+経度と緯度の平面上において，既存のどの辺とも交わらないような辺の中から$9067$本を選択した．
+
+図\ref{fig:exp-road-betweenness-max}はそれぞれの辺操作後の媒介中心性の
+最大値の分布を表す．
+最大$0.1607$の正規化された媒介中心性を
+辺の挿入によって最大$0.1727$に増加，辺の削除によって最大$0.1027$に減少させることに成功した．
+% 辺\{4153334442,5358091035\}を挿入，辺\{5358095473,5389817383\}を削除
 
 \begin{figure}[tb]
   \centering
-  \includegraphics{exp-road-oka-correlation.eps}
-  \caption{辺操作後の媒介中心性の最大値の分布}
-  \label{fig:exp-road-oka-correlation}
+  \includegraphics{exp-road-betweenness-max.eps}
+  \caption{辺操作時の媒介中心性の最大値の変化量．直線は操作前の媒介中心性の最大値($0.1607$)を表す．}
+  \label{fig:exp-road-betweenness-max}
 \end{figure}
 
-\subsection{媒介中心性のリアルタイム計算に関する実験}
-\label{subsect:exp-sfhh}
+図\ref{fig:road-oka-minimal-betweenness}と\ref{fig:road-oka-maximal-betweenness}は
+それぞれ，正規化された媒介中心性を最大，最小にするような辺操作後の，
+各頂点の正規化された媒介中心性の値の変化量を示す．
 
-第\ref{chap:introduction}章で説明したように，社会ネットワーク分析に
-おいて，媒介中心性をはじめとした中心性に注目することは重要である．
-しかし，現実の社会ネットワークでは，友人関係が時間とともに出現と消滅を繰り返している．
-この実験では，友人関係の出現と消滅が頻繁に起こりうる状況で，
-媒介中心性をリアルタイムで計算する用途への応用を想定する．
+\begin{figure}[tb]
+   \begin{minipage}{0.48\textwidth}
+     \centering
+     \includegraphics[width=.95\linewidth]{road-oka-minimal-betweenness.eps}
+     \caption{媒介中心性の最大値を最小にする削除辺と媒介中心性の値の変化量}
+     \label{fig:road-oka-minimal-betweenness}
+   \end{minipage}\hfill
+   \begin{minipage}{0.48\textwidth}
+     \centering
+     \includegraphics[width=.95\linewidth]{road-oka-maximal-betweenness.eps}
+     \caption{媒介中心性の最大値を最大にする挿入辺と媒介中心性の値の変化量}
+     \label{fig:road-oka-maximal-betweenness}
+   \end{minipage}
+\end{figure}
+
+\section{媒介中心性のリアルタイム計算}
+
+第\ref{chap:introduction}章は，社会ネットワークの分析に媒介中心性が用いられることを説明した．
+しかし，現実の社会ネットワークでは，友人関係の出現や消滅が時間とともに繰り返される．
+そのようなネットワークに対して，リアルタイムに媒介中心性を計算することは，
+社会ネットワークの解析の観点から有用であると考えられる．
+この実験では，友人関係の出現と消滅が頻繁に発生する状況において，
+提案手法を用いて媒介中心性をリアルタイムに計算する．
 
 この実験では，SFHH conference data set\cite{Genois2018}というデータセットを用いた．
-このデータセットは，2009年にフランスで開催されたSFHHという会議の参加者$405$人に
-赤外線タグを持たせて，参加者同士の交流の様子を時間とともに記録したものである．
+このデータセットは，2009年にフランスで開催されたSFHHと呼ばれる会議の参加者に
+赤外線タグを持たせることによって，参加者同士の交流の発生を記録したものである．
+データは20秒ごとに取得され，それぞれの時刻でどの参加者同士が近接しているかが保存されている．
+ネットワークの頂点数は$405$，辺の総数は$3509$である．
 
-図\ref{fig:exp-sfhh}は，データセットをもとにして辺の挿入と削除を
-繰り返したときの各手法の実行時間を表す．あわせて，
-20秒間のうちに発生した挿入と削除操作の回数の内訳を示す．
+図\ref{fig:exp-sfhh}はデータセットをもとに辺の挿入と削除を繰り返したときの，
+提案手法とBrandes法の実行時間を表す．
+それとともに，20秒間のうちに発生した挿入辺数および削除辺数を示す．
+図\ref{fig:exp-sfhh}より，小規模な場合ではあるが，提案手法は媒介中心性をリアルタイムに
+計算できることが確認できる．
+しかし，更新の量が多い場合，Brandes法の方が高速に計算していることが分かる．
+今後は，多くの辺の操作に対応するアルゴリズムの開発が求められる．
 
 \begin{figure}[tb]
   \centering
-  \includegraphics{exp-sfhh.pdf}
-  \caption{SFHHに対する実験結果}
+  \includegraphics{exp-sfhh.eps}
+  \caption{各時刻に対する各アルゴリズムの計算時間と挿入または削除された辺数．}
   \label{fig:exp-sfhh}
 \end{figure}
-
-図より，小規模な場合ではあるが，媒介中心性をリアルタイムに計算できる．
-しかし，更新の量が多い場合，Brandesのアルゴリズムの方が高速に計算していることが分かる．
-今後は，多くの辺の操作に対応するアルゴリズムの開発が課題である．
