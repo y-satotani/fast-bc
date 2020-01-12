@@ -229,55 +229,88 @@ RRGモデルにおいて走査された頂点の個数は，実際に媒介中�
 \section{道路ネットワークを頑健にする辺操作}
 
 以降，本研究で提案したアルゴリズムの応用例を示す．
-第\ref{chap:introduction}章でも述べたように，道路ネットワークの頑健性を
-向上するには，道路の建設によって媒介中心性の最大値を最小化する必要がある．
-そこで，この実験では，実際の道路ネットワークに辺を挿入することによって，
-媒介中心性の最大値を最小化させる．
+第\ref{chap:introduction}章でも述べたように，道路ネットワークの頑健性を向上するには，
+道路の建設や取り壊しによって媒介中心性の最大値を最小化する問題が適用できる．
+そこで，この実験では，実際の道路ネットワークに対して一辺挿入や一辺削除を行うことによって，
+媒介中心性の最大値を最小化させ，もとの道路ネットワークの頑健性を向上させる．
 
 道路ネットワークはOpenStreetMap\cite{OpenStreetMap}を利用して独自に構築した．
 実験で用いる道路ネットワークを図\ref{fig:road-okayama}に示す．
 このネットワークは$12165$個の頂点と$14820$本の辺を有する．
+正規化された媒介中心性の値とは，媒介中心性の値$B_x$を$(|V|-1)(|V|-2)$で割った値である．
+図\ref{fig:road-okayama}の正規化された媒介中心性の最小値は$0$で，最大値は$0.1607$である．
 
 \begin{figure}[tb]
   \centering
   \includegraphics[width=.6\textwidth]{road-oka-with-betweenness.eps}
-  \caption{実験で用いる道路ネットワーク}
+  \caption{
+    実験で用いる道路ネットワーク
+  }
   \label{fig:road-okayama}
 \end{figure}
 
-図\textcolor{red}{TODO}は辺操作後の媒介中心性の最大値の分布を表す．
-辺の追加によって，最大$0.1607$の正規化された媒介中心性を
-\textcolor{red}{xxx}まで減少させることに成功した．
-また，辺の追加によって，最大$0.1607$の正規化された媒介中心性を
-\textcolor{red}{xxx}まで減少させることに成功した．
+図\ref{fig:road-okayama}のネットワークのひとつの辺を操作することによって各頂点の
+媒介中心性を変化させる．ネットワークから削除する辺は全ての辺$14820$本が対象で，挿入する辺は
+経度と緯度の平面上において，既存のどの辺とも交わらないような辺の中から$9067$本を選択した．
 
-\textcolor{red}{TODO: insert histogram of diff of min, mean, and max}
+図\ref{fig:exp-road-betweenness-max}はそれぞれの辺操作後の媒介中心性の
+最大値の分布を表す．
+最大$0.1607$の正規化された媒介中心性を
+辺の挿入によって最大$0.1727$に増加，辺の削除によって最大$0.1027$に減少させることに成功した．
+% 辺\{4153334442,5358091035\}を挿入，辺\{5358095473,5389817383\}を削除
 
-\textcolor{red}{TODO: insert figure of road indicates minimized maximum bc}
+\begin{figure}[tb]
+  \centering
+  \includegraphics{exp-road-betweenness-max.eps}
+  \caption{辺操作時の媒介中心性の最大値の変化量．直線は操作前の媒介中心性の最大値($0.1607$)を表す．}
+  \label{fig:exp-road-betweenness-max}
+\end{figure}
+
+図\ref{fig:road-oka-minimal-betweenness}と\ref{fig:road-oka-maximal-betweenness}は
+それぞれ，正規化された媒介中心性を最大，最小にするような辺操作後の，
+各頂点の正規化された媒介中心性の値の変化量を示す．
+
+\begin{figure}[tb]
+   \begin{minipage}{0.48\textwidth}
+     \centering
+     \includegraphics[width=.95\linewidth]{road-oka-minimal-betweenness.eps}
+     \caption{媒介中心性の最大値を最小にする削除辺と媒介中心性の値の変化量}
+     \label{fig:road-oka-minimal-betweenness}
+   \end{minipage}\hfill
+   \begin{minipage}{0.48\textwidth}
+     \centering
+     \includegraphics[width=.95\linewidth]{road-oka-maximal-betweenness.eps}
+     \caption{媒介中心性の最大値を最大にする挿入辺と媒介中心性の値の変化量}
+     \label{fig:road-oka-maximal-betweenness}
+   \end{minipage}
+\end{figure}
 
 \section{媒介中心性のリアルタイム計算}
 
-第\ref{chap:introduction}章で説明したように，社会ネットワーク分析に
-おいて，媒介中心性をはじめとした中心性に注目することは重要である．
-しかし，現実の社会ネットワークでは，友人関係が時間とともに出現と消滅を繰り返している．
-この実験では，友人関係の出現と消滅が頻繁に起こりうる状況で，
-媒介中心性をリアルタイムで計算する用途への応用を想定する．
+第\ref{chap:introduction}章は，社会ネットワークの分析に媒介中心性が用いられることを説明した．
+しかし，現実の社会ネットワークでは，友人関係の出現や消滅が時間とともに繰り返される．
+そのようなネットワークに対して，リアルタイムに媒介中心性を計算することは，
+社会ネットワークの解析の観点から有用であると考えられる．
+この実験では，友人関係の出現と消滅が頻繁に発生する状況において，
+提案手法を用いて媒介中心性をリアルタイムに計算する．
 
-この実験では，SFHH\cite{Genois2018}というデータセットを用いた．
-このデータセットは，ある会議の参加者に赤外線タグを持たせることによって，
-参加者同士の交流の様子を記録したものである．
+この実験では，SFHH conference data set\cite{Genois2018}というデータセットを用いた．
+このデータセットは，2009年にフランスで開催されたSFHHと呼ばれる会議の参加者に
+赤外線タグを持たせることによって，参加者同士の交流の発生を記録したものである．
+データは20秒ごとに取得され，それぞれの時刻でどの参加者同士が近接しているかが保存されている．
+ネットワークの頂点数は$405$，辺の総数は$3509$である．
 
-図\ref{fig:exp-sfhh}は，そのSFHHデータセットをもとに，辺の挿入と削除を
-繰り返したときの，各手法の実行時間を表す．それとともに，20秒間の
-うちに発生した，挿入と削除操作の内訳を示す．
+図\ref{fig:exp-sfhh}はデータセットをもとに辺の挿入と削除を繰り返したときの，
+提案手法とBrandes法の実行時間を表す．
+それとともに，20秒間のうちに発生した挿入辺数および削除辺数を示す．
+図\ref{fig:exp-sfhh}より，小規模な場合ではあるが，提案手法は媒介中心性をリアルタイムに
+計算できることが確認できる．
+しかし，更新の量が多い場合，Brandes法の方が高速に計算していることが分かる．
+今後は，多くの辺の操作に対応するアルゴリズムの開発が求められる．
 
 \begin{figure}[tb]
   \centering
   \includegraphics{exp-sfhh.eps}
-  \caption{SFHHに対する実験結果}
+  \caption{各時刻に対する各アルゴリズムの計算時間と挿入または削除された辺数．}
   \label{fig:exp-sfhh}
 \end{figure}
-
-図より，小規模な場合ではあるが，媒介中心性をリアルタイムに計算できる．
-しかし，更新の量が多い場合，Brandesのアルゴリズムの方が高速に計算していることが分かる．
-今後は，多くの辺の操作に対応するアルゴリズムの開発が求められる．

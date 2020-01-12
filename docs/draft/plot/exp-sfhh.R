@@ -56,7 +56,7 @@ gp_bottom <- ggplot() +
         aes(`time-real`, `update-size`, fill = query),
         stat = 'identity'
     ) +
-    xlab('実時間(s)') +
+    xlab('実時刻(s)') +
     ylab('更新辺数') +
     scale_y_continuous(labels = function(x) abs(x)) +
     scale_fill_manual(

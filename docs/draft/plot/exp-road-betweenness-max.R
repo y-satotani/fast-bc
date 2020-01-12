@@ -26,10 +26,12 @@ data_dynamic %>% arrange(`bc-after-max`) %>% tail(n = 3)
 gp <- ggplot(data_dynamic, aes(query, `bc-after-max`, colour = `query`)) +
     geom_jitter(alpha = 0.2) +
     geom_hline(yintercept = bc_max) +
+    xlab('操作') +
+    ylab('操作後の媒介中心性の最大値') +
     scale_colour_viridis(discrete = TRUE) +
     theme(
         legend.title = element_blank(),
-        legend.position = 'top',
+        legend.position = 'none',
     )
 
-ggsave(out_file, gp, cairo_pdf, width = 9, height = 7, units = 'cm')
+ggsave(out_file, gp, cairo_pdf, width = 7, height = 7, units = 'cm')
