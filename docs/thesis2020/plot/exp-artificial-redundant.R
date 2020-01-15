@@ -55,9 +55,9 @@ make_gp = function(topology_, is_weighted_, query_) {
             `is-weighted` == is_weighted_,
             query == query_
         ),
-        aes(`tau-ast`, `tau-hat`, colour = factor(degree))
+        aes(`tau-ast`, `tau-hat`)
     ) +
-        geom_point(alpha = 0.2) +
+        geom_point(colour = 'royalblue', alpha = 0.2) +
         geom_abline(
             aes(slope = slope, intercept = 0),
             data = max_slope %>%
@@ -71,7 +71,6 @@ make_gp = function(topology_, is_weighted_, query_) {
         xlab(expression(tau*"*")) +
         ylab(TeX('$\\mathit{\\hat{\\tau}}$')) +
         xlim(0, max(data$order)) +
-        scale_colour_viridis(discrete = TRUE, begin = 0.8, end = 0.2) +
         theme(
             legend.position = 'none',
             plot.title = element_text(size = 10),

@@ -62,15 +62,15 @@ linear_models_glance <- data_time %>%
     do(broom::glance(lm(`time-path` ~ `pred-time-path`, .)))
 linear_models_glance
 
-x_label = '計算ステップ'
+x_label = '計算ステップ数'
 y_label = '実行時間(s)'
 
 make_gp = function(is_weighted_, query_) {
     gp <- ggplot(
         data_time %>% filter(`is-weighted` == is_weighted_, query == query_),
-        aes(`pred-time-path`, `time-path`, colour = factor(degree))
+        aes(`pred-time-path`, `time-path`)
     ) +
-        geom_point(alpha = 0.2) +
+        geom_point(colour = 'royalblue', alpha = 0.2) +
         geom_abline(
             aes(slope = slope, intercept = intercept),
             data = linear_models %>%
@@ -84,7 +84,6 @@ make_gp = function(is_weighted_, query_) {
         ) +
         xlab(x_label) +
         ylab(y_label) +
-        scale_colour_viridis(discrete = TRUE, begin = 0.8, end = 0.2) +
         theme(
             legend.position = 'none'
         )
@@ -101,4 +100,4 @@ gp <- plot_grid(
     label_size = 10,
     labels = c('a', 'b', 'c', 'd')
 )
-ggsave(out_file, gp, cairo_pdf, width = 9, height = 9, units = 'cm')
+ggsave(out_file, gp, cairo_pdf, width = 10, height = 10, units = 'cm')

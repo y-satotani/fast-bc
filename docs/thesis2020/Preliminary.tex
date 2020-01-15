@@ -1,6 +1,6 @@
 \chapter{準備}
 \label{chap:preliminary}
-本章では，後の章に向けての準備をする．はじめに，最短経路や距離を含む，
+本章では，後の章で提案するアルゴリズムを説明するための準備をする．はじめに，最短経路や距離を含む，
 グラフ理論の基本事項を説明する．
 次に，距離や最短経路の数に関する重要な性質を示す．
 最後に，媒介中心性とその計算に用いられるペア依存度について説明する．
@@ -13,9 +13,10 @@ $E\subset V^2$を満たす．つまり，$V$から元を2個取り出した集�
 $V$を\textbf{頂点集合}とよび，その元を\textbf{頂点}とよぶ．
 また，頂点集合の要素数$|V|$を\textbf{頂点数}とよぶ．
 $E$を\textbf{辺集合}とよび，その元を\textbf{辺}とよぶ．
-また，辺集合の要素数$|E|$を\textbf{頂点数}とよぶ．
-$E$の要素が順序対ならば，$G$は\textbf{有向グラフ}と呼ばれ，
-非順序対ならば$G$は\textbf{無向グラフ}と呼ばれる．
+また，辺集合の要素数$|E|$を\textbf{辺数}とよぶ．
+頂点および辺は，ネットワークにおけるノードとリンクに対応する．
+$E$の要素が丸括弧で表される順序対ならば，$G$は\textbf{有向グラフ}と呼ばれ，
+波括弧で表される非順序対ならば$G$は\textbf{無向グラフ}と呼ばれる．
 有向グラフの辺$e=(v,w)$において，頂点$v$を始点，頂点$w$を終点と呼ぶ．
 グラフ$G=(V,E)$と$G'=(V',E')$に対して，$V'\subseteq V$かつ$E'\subseteq E$
 を満たすとき，$G'$は$G$の\textbf{部分グラフ}であるといい，$G'\subseteq G$と記す．
@@ -26,30 +27,25 @@ $E$の要素が順序対ならば，$G$は\textbf{有向グラフ}と呼ばれ�
 辺の重み$l_{vw}\in\mathbb{R}$が定められているグラフである．
 以下，特に断らない限り辺の重みは正であるとする．
 また，重み付きグラフでないグラフを\textbf{重みなしグラフ}と呼ぶ．
+重みなしグラフに対して後述する距離などの重みが必要な量を計算する際，
+全ての辺に対して同一の重みが付与されていると仮定する．
+特に断らない限り，その重みを$1$とする．
 
 無向グラフにおいて，頂点$v$と辺$e$が\textbf{接続する}とは，$v\in e$つまり，
 $e$の端点に$v$が属することをいう．
-頂点$v$と頂点$w$が\textbf{隣接する}とは，$\{v,w\}$が辺集合$E$に属することをいう．
+頂点$v$と頂点$w$が\textbf{隣接する}とは，$(v,w)$ないし$\{v,w\}$が辺集合$E$に属することをいう．
 無向グラフ$G$の頂点$v$について，$v$と隣接する頂点の集合を頂点$v$の\textbf{近傍}と
-呼び，$\mathcal{N}_G(v)$で表す．また，無向グラフ$G$について$v$の近傍の数
+呼び，$\mathcal{N}_G(v)$ないし$\mathcal{N}(v)$で表す．また，無向グラフ$G$について$v$の近傍の数
 $|\mathcal{N}_G(v)|$を\textbf{次数}と呼び，$k(v)$あるいは$k_G(v)$と記す．
 すべての頂点の次数が等しいグラフを\textbf{正則グラフ}と呼ぶ．
-
-無向グラフ$G=(\{1,\ldots,n\},E)$に対して，次の行列$A\in\{0,1\}^{n\times n}$を
-\textbf{隣接行列}と呼ぶ．
-\begin{equation*}
-  a_{ij}=
-  \begin{cases}
-    1 & (i\text{と}j\text{が隣接する}) \\
-    0. & (i\text{と}j\text{が隣接しない})
-  \end{cases}
-\end{equation*}
 
 有向グラフ$G$の頂点$v$について，$v$を終点とする辺の始点の集合を\textbf{先行}
 (predecessor)と呼び，$\mathcal{P}_G(v)$と記す．すなわち，
 $\mathcal{P}_G(v)=\{u|(u,v)\in E\}$である．
 同様に，$v$を始点とする辺の終点の集合を\textbf{後継}(successor)と呼び，
 $\mathcal{S}_G(v)$と記す．すなわち，$\mathcal{S}_G(v)=\{w|(v,w)\in E\}$である．
+先行と後継を記すとき，近傍と同様にグラフが省略されることがある．つまり，$v$の先行および後継を
+$\mathcal{P}(v)$および$\mathcal{S}(v)$と記すことがある．
 
 有向な\textbf{道グラフ}，あるいは単に道とは，$P=(V,E)$のグラフで，
 \begin{equation*}
@@ -61,17 +57,15 @@ $\mathcal{S}_G(v)$と記す．すなわち，$\mathcal{S}_G(v)=\{w|(v,w)\in E\}$
 を満たすものである．道グラフ$P=(\{v_i\},\{e_i\})$の頂点および辺の並びを
 示すために，次の表記を用いる．
 \[ v_1,e_1,v_2,\ldots,v_{n-1},e_n,v_n \]
-重み付き経路グラフに対して，その重みの総和を経路の長さと呼ぶ．
+経路グラフに対して，その重みの総和を\textbf{長さ}と呼ぶ．
 
-重み付きグラフ$G$上の頂点$s$と頂点$t$について，それらを結ぶ道$P\subset G$のうち，
+グラフ$G$上の頂点$s$と頂点$t$について，それらを結ぶ道$P\subset G$のうち，
 長さが最小のものを\textbf{最短経路}と呼ぶ．$G$の頂点$s$と頂点$t$の最短経路のうち，
 ひとつの長さを$s$と$t$の\textbf{最短距離}あるいは\textbf{距離}と呼び，$d_{st}$と表す．
-重みなしグラフの距離は，重みをすべて$1$と仮定して計算することが多い．
 距離と同様に，$s$と$t$を結ぶ最短経路の数を\textbf{最短経路数}と呼び，$\sigma_{st}$と記す．
 $G$が無向グラフであるならば，すべての$s,t\in S$に対して$d_{st}=d_{ts}$かつ
 $\sigma_{st}=\sigma_{ts}$である．
 以下の議論では，便宜上，すべての$s\in V$に対し$d_{ss}=0$, $\sigma_{ss}=1$とする．
-
 また，$s$から$t$への最短経路の中で頂点$v$を通るものの個数を$\sigma_{st}(v)$で表す．
 頂点$s$から他の頂点へのすべての最短経路で構成される有向グラフを$G_s=(V_s,E_s)$で表す．
 同様に，頂点$s$から頂点$t$へのすべての最短経路で構成される有向グラフを$G_{st}=(V_{st},E_{st})$で表す．
@@ -205,7 +199,7 @@ $\sigma_{st}=\sigma_{ts}$である．
 \section{媒介中心性とペア依存度}
 \label{sect:pairwise-dependency}
 
-本説では，媒介中心性の定義からその効率的な計算方法を説明する．
+本節では，媒介中心性の定義からその効率的な計算方法を説明する．
 
 \begin{definition}[Freeman\cite{Freeman1977}]
   \label{def:betweenness-centrality}
@@ -217,8 +211,8 @@ $\sigma_{st}=\sigma_{ts}$である．
   で定義される．
 \end{definition}
 
-すなわち，頂点$v$の媒介中心性は$s$から$t$への最短経路の個数とその中で
-頂点$v$を通るものの個数の比を$s,t$のすべての組について足し合わせたものである．
+定義より，頂点$v$の媒介中心性は$s$から$t$への最短経路の個数とその中で
+頂点$v$を通るものの個数の比を$s,t$のすべての組について足し合わせたものと言える．
 したがって，媒介中心性の大きな頂点は多くの最短経路上にあり，この意味で重要度が高いと言える．
 
 すべての頂点の媒介中心性を求める単純な方法は以下の通りである．
@@ -226,7 +220,7 @@ $\sigma_{st}=\sigma_{ts}$である．
 その過程で，$s$から他のすべての頂点への最短距離と最短経路数も同時に求める．
 次に，互いに異なる3頂点の組$\{s,t,v\}$のすべてに対して，$\sigma_{st}(v)$の値を計算する．
 最後に媒介中心性$B_v$ $(v\in V)$を定義の式により計算する．
-しかしながら，この方法の計算量は$\mathcal{O}(|V|^3)$であり，大規模なネットワークでは膨大な計算時間が必要になる．
+この方法の時間計算量は$\mathcal{O}(|V|^3)$であり，大規模なネットワークでは膨大な計算時間が必要になる．
 
 媒介中心性の効率的計算法として最も広く用いられているのは
 Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである．
@@ -235,16 +229,15 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
 
 \begin{definition}[Brandes\cite{Brandes2001}]
   \label{def:pairwise-dependency}
-  頂点$s,t,v$のペア依存度は次式で定義される．
-  \begin{equation}
-    \label{eq:def-pairwise-dependency}
-    \delta_{st}(v)=\frac{\sigma_{st}(v)}{\sigma_{st}}
-  \end{equation}
-  また，頂点$s,v$と他の頂点の依存度は次式で定義される．
-  \begin{equation}
-    \label{eq:def-sum-pairwise-dependency}
-    \delta_{s\bullet}(v)=\sum_{t\neq v,s}\delta_{st}(v)
-  \end{equation}
+  頂点$s,t,v$のペア依存度および頂点$s,v$と他の頂点の依存度はそれぞれ
+  式\eqref{eq:def-pairwise-dependency}と
+  式\eqref{eq:def-sum-pairwise-dependency}で定義される．
+    \begin{align}
+      \delta_{st}(v)&=\frac{\sigma_{st}(v)}{\sigma_{st}}
+      \label{eq:def-pairwise-dependency} \\
+      \delta_{s\bullet}(v)&=\sum_{t\neq v,s}\delta_{st}(v)
+      \label{eq:def-sum-pairwise-dependency}
+    \end{align}
 \end{definition}
 
 ペア依存度および依存度を使うと，媒介中心性は次式で表される．
@@ -255,12 +248,12 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
   \end{aligned}
 \end{equation*}
 
-$\delta_{s\bullet}(v)$を効率的に計算する方法について，次の性質が知られている．
+依存度$\delta_{s\bullet}(v)$を効率的に計算する方法について，次の性質が知られている．
 
 \begin{lemma}
   \label{lemma:implicit-dependency-part}
   グラフ$G=(V,E)$の異なる頂点$s,t$について，$\sigma_{st}=1$ならば，
-  頂点$v$の$s$に対するペア依存度は式\eqref{eq:implicit-dependency-part}で計算できる．
+  頂点$v$の$s$に対するペア依存度は式\eqref{eq:implicit-dependency-part}を満たす．
   \begin{equation}
     \label{eq:implicit-dependency-part}
     \delta_{s\bullet}(v)=\sum_{(v,w)\in E_s}(1+\delta_{s\bullet}(w))
@@ -281,19 +274,22 @@ $\delta_{s\bullet}(v)$を効率的に計算する方法について，次の性�
   \label{fig:implicit-dependency-1}
 \end{figure}
 
-さらに$\sigma_{st}>1$のような一般的な場合も，次の定理の通りに計算できる．
+さらに$\sigma_{st}>1$のような一般的な場合も，次の性質が知られている．
 
 \begin{theorem}
   \label{th:implicit-dependency}
+  グラフ$G=(V,E)$の異なる頂点$s,t$について，
+  頂点$v$の$s$に対するペア依存度は式\eqref{eq:implicit-dependency}を満たす．
   \begin{equation}
     \label{eq:implicit-dependency}
     \delta_{s\bullet}(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_{s\bullet}(w)).
   \end{equation}
 \end{theorem}
 \begin{proof}
-  $E_{st}$の上に$v$があるような$t$についてのみ$\delta_{st}(v)>0$が成り立ち，このような
-  最短経路は$v\in\mathcal{P}_{E_{st}}(w)$を満たす辺$(v,w)$をただひとつもつ．
-  このような状況は，図\ref{fig:implicit-dependency-2}のように，先のものより少し複雑である．
+  $E_{st}$の上に$v$があるような$t$に対してのみ$\delta_{st}(v)>0$が成り立ち，このような
+  最短経路は$v\in\mathcal{P}_{E_{st}}(w)$を満たす辺$(v,w)$をひとつだけもつ．
+  このような状況は，図\ref{fig:implicit-dependency-2}のように，
+  図\ref{fig:implicit-dependency-1}の場合より複雑である．
 
   辺$e\in E$を含むように拡張したペア依存度を$\delta_{st}(v,e)=\sigma_{st}(v,e)/\sigma_{st}$で定義する．
   ただし，$\sigma_{st}(v,e)$は$s$から$t$への最短経路の中で$v$と$e$を通るものの個数とする．

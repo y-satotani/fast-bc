@@ -1,20 +1,19 @@
 \chapter{計算量の解析}
 \label{chap:complexity-analysis}
 
-本章では，第\ref{chap:algorithm}章で提案したアルゴリズムの計算量を与える．
+本章では，第\ref{chap:algorithm}章で提案したアルゴリズムの計算量を導出する．
 まず，以下の議論のためにいくつかの記号を導入しておく．
-$\tau(s)$および$\tau'(s)$は，それぞれ$T(s)$と$\Delta_{s\bullet}(x)>0$
-および$\Delta'_{s\bullet}(x)>0$を満たす頂点の和集合である．つまり，
-$\tau(s)=T(s)\cup\{x|\Delta_{s\bullet}(x)>0\}$,
-$\tau'(s)=T(s)\cup\{x|\Delta'_{s\bullet}(x)>0\}$とする．
+$\tau(s)$は，$\Delta_{s\bullet}(x)>0$満たす頂点$x$の集合と$T(s)$の和集合である．
+つまり，$\tau(s)=T(s)\cup\{x|\Delta_{s\bullet}(x)>0\}$である．
+同様に，$\tau'(s)$は，$\Delta'_{s\bullet}(x)>0$満たす頂点$x$の集合と$T(s)$の和集合である．
+つまり，$\tau'(s)=T(s)\cup\{x|\Delta'_{s\bullet}(x)>0\}$である．
 また，頂点集合$V$について$\left\vert V\right\vert$を$V$の要素数，
 $\left\Vert V\right\Vert$を$V$の各頂点と接続する辺の数とする．
 
-\section{媒介中心性を減少/増加させるアルゴリズムの計算量}
+\section{媒介中心性の値を増減させるアルゴリズムの計算量}
 
 本節では，媒介中心性を減少および増加させるアルゴリズムの計算量を与える．
-次の定理は，最短経路の更新の前後に行われる媒介中心性の更新の計算量を示す．
-まず，古い最短経路に関する依存度の分だけ媒介中心性を減算するアルゴリズムの計算量を示す．
+次の定理は，古い最短経路に関する依存度の分だけ媒介中心性を減算するアルゴリズムの計算量を示す．
 
 \begin{theorem}[Bergamini et.al.\cite{Bergamini2017}]
   \label{thm:decrease-betweenness-weight-complexity}
@@ -108,12 +107,14 @@ $\left\Vert V\right\Vert$を$V$の各頂点と接続する辺の数とする．
 
 \begin{theorem}
   \label{thm:incremental-shortest-path-update}
-  アルゴリズム\ref{alg:incremental-algorithm}の\textproc{UpdateShortestPath}の
-  重み付きグラフと重みなしグラフに対する計算量はそれぞれ次式で与えられる．
+  アルゴリズム\ref{alg:incremental-algorithm}の\textproc{UpdateSSSP}の
+  重み付きグラフと重みなしグラフに対する計算量はそれぞれ
+  式\eqref{eq:incremental-shortest-path-update-weighted}と
+  式\eqref{eq:incremental-shortest-path-update-unweighted}で与えられる．
   \begin{align}
-    &\mathcal{O}\left(\|T(s)\|\log|T(s)|)+\sum_{t\in T(u)}(\|S(t)\|\log|S(t)|\right)
+    &\mathcal{O}\left(\|T(s)\|\log|T(s)|\right)
     \label{eq:incremental-shortest-path-update-weighted} \\
-    &\mathcal{O}\left(\|T(s)\|+\sum_{t\in T(u)}\|S(t)\|\right)
+    &\mathcal{O}\left(\|T(s)\|\right)
     \label{eq:incremental-shortest-path-update-unweighted}
   \end{align}
 \end{theorem}
@@ -130,29 +131,35 @@ $\left\Vert V\right\Vert$を$V$の各頂点と接続する辺の数とする．
   ある$s$が与えられたときの計算量は，
   \begin{equation*}
     \begin{aligned}
-      \mathcal{O}(\sum_{s\in S(t)}(|(\mathcal{S}(s)|+|\mathcal{P}(s)|\log|S(t)|))
-      &=\mathcal{O}(\|S(t)\|+\|S(t)\|\log|S(t)|) \\
-      &=\mathcal{O}(\|S(t)\|\log|S(t)|)
+      \mathcal{O}\left(\sum_{s\in T(s)}|(\mathcal{S}(s)|+|\mathcal{P}(s)|\log|T(s)|\right)
+      &=\mathcal{O}(\|T(s)\|+\|T(s)\|\log|T(s)|) \\
+      &=\mathcal{O}(\|T(s)\|\log|T(s)|)
     \end{aligned}
   \end{equation*}
 \end{proof}
 
-同様に，辺挿入時の\textproc{UpdateSTSP}の計算量は，$S$を$T$にすれば良いので，
+同様に，辺挿入時のアルゴリズム\ref{alg:proposed-algorithm-full}の
+\textproc{UpdateSTSP}の計算量は，$S$を$T$にすれば良い．
+したがって，重み付きグラフと重みなしグラフに対する目的の計算量はそれぞれ次式で与えられる．
 \begin{equation*}
   \begin{aligned}
-    &\mathcal{O}(\|S(v)\|+\|T(u)\|+\sum_{s\in S(v)}(\|T(s)\|\log|T(s)|)+\sum_{t\in T(u)}(\|S(t)\|\log|S(t)|))\\
-    &\:=\mathcal{O}(\sum_{s\in S(v)}(\|T(s)\|\log|T(s)|)+\sum_{t\in T(u)}(\|S(t)\|\log|S(t)|)).
+    &\mathcal{O}\left(\|S(t)\|\log|S(t)|\right) \\
+    &\mathcal{O}\left(\|S(t)\|\right)
   \end{aligned}
 \end{equation*}
-である．
 
-さらに，定理\ref{thm:incremental-shortest-path-update}より，辺挿入時の全頂点間の最短経路を更新する
-処理の計算量は，$S(v)$と$T(u)$を求め，$s\in S(v)$に対して\textproc{UpdateSSSP}を，
-$t\in T(u)$に対して\textproc{UpdateSTSP}を実行するため，
+さらに，定理\ref{thm:incremental-shortest-path-update}より，
+辺挿入時の全頂点間の最短経路を更新する処理は
+$S(v)$と$T(u)$を求め，$s\in S(v)$に対して\textproc{UpdateSSSP}を，
+$t\in T(u)$に対して\textproc{UpdateSTSP}を実行する．
+よって，辺挿入時の全頂点間の最短経路を更新する処理の計算量は，
+重み付きグラフと重みなしグラフに対してそれぞれ，
 \begin{align}
-  &\mathcal{O}(\|S(v)\|+\|T(u)\|+\sum_{s\in S(v)}(\|T(s)\|\log|T(s)|)+\sum_{t\in T(u)}(\|S(t)\|\log|S(t)|)), \label{eq:full-incremental-shortest-path-update-weighted} \\
-  &\:=\mathcal{O}(\sum_{s\in S(v)}(\|T(s)\|\log|T(s)|)+\sum_{t\in T(u)}(\|S(t)\|\log|S(t)|)). \label{eq:full-incremental-shortest-path-update-unweighted}
-\end{align}
+  &\mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|\log|T(s)|+\sum_{t\in T(u)}\|S(t)\|\log|S(t)|\right),
+  \label{eq:full-incremental-shortest-path-update-weighted} \\
+  &\mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|+\sum_{t\in T(u)}\|S(t)\|\right).
+  \label{eq:full-incremental-shortest-path-update-unweighted}
+  \end{align}
 である．
 
 \section{辺削除時の最短経路更新アルゴリズムの計算量}
@@ -161,7 +168,9 @@ $t\in T(u)$に対して\textproc{UpdateSTSP}を実行するため，
 \begin{theorem}
   \label{thm:decremental-shortest-path-update}
   アルゴリズム\ref{alg:decremental-algorithm}の\textproc{UpdateSSSP}の
-  重み付きグラフと重みなしグラフに対する計算量はそれぞれ次式で与えられる．
+  重み付きグラフと重みなしグラフに対する計算量はそれぞれ
+  式\eqref{eq:decremental-shortest-path-update-weighted}と
+  式\eqref{eq:decremental-shortest-path-update-unweighted}で与えられる．
   \begin{align}
     &\mathcal{O}\left(\|T(s)\|\log|T(s)|\right)
     \label{eq:decremental-shortest-path-update-weighted} \\
@@ -201,31 +210,38 @@ $t\in T(u)$に対して\textproc{UpdateSTSP}を実行するため，
   \end{equation*}
 \end{proof}
 
-同様に，辺削除時の\textproc{UpdateSTSP}の計算量は，$S$を$T$にすれば良いので，
+同様に，辺削除時のアルゴリズム\ref{alg:proposed-algorithm-full}の
+\textproc{UpdateSTSP}の計算量は，$S$を$T$にすれば良いので，
 \begin{equation*}
   \begin{aligned}
-    &\mathcal{O}(\|S(v)\|+\|T(u)\|+\sum_{s\in S(v)}(\|T(s)\|\log|T(s)|)+\sum_{t\in T(u)}(\|S(t)\|\log|S(t)|))\\
-    &\:=\mathcal{O}(\sum_{s\in S(v)}(\|T(s)\|\log|T(s)|)+\sum_{t\in T(u)}(\|S(t)\|\log|S(t)|)).
+    &\mathcal{O}\left(\|S(t)\|\log|S(t)|\right) \\
+    &\mathcal{O}\left(\|S(t)\|\right)
   \end{aligned}
 \end{equation*}
 である．
 
-さらに，定理\ref{thm:decremental-shortest-path-update}より，辺削除時の全頂点間の最短経路を更新する
-処理の計算量は，$S(v)$と$T(u)$を求め，$s\in S(v)$に対して\textproc{UpdateSSSP}を，
-$t\in T(u)$に対して\textproc{UpdateSTSP}を実行するため，
+さらに，定理\ref{thm:decremental-shortest-path-update}より，
+辺削除時の全頂点間の最短経路を更新する処理は
+$S(v)$と$T(u)$を求め，$s\in S(v)$に対して\textproc{UpdateSSSP}を，
+$t\in T(u)$に対して\textproc{UpdateSTSP}を実行する．
+よって，辺削除時の全頂点間の最短経路を更新する処理の計算量は，
+重み付きグラフと重みなしグラフに対してそれぞれ，
 \begin{align}
-  &\mathcal{O}(\|S(v)\|+\|T(u)\|+\sum_{s\in S(v)}(\|T(s)\|\log|T(s)|)+\sum_{t\in T(u)}(\|S(t)\|\log|S(t)|)), \label{eq:full-decremental-shortest-path-update-weighted} \\
-  &\:=\mathcal{O}(\sum_{s\in S(v)}(\|T(s)\|\log|T(s)|)+\sum_{t\in T(u)}(\|S(t)\|\log|S(t)|)). \label{eq:full-decremental-shortest-path-update-unweighted}
-\end{align}
+  &\mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|\log|T(s)|+\sum_{t\in T(u)}\|S(t)\|\log|S(t)|\right),
+  \label{eq:full-decremental-shortest-path-update-weighted} \\
+  &\mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|+\sum_{t\in T(u)}\|S(t)\|\right).
+  \label{eq:full-decremental-shortest-path-update-unweighted}
+  \end{align}
 である．
 
 本章の最後に，提案アルゴリズムの最悪計算量を評価する．
-定理\ref{thm:decrease-betweenness-weight-complexity}および
-定理\ref{thm:increase-betweenness-weight-complexity}より，
-最短経路更新の前後で媒介中心性を更新するアルゴリズムの最悪計算量は，$S(v)=\tau(s)=V$のときで，
-$\mathcal{O}(|V||E|+|V|^2\log|V|)$である．これは，Brandesのアルゴリズムの計算量と同じである．
-また，定理\ref{thm:incremental-shortest-path-update}および
-定理\ref{thm:decremental-shortest-path-update}より，
-最短経路を更新するアルゴリズムの最悪計算量は，$S(v)=T(u)=V$のときで，
+重み付きグラフに対する媒介中心性増減アルゴリズムの最悪時間計算量は，
+式\eqref{eq:full-incremental-betweenness-weighted-complexity}より，
+$S(v)=\tau(s)=\tau'(s)=V$を満たすときの$\mathcal{O}(|V||E|+|V|^2\log|V|)$である．
+これは，Brandesのアルゴリズムの計算量と同じである．
+また，式\eqref{eq:full-incremental-shortest-path-update-weighted}および
+式\eqref{eq:full-decremental-shortest-path-update-weighted}より，
+最短経路を更新するアルゴリズムの最悪時間計算量は，$S(v)=T(u)=V$を満たすときの
 $\mathcal{O}(|V||E|\log|V|)$である．これは，Dijkstraのアルゴリズムを
 全頂点に対して行うときの計算量と同じである．
+重みなしグラフに対しても同様の議論ができ，同じ結果が得られる．

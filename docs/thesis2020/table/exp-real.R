@@ -11,6 +11,7 @@ data_net_info <- read_csv('../../res/data/real-network-info.csv') %>%
 data_time <- read_csv('../../res/data/real-performance-comparison.csv') %>%
     select(c('network', 'query', 'time-proposed', 'time-brandes')) %>%
     mutate(network = sub('.edgelist', '', network)) %>%
+    filter(grepl('^ca-|^musae-|^soc-sign-bitcoin|^sx-', network)) %>%
     filter(query == 'delete') %>%
     group_by(network, query) %>%
     summarise(
@@ -24,7 +25,7 @@ data_time <- read_csv('../../res/data/real-performance-comparison.csv') %>%
 
 geomean = function(x) { exp(sum(log(x)) / length(x)) }
 geomean_of_speedups = c(
-    network = 'geometric mean',
+    network = '幾何平均',
     nodes = NA,
     links = NA,
     `is-directed` = NA,
@@ -40,12 +41,24 @@ data_time <- rbind(data_time, t(as.data.frame(geomean_of_speedups))) %>%
         `Brandes` = as.numeric(`Brandes`),
         `proposed` = as.numeric(`proposed`),
         speedup = as.numeric(speedup)
+    ) %>%
+    mutate(
+        `is-directed` = if_else(`is-directed` == 'undirected', '無向', '有向')
+    ) %>%
+    rename(
+        `ネットワーク名` = `network`,
+        `有向/無向` = `is-directed`,
+        `頂点数` = `nodes`,
+        `辺数` = `links`,
+        `Brandes法` = `Brandes`,
+        `提案手法` = `proposed`,
+        `性能比` = `speedup`
     )
 
 hlines = c(-1, 0, nrow(data_time)-1, nrow(data_time))
 print(
     xtable(data_time,
-           caption = 'Execution time on real networks (in seconds)',
+           caption = '実ネットワークの上での性能比較(秒)',
            label = 'tab:exp-real',
            digits = c(0, 0, 0, 0, 0, 2, 2, 2)
            ),
