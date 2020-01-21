@@ -3,8 +3,8 @@
 
 \section{提案アルゴリズムの概要}
 
-本章では，グラフ$G=(V,E)$に辺$(u,v)$が挿入または削除された後の最短経路および
-媒介中心性の値を更新するアルゴリズムを提案する．
+本章では，有向グラフ$G=(V,E)$に辺$(u,v)$が挿入，または，辺$(u,v)$が削除された後の各頂点からの最短経路および
+各頂点の媒介中心性の値を更新するアルゴリズムを提案する．
 挿入操作について$(u,v)\notin E$が，
 削除操作については$(u,v)\in E$が成り立っていると仮定する．
 記号について，挿入または削除の操作後であることを明示するため，記号$'$をつける．
@@ -13,17 +13,19 @@
 挿入操作に対する提案アルゴリズムを拡張して，ある辺の重みを減少させる操作に対応できる．
 同様に，辺$(u,v)$を削除する操作は，有限の$l_{uv}$を無限大にする操作であると言えるから，
 削除操作に対する提案アルゴリズムを拡張して，ある辺の重みを増加させる操作に対応できる．
+さらに，無向辺$\{a,b\}$を有効辺$(a,b)$と$(b,a)$の組と見なすことにより，
+提案アルゴリズムは無向グラフに対しても適用可能である．
 
 頂点$t$に対して，辺操作によって$t$への最短経路が変化する頂点の集合を$S(t)$と表す．
 同様に，頂点$s$に対して，辺操作によって$s$からの最短経路が変化する頂点の集合を$T(s)$と表す．
 $S(t)$および$T(s)$に属する頂点は，それぞれ$t$および$s$について，辺更新の影響を受ける頂点集合と言える．
-後述するが，$S(t)$および$T(s)$具体的な式は，操作によって異なる．
+後述するが，$S(t)$および$T(s)$具体的な内容は，操作によって異なる．
 さらに，頂点$s,x\in V$に対して，$T(s)$に含まれる頂点$t$についてペア依存度$\delta_{st}(x)$の総和を
 $\Delta_{s\bullet}(x)$で表す\cite{Bergamini2017}．
 つまり，$\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x)$である．
 同様に，$\Delta'_{s\bullet}(x)=\sum_{t\in T(s)}\delta'_{st}(x)$とする．
 
-挿入と削除共通のアルゴリズムの流れは以下である．
+挿入と削除共通の処理の流れは以下である．
 まず，$T(u)$および$S(v)$を計算する．
 各$s\in S(v)$に対して以下を実行する．
 1. $x\in V$に対する$\Delta_{s\bullet}(x)$を求めて，媒介中心性の値$B_x$から減算する．
@@ -88,12 +90,12 @@ $\Delta_{s\bullet}(x)$で表す\cite{Bergamini2017}．
   任意の$s\in S(v)$と$x\in V$について，次式が成り立つ．
   \begin{align}
     \Delta_{s\bullet}(x)
-    &=\sum_{y|y\in\mathcal{S}_G(x)\land y\in T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}(1+\Delta_{s\bullet}(y))
-    +\sum_{y|y\in\mathcal{S}_G(x)\land y\notin T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\Delta_{s\bullet}(y)
+    &=\sum_{y\in\mathcal{S}_G(x)\cap T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}(1+\Delta_{s\bullet}(y))
+    +\sum_{y\in\mathcal{S}_G(x)\setminus T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\Delta_{s\bullet}(y)
     \label{eq:delta-dependency-1} \\
     \Delta'_{s\bullet}(x)
-    &=\sum_{y|y\in\mathcal{S}_G(x)\land y\in T(s)}\frac{\sigma'_{sx}}{\sigma'_{sy}}(1+\Delta'_{s\bullet}(y))
-    +\sum_{y|y\in\mathcal{S}_G(x)\land y\notin T(s)}\frac{\sigma'_{sx}}{\sigma'_{sy}}\Delta'_{s\bullet}(y)
+    &=\sum_{y\in\mathcal{S}_G(x)\cap T(s)}\frac{\sigma'_{sx}}{\sigma'_{sy}}(1+\Delta'_{s\bullet}(y))
+    +\sum_{y\in\mathcal{S}_G(x)\setminus T(s)}\frac{\sigma'_{sx}}{\sigma'_{sy}}\Delta'_{s\bullet}(y)
     \label{eq:delta-dependency-2}
   \end{align}
 \end{theorem}
@@ -114,12 +116,12 @@ $\Delta_{s\bullet}(x)$で表す\cite{Bergamini2017}．
   したがって，次が成り立つ．
   \begin{equation*}
     \begin{aligned}
-      &\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\in T(s)}\left(\frac{\sigma_{sx}}{\sigma_{sy}}+\sum_{t\in T(s)-\{y\}}\frac{\sigma_{st}(y,x)}{\sigma_{st}}\right)
-      +\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\notin T(s)}\sum_{t\in T(s)-\{y\}}\frac{\sigma_{st}(y,x)}{\sigma_{st}} \\
-      &\quad=\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\in T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\left(1+\sum_{t\in T(s)-\{y\}}\frac{\sigma_{st}(y)}{\sigma_{st}}\right)
-      +\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\notin T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\sum_{t\in T(s)-\{y\}}\frac{\sigma_{st}(y)}{\sigma_{st}} \\
-      &\quad=\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\in T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\left(1+\Delta_{s\bullet}(y)\right)
-      +\sum_{y|y\in\mathcal{S}_{G_s}(x)\land y\notin T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\Delta_{s\bullet}(y) \\
+      &\sum_{y\in\mathcal{S}_{G_s}(x)\cap T(s)}\left(\frac{\sigma_{sx}}{\sigma_{sy}}+\sum_{t\in T(s)\setminus\{y\}}\frac{\sigma_{st}(y,x)}{\sigma_{st}}\right)
+      +\sum_{y\in\mathcal{S}_{G_s}(x)\setminus T(s)}\sum_{t\in T(s)\setminus\{y\}}\frac{\sigma_{st}(y,x)}{\sigma_{st}} \\
+      &\quad=\sum_{y\in\mathcal{S}_{G_s}(x)\cap T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\left(1+\sum_{t\in T(s)\setminus\{y\}}\frac{\sigma_{st}(y)}{\sigma_{st}}\right)
+      +\sum_{y\in\mathcal{S}_{G_s}(x)\setminus T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\sum_{t\in T(s)\setminus\{y\}}\frac{\sigma_{st}(y)}{\sigma_{st}} \\
+      &\quad=\sum_{y\in\mathcal{S}_{G_s}(x)\cap T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\left(1+\Delta_{s\bullet}(y)\right)
+      +\sum_{y\in\mathcal{S}_{G_s}(x)\setminus T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\Delta_{s\bullet}(y) \\
     \end{aligned}
   \end{equation*}
   $\Delta'_{s\bullet}(x)$に対しても同様に証明できる．
@@ -252,11 +254,11 @@ $\sigma'_{st}$を計算する方法を説明する．
 キューに要素が存在する限り，以下を繰り返す．
 キューから優先度最小の要素を取り出し，これを$x$とする．このとき，
 優先度を$\hat{d}_{sx}$とする．
-次式にしたがって，$d'_{sx}$および$\sigma'_{sx}$を計算する．
+その後，次式にしたがって$d'_{sx}$および$\sigma'_{sx}$を計算する．
 \begin{equation*}
   \begin{aligned}
     d'_{sx}&=\hat{d}_{sx},\\
-    \sigma'_{sx}&=\sum_{y|y\in\mathcal{P}(x)\land d'_{sx}=d'_{sy}+l'_{yx}}\sigma'_{sy}
+    \sigma'_{sx}&=\sum_{y\in\mathcal{P}(x)\land d'_{sx}=d'_{sy}+l'_{yx}}\sigma'_{sy}
   \end{aligned}
 \end{equation*}
 さらに，$y\in\mathcal{S}(x)$のうち，式\eqref{eq:update-augdist-on-insert}を満たす，
@@ -347,11 +349,11 @@ $\min\{d_{sx}+l_{xy}|y\in\mathcal{P}(x)\land y\notin T(s)\}$とする．
 キューに要素が存在する限り，以下を繰り返す．
 キューから優先度最小の要素を取り出し，これを$x$とする．このとき，
 優先度を$\hat{d}_{sx}$とする．
-次式にしたがって，$d'_{sx}$および$\sigma'_{sx}$を計算する．
+その後，次式にしたがって$d'_{sx}$および$\sigma'_{sx}$を計算する．
 \begin{equation*}
   \begin{aligned}
     d'_{sx}&=\hat{d}_{sx},\\
-    \sigma'_{sx}&=\sum_{y|y\in\mathcal{P}(x)\land d'_{sx}=d'_{sy}+l'_{yx}}\sigma'_{sy}
+    \sigma'_{sx}&=\sum_{y\in\mathcal{P}(x)\land d'_{sx}=d'_{sy}+l'_{yx}}\sigma'_{sy}
   \end{aligned}
 \end{equation*}
 さらに，$y\in\mathcal{S}(x)$のうち，式\eqref{eq:update-augdist-on-delete}を満たす，

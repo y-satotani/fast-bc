@@ -1,6 +1,6 @@
 \chapter{準備}
 \label{chap:preliminary}
-本章では，後の章で提案するアルゴリズムを説明するための準備をする．はじめに，最短経路や距離を含む，
+本章では，後の章で提案するアルゴリズムを説明するための準備をする．はじめに，最短経路などの
 グラフ理論の基本事項を説明する．
 次に，距離や最短経路の数に関する重要な性質を示す．
 最後に，媒介中心性とその計算に用いられるペア依存度について説明する．
@@ -8,44 +8,42 @@
 \section{グラフの数学的表現}
 \label{sect:graph-theory}
 
-\textbf{グラフ}とは，二つの集合$V$と$E$の組$G=(V,E)$で，
-$E\subset V^2$を満たす．つまり，$V$から元を2個取り出した集合の部分集合である．
+\textbf{グラフ}とは，ふたつの集合$V$と$E$の組$G=(V,E)$で，
+$E$は$E\subseteq V^2$を満たす．つまり，$E$は$V$の元の二つ組から成る集合の部分集合である．
 $V$を\textbf{頂点集合}とよび，その元を\textbf{頂点}とよぶ．
 また，頂点集合の要素数$|V|$を\textbf{頂点数}とよぶ．
 $E$を\textbf{辺集合}とよび，その元を\textbf{辺}とよぶ．
 また，辺集合の要素数$|E|$を\textbf{辺数}とよぶ．
-頂点および辺は，ネットワークにおけるノードとリンクに対応する．
+グラフの頂点および辺は，ネットワークにおけるノードとリンクに対応する．
 $E$の要素が丸括弧で表される順序対ならば，$G$は\textbf{有向グラフ}と呼ばれ，
 波括弧で表される非順序対ならば$G$は\textbf{無向グラフ}と呼ばれる．
-有向グラフの辺$e=(v,w)$において，頂点$v$を始点，頂点$w$を終点と呼ぶ．
+有向グラフの辺$e=(v,w)$において，頂点$v$を\textbf{始点}，頂点$w$を\textbf{終点}と呼ぶ．
 グラフ$G=(V,E)$と$G'=(V',E')$に対して，$V'\subseteq V$かつ$E'\subseteq E$
 を満たすとき，$G'$は$G$の\textbf{部分グラフ}であるといい，$G'\subseteq G$と記す．
-有向グラフ$G$について，各辺$(v,w)$を逆向きにしたグラフを$G$の逆と呼び，$\bar{G}$で表す．
+有向グラフ$G$について，各辺$(v,w)$を逆向きにしたグラフを$G$の\textbf{逆}と呼び，$\bar{G}$で表す．
 すなわち，$G=(V,E)$のとき，$\bar{G}=(V,\{(w,v)|(v,w)\in E\})$である．
 
 \textbf{重み付きグラフ}とは，すべての辺$(v,w)$もしくは$\{v,w\}$に対して，
-辺の重み$l_{vw}\in\mathbb{R}$が定められているグラフである．
-以下，特に断らない限り辺の重みは正であるとする．
-また，重み付きグラフでないグラフを\textbf{重みなしグラフ}と呼ぶ．
-重みなしグラフに対して後述する距離などの重みが必要な量を計算する際，
+辺の\textbf{重み}$l_{vw}\in\mathbb{R}$が定められているグラフである．
+以下，特に断らない限り辺の重みは正とする．
+また，辺に重みが定められていないグラフを\textbf{重みなしグラフ}と呼ぶ．
+後述する距離などの辺の重みが必要な量を重みなしグラフに対して計算する際，
 全ての辺に対して同一の重みが付与されていると仮定する．
 特に断らない限り，その重みを$1$とする．
 
 無向グラフにおいて，頂点$v$と辺$e$が\textbf{接続する}とは，$v\in e$つまり，
 $e$の端点に$v$が属することをいう．
-頂点$v$と頂点$w$が\textbf{隣接する}とは，$(v,w)$ないし$\{v,w\}$が辺集合$E$に属することをいう．
+頂点$v$と頂点$w$が\textbf{隣接する}とは，$(v,w)$または$\{v,w\}$が辺集合$E$に属することをいう．
 無向グラフ$G$の頂点$v$について，$v$と隣接する頂点の集合を頂点$v$の\textbf{近傍}と
-呼び，$\mathcal{N}_G(v)$ないし$\mathcal{N}(v)$で表す．また，無向グラフ$G$について$v$の近傍の数
-$|\mathcal{N}_G(v)|$を\textbf{次数}と呼び，$k(v)$あるいは$k_G(v)$と記す．
+呼び，$\mathcal{N}_G(v)$あるいは$\mathcal{N}(v)$で表す．また，無向グラフ$G$について$v$の近傍の数
+$|\mathcal{N}_G(v)|$を\textbf{次数}と呼び，$k_G(v)$あるいは$k(v)$と記す．
 すべての頂点の次数が等しいグラフを\textbf{正則グラフ}と呼ぶ．
 
 有向グラフ$G$の頂点$v$について，$v$を終点とする辺の始点の集合を\textbf{先行}
-(predecessor)と呼び，$\mathcal{P}_G(v)$と記す．すなわち，
+(predecessor)と呼び，$\mathcal{P}_G(v)$あるいは$\mathcal{P}(v)$と記す．すなわち，
 $\mathcal{P}_G(v)=\{u|(u,v)\in E\}$である．
 同様に，$v$を始点とする辺の終点の集合を\textbf{後継}(successor)と呼び，
-$\mathcal{S}_G(v)$と記す．すなわち，$\mathcal{S}_G(v)=\{w|(v,w)\in E\}$である．
-先行と後継を記すとき，近傍と同様にグラフが省略されることがある．つまり，$v$の先行および後継を
-$\mathcal{P}(v)$および$\mathcal{S}(v)$と記すことがある．
+$\mathcal{S}_G(v)$あるいは$\mathcal{S}(v)$と記す．すなわち，$\mathcal{S}_G(v)=\{w|(v,w)\in E\}$である．
 
 有向な\textbf{道グラフ}，あるいは単に道とは，$P=(V,E)$のグラフで，
 \begin{equation*}
@@ -57,9 +55,9 @@ $\mathcal{P}(v)$および$\mathcal{S}(v)$と記すことがある．
 を満たすものである．道グラフ$P=(\{v_i\},\{e_i\})$の頂点および辺の並びを
 示すために，次の表記を用いる．
 \[ v_1,e_1,v_2,\ldots,v_{n-1},e_n,v_n \]
-経路グラフに対して，その重みの総和を\textbf{長さ}と呼ぶ．
+道グラフ$P=(V,E)$に対して，$E$の各要素の重みの総和を\textbf{長さ}と呼ぶ．
 
-グラフ$G$上の頂点$s$と頂点$t$について，それらを結ぶ道$P\subset G$のうち，
+グラフ$G$上の頂点$s$と頂点$t$について，それらを結ぶ道$P\subseteq G$のうち，
 長さが最小のものを\textbf{最短経路}と呼ぶ．$G$の頂点$s$と頂点$t$の最短経路のうち，
 ひとつの長さを$s$と$t$の\textbf{最短距離}あるいは\textbf{距離}と呼び，$d_{st}$と表す．
 距離と同様に，$s$と$t$を結ぶ最短経路の数を\textbf{最短経路数}と呼び，$\sigma_{st}$と記す．
@@ -79,42 +77,39 @@ $\sigma_{st}=\sigma_{ts}$である．
 \begin{lemma}[Brandes~\cite{Brandes2001}]
   \label{lemma:inclusion-v}
   $G=(V,E)$の異なる2頂点$s,t \in V$に対して，$s$から$t$への最短経路
-  $G_{st}=(V_{st},E_{st})$が$i \in V$を含む，すなわち$i \in V_{st}$であるための
-  必要十分条件は
+  $G_{st}=(V_{st},E_{st})$が$v\in V$を含む，すなわち$v\in V_{st}$であるための
+  必要十分条件は，式\eqref{eq:inclusion-v}が成り立つことである．
   \begin{equation}
-    d_{st}=d_{si}+d_{it}
+    d_{st}=d_{sv}+d_{vt}
     \label{eq:inclusion-v}
   \end{equation}
-  が成り立つことである．
 \end{lemma}
 \begin{proof}
-  はじめに$i=s$の場合を考える．このとき明らかに$i \in V_{st}$であり，
-  かつ$d_{si}+d_{it}=d_{ss}+d_{st}=d_{st}$より\eqref{eq:inclusion-v}もつねに成り立つ．
-  $i=t$の場合も同様である．そこで以下では$i \not\in \{s,t\}$と仮定する．
+  はじめに$v=s$の場合を考える．このとき明らかに$v \in V_{st}$であり，
+  かつ$d_{sv}+d_{vt}=d_{ss}+d_{st}=d_{st}$より\eqref{eq:inclusion-v}もつねに成り立つ．
+  $v=t$の場合も同様である．そこで以下では$v \not\in \{s,t\}$と仮定する．
 
-  $G_{st}$が頂点$i$を含むならば，$G_{st}$の中に
-  $s \rightarrow \cdots \rightarrow i \rightarrow \cdots \rightarrow t$の順に
-  頂点を通る有向道が存在する．この有向道の長さは$d_{si}+d_{it}$で与えられるので
+  $G_{st}$が頂点$v$を含むならば，$G_{st}$の中に$s,\ldots,v,\ldots,t$の順に
+  頂点を通る道が存在する．この道の長さは$d_{sv}+d_{vt}$で与えられるので
   \eqref{eq:inclusion-v}が成り立つ．
 
-  次に\eqref{eq:inclusion-v}が成り立つと仮定する．頂点$s$を出発して$s$から$i$への
-  最短経路の一つを通って$i$に行き，次に$i$から$t$への最短経路の一つを通って$t$に行く有向道を考える．
-  この有向道は$s$から$t$への最短経路の一つである．
-  なぜなら，その長さは$d_{si}+d_{it}$で与えられ，\eqref{eq:inclusion-v}より
+  次に\eqref{eq:inclusion-v}が成り立つと仮定し，道$s,\ldots,v,\ldots,t$を考える．
+  この道は$s$から$t$への最短経路の一つである．
+  なぜなら，その長さは$d_{sv}+d_{vt}$で与えられ，\eqref{eq:inclusion-v}より
   $s$から$t$への最短経路長$d_{st}$に等しいからである．
-  したがって$i \in V_{st}$が成り立つ．
+  したがって$v\in V_{st}$が成り立つ．
 \end{proof}
 
 補題\ref{lemma:inclusion-v}の証明の考え方を用いれば，ある頂点を通過する最短経路数を導出できる．
 
 \begin{lemma}[Brandes\cite{Brandes2001}]
   $G=(V,E)$の異なる2頂点$s,t \in V$に対して，
-  $s$から$t$への最短経路の中で$i$を通るものの個数$\sigma_{st}(i)$は
+  $s$から$t$への最短経路の中で$v$を通るものの個数$\sigma_{st}(v)$は
   次式で与えられる．
   \begin{equation}
-    \sigma_{st}(i)=
+    \sigma_{st}(v)=
     \begin{cases}
-      \sigma_{si} \sigma_{it}, & d_{st}=d_{si}+d_{it}\,\text{のとき} \\
+      \sigma_{sv} \sigma_{vt}, & d_{st}=d_{sv}+d_{vt}\,\text{のとき} \\
       0, & \text{それ以外のとき}
     \end{cases}
   \end{equation}
@@ -124,77 +119,74 @@ $\sigma_{st}=\sigma_{ts}$である．
 
 \begin{lemma}
   \label{lemma:inclusion-e}
-  $G=(V,E)$の異なる2頂点$s,t\in V$と辺$\{i,j\} \in E$を考える．$s$から$t$への最短経路
-  $G_{st}=(V_{st},E_{st})$が有向辺$(i,j)$を含む，すなわち$(i,j) \in E_{st}$が成り立つための
-  必要十分条件は
+  $G=(V,E)$の異なる2頂点$s,t\in V$と辺$(u,v)\in E$を考える．$s$から$t$への最短経路
+  $G_{st}=(V_{st},E_{st})$が有向辺$(u,v)$を含む，すなわち$(u,v)\in E_{st}$が成り立つための
+  必要十分条件は，式\eqref{eq:inclusion-e}が成り立つことである．
   \begin{equation}
-    d_{st}=d_{si}+l_{ij}+d_{jt}
+    d_{st}=d_{su}+l_{uv}+d_{vt}
     \label{eq:inclusion-e}
   \end{equation}
-  が成り立つことである．
 \end{lemma}
 \begin{proof}
-  はじめに$i=s$, $j=t$の場合を考える．このとき明らかに$G_{st}$は
-  有向辺$(i,j)$を含み，かつ$d_{si}+l_{ij}+d_{jt}=d_{ss}+l_{st}+d_{tt}=l_{st}=d_{st}$
-  より\eqref{eq:inclusion-e}も成り立つ．
+  はじめに$u=s$, $v=t$の場合を考える．このとき明らかに$G_{st}$は
+  有向辺$(u,v)$を含み，かつ$d_{su}+l_{uv}+d_{vt}=d_{ss}+l_{st}+d_{tt}=l_{st}=d_{st}$
+  より\eqref{eq:inclusion-e}を満たす．
 
-  次に$i=s$, $j \neq t$の場合を考える．このとき$(i,j)\in E_{st}$であるための
-  必要十分条件は$G_{st}$が$j$を含むことである．これは補題~\ref{lemma:inclusion-v}より
-  $d_{st}=d_{sj}+d_{jt}$と等価であり，さらに右辺$d_{sj}+d_{jt}$は\eqref{eq:inclusion-e}の右辺と等しい．
-  $i\neq s$, $j=t$の場合も同様である．
+  次に$u=s$, $v\neq t$の場合を考える．このとき$(u,v)\in E_{st}$であるための
+  必要十分条件は$G_{st}$が$v$を含むことである．これは補題~\ref{lemma:inclusion-v}より
+  $d_{st}=d_{sv}+d_{vt}$と等価であり，さらに右辺$d_{sv}+d_{vt}$は\eqref{eq:inclusion-e}の右辺と等しい．
+  $u\neq s$, $v=t$の場合も同様である．
 
-  そこで以下では$s,t,i,j$がすべて異なると仮定する．
-  $G_{st}$が有向辺$(i,j)$を含むならば，$G_{st}$の中に
-  $s \rightarrow \cdots \rightarrow i \rightarrow j \rightarrow \cdots \rightarrow t$
+  そこで以下では$s,t,u,v$がすべて異なると仮定する．
+  $G_{st}$が有向辺$(u,v)$を含むならば，$G_{st}$の中に
+  $s,\ldots, u,v,\ldots,t$
   の順に頂点を通る有向道が存在する．
-  この有向道の長さは$d_{si}+l_{ij}+d_{jt}$で与えられるので\eqref{eq:inclusion-e}が成り立つ．
+  この道の長さは$d_{su}+l_{uv}+d_{vt}$で与えられるので\eqref{eq:inclusion-e}が成り立つ．
 
   次に\eqref{eq:inclusion-e}が成り立つと仮定する．
-  頂点$s$を出発して$s$から$i$への最短経路の一つを通って$i$に行き，次に辺$\{i,j\}$を通って$j$に行き，
-  最後に$j$から$t$への最短経路の一つを通って$t$に行く有向道が存在する．
-  この有向道は$s$から$t$への最短経路の一つである．なぜなら，その長さは$d_{si}+l_{ij}+d_{jt}$で与えられ，
+  すると，$s,\ldots, u,v,\ldots,t$である道が存在する．
+  この道は$s$から$t$への最短経路の一つである．なぜなら，その長さは$d_{su}+l_{uv}+d_{vt}$で与えられ，
   \eqref{eq:inclusion-e}より$s$から$t$への最短経路長$d_{st}$に等しいからである．
-  したがって，$(i,j) \in E_{st}$が成り立つ．
+  したがって，$(u,v) \in E_{st}$が成り立つ．
 \end{proof}
 
 補題\ref{lemma:inclusion-e}の証明の考え方を用いれば，ある辺を通る最短経路数を導出できる．
 
 \begin{lemma}
   $G=(V,E)$の異なる2頂点$s,t \in V$に対して，
-  $s$から$t$への最短経路の中で有向辺$(i,j)$を通るものの個数を
-  $\sigma_{st}(i,j)$とおくと，それは次式で与えられる．
+  $s$から$t$への最短経路の中で有向辺$(u,v)$を通るものの個数を
+  $\sigma_{st}(u,v)$とおくと，それは次式で与えられる．
   \begin{equation*}
-    \sigma_{st}(i,j)=
+    \sigma_{st}(u,v)=
     \begin{cases}
-      \sigma_{si} \sigma_{jt}, & d_{st}=d_{si}+l_{ij}+d_{jt}\,\text{のとき} \\
+      \sigma_{su}\sigma_{vt}, & d_{st}=d_{su}+l_{uv}+d_{vt}\,\text{のとき} \\
       0, & \text{それ以外のとき}
     \end{cases}
   \end{equation*}
 \end{lemma}
 
-次の補題は，最短距離および最短経路数を，ほかの頂点とのもので陰に表すことができる
-ことを示している．
+さらに，次の補題は距離および最短経路数をほかの頂点とのもので陰に表す．
 
 \begin{lemma}
   \label{lemma:distance-and-geodesics}
-  $G=(V,E)$の異なるに頂点$s,t\in V$について，次が成り立つ．
+  $G=(V,E)$の異なるに頂点$s,t\in V$について，次式が成り立つ．
   \begin{equation*}
     \begin{aligned}
-      d_{st}&=\min\{l_{si}+d_{it}|i\in\mathcal{N}_G(s)\} \\
-      \sigma_{st}&=\sum_{i\in\mathcal{N}_G(s),\,d_{st}=l_{si}+d_{it}}\sigma_{it}
+      d_{st}&=\min\{l_{sv}+d_{vt}|v\in\mathcal{S}_G(s)\} \\
+      \sigma_{st}&=\sum_{v\in\mathcal{S}_G(s),\,d_{st}=l_{sv}+d_{vt}}\sigma_{vt}
     \end{aligned}
   \end{equation*}
 \end{lemma}
-\begin{proof}
-  すべての辺の重みは正であるため，頂点$s$から頂点$v$までの最短経路の最後の辺は，
-  $d_{su}<d_{su}$が成立する辺集合に含まれる辺$(u,v)$である．これは，補題1
-  \par $G=(V,E$の互いに異なる3頂点$s,t,v$に対して，$s$から$t$への最短経路の集合
-  $G_{st}=(V_{st},E_{st})$が$v$を含む，すなわち，$v\in E_{st}$が成り立つための
-  必要十分条件は$d_{st}=d_{sv}+d_{vt}$である．
-
-  より頂点$s$から頂点$v$までの最短経路の数は，頂点$s$から頂点$u$までの
-  最短経路の数と等しいと言える．
-\end{proof}
+%\begin{proof}
+%  すべての辺の重みは正であるため，頂点$s$から頂点$v$までの最短経路の最後の辺は，
+%  $d_{su}<d_{su}$が成立する辺集合に含まれる辺$(u,v)$である．これは，補題1
+%  \par $G=(V,E$の互いに異なる3頂点$s,t,v$に対して，$s$から$t$への最短経路の集合
+%  $G_{st}=(V_{st},E_{st})$が$v$を含む，すなわち，$v\in E_{st}$が成り立つための
+%  必要十分条件は$d_{st}=d_{sv}+d_{vt}$である．
+%
+%  より頂点$s$から頂点$v$までの最短経路の数は，頂点$s$から頂点$u$までの
+%  最短経路の数と等しいと言える．
+%\end{proof}
 
 \section{媒介中心性とペア依存度}
 \label{sect:pairwise-dependency}
@@ -203,12 +195,11 @@ $\sigma_{st}=\sigma_{ts}$である．
 
 \begin{definition}[Freeman\cite{Freeman1977}]
   \label{def:betweenness-centrality}
-  頂点$i$の媒介中心性$B_v$は
+  頂点$i$の媒介中心性$B_v$は式\eqref{eq:betweenness-centrality}で定義される．
   \begin{equation}
     B_v=\sum_{s\neq v}\sum_{t\neq {v,s}}\frac{\sigma_{st}(v)}{\sigma_{st}}
     \label{eq:betweenness-centrality}
   \end{equation}
-  で定義される．
 \end{definition}
 
 定義より，頂点$v$の媒介中心性は$s$から$t$への最短経路の個数とその中で

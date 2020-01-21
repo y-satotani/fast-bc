@@ -17,8 +17,10 @@ $\left\Vert V\right\Vert$を$V$の各頂点と接続する辺の数とする．
 
 \begin{theorem}[Bergamini et.al.\cite{Bergamini2017}]
   \label{thm:decrease-betweenness-weight-complexity}
-  アルゴリズム\ref{alg:decrease-betweenness}の\textproc{DecreaseBetweenness}の，
-  重み付きグラフと重みなしグラフに対する計算量は，それぞれ次式で与えられる．
+  重み付きグラフと重みなしグラフに対する
+  アルゴリズム\ref{alg:decrease-betweenness}の\textproc{DecreaseBetweenness}の計算量は
+  それぞれ式\eqref{eq:decrease-betweenness-weighted-complexity}と
+  式\eqref{eq:decrease-betweenness-unweighted-complexity}として与えられる．
   \begin{align}
     &\mathcal{O}\left(\left\|\tau(s)\right\|+\left|\tau(s)\right|\log\left|\tau(s)\right|\right)
     \label{eq:decrease-betweenness-weighted-complexity} \\
@@ -29,17 +31,18 @@ $\left\Vert V\right\Vert$を$V$の各頂点と接続する辺の数とする．
 \begin{proof}
   重み付きグラフでは二分ヒープを，重みなしグラフではバケツヒープを優先度付きキューとして
   用いると仮定する．
-  すると，8行目の要素取り出しの操作はそれぞれ対数時間と定数時間で実行できる．
+  すると，8行目の要素取り出しの操作はそれぞれ要素数の対数時間と要素数の定数時間で実行できる．
+
   10行目から22行目で取り出された要素の近傍を走査する．
   ここで，優先度付きキューから取り出された要素の数が$|\tau(s)|$と一致することを示す．
   4行目で\texttt{PQ}に$|T(s)|$個の要素をプッシュする．
   また，20行目で\texttt{PQ}に追加される要素は，$s$と$T(s)$のひとつの頂点との間の最短経路の上にある．
   これは，少なくとも一つの$t\in T(s)$が，$\sigma_{st}(y)>0$であることを示し，
-  $\Delta_{s\bullet}(y)>0$が成り立つ．したがって，\texttt{PQ}に追加される要素の個数は
+  $\Delta_{s\bullet}(y)>0$が成り立つ．よって，\texttt{PQ}に追加される要素の個数は
   $T(s)\cup\{x|\Delta_{s\bullet}(x)>0\}=\tau(s)$である．
   したがって，アルゴリズム\ref{alg:decrease-betweenness}の\textproc{DecreaseBetweenness}の，
-  計算量は，重みグラフに対して$\mathcal{O}(\|\tau(s)\|+|\tau(s)|\log|\tau(s)|)$
-  で，重みなしグラフに対して$\mathcal{O}(\|\tau(s)\|)$である．
+  計算量は，重みグラフに対して$\mathcal{O}(\|\tau(s)\|+|\tau(s)|\log|\tau(s)|)$，
+  重みなしグラフに対して$\mathcal{O}(\|\tau(s)\|)$である．
 \end{proof}
 
 定理\ref{thm:decrease-betweenness-weight-complexity}より，全ての$s$に対して
@@ -56,13 +59,15 @@ $\left\Vert V\right\Vert$を$V$の各頂点と接続する辺の数とする．
   \label{eq:full-decremental-betweenness-unweighted-complexity}
 \end{align}
 
-次に，最短経路更新の後に行う，新たな最短経路に関する依存度の値だけ媒介中心性を
-増加させるアルゴリズムの計算量を示す．
+最短経路更新の後に行う，新たな最短経路に関する依存度の値だけ媒介中心性を
+増加させるアルゴリズムの計算量についても同様である．
 
 \begin{theorem}[Bergamini et.al.\cite{Bergamini2017}]
   \label{thm:increase-betweenness-weight-complexity}
   アルゴリズム\ref{alg:decrease-betweenness}の\textproc{IncreaseBetweenness}の
-  重み付きグラフと重みなしグラフに対する計算量は，それぞれ次式で与えられる．
+  重み付きグラフと重みなしグラフに対する計算量は，それぞれ式
+  \eqref{eq:increase-betweenness-weighted-complexity}と
+  式\eqref{eq:increase-betweenness-unweighted-complexity}で与えられる．
   \begin{align}
     &\mathcal{O}\left(\|\tau'(s)\|+|\tau'(s)|\log|\tau'(s)|\right)
     \label{eq:increase-betweenness-weighted-complexity} \\
@@ -70,23 +75,23 @@ $\left\Vert V\right\Vert$を$V$の各頂点と接続する辺の数とする．
     \label{eq:increase-betweenness-unweighted-complexity}
   \end{align}
 \end{theorem}
-\begin{proof}
-  定理\ref{thm:decrease-betweenness-weight-complexity}と同じ要領で示すことができる．
-  重み付きグラフでは二分ヒープを，重みなしグラフではバケツヒープを優先度付きキューとして
-  用いると仮定する．
-  すると，8行目の要素取り出しの操作はそれぞれ対数時間と定数時間で実行できる．
-  10行目から22行目で取り出された要素の近傍を走査する．
-  ここで，優先度付きキューから取り出された要素の数が$|\tau'(s)|$と一致することを示す．
-  4行目で\texttt{PQ}に$|T(s)|$個の要素をプッシュする．
-  また，20行目で\texttt{PQ}に追加される要素は，$s$と$T(s)$のひとつの頂点との間の最短経路の上にある．
-  これは，少なくとも一つの$t\in T(s)$が，$\sigma'_{st}(y)>0$であることを示し，
-  $\Delta'_{s\bullet}(y)>0$が成り立つ．したがって，\texttt{PQ}に追加される要素は
-  $T(s)\cup\{x|\Delta'_{s\bullet}(x)>0\}=\tau'(s)$である．
-  したがって，アルゴリズム\ref{alg:decrease-betweenness}の
-  \textproc{IncreaseBetweenness}の計算量は，
-  重みグラフに対して$\mathcal{O}(\|\tau'(s)\|+|\tau'(s)|\log|\tau'(s)|)$で，
-  重みなしグラフに対して$\mathcal{O}(\|\tau'(s)\|)$である．
-\end{proof}
+%\begin{proof}
+%  定理\ref{thm:decrease-betweenness-weight-complexity}と同じ要領で示すことができる．
+%  重み付きグラフでは二分ヒープを，重みなしグラフではバケツヒープを優先度付きキューとして
+%  用いると仮定する．
+%  すると，8行目の要素取り出しの操作はそれぞれ対数時間と定数時間で実行できる．
+%  10行目から22行目で取り出された要素の近傍を走査する．
+%  ここで，優先度付きキューから取り出された要素の数が$|\tau'(s)|$と一致することを示す．
+%  4行目で\texttt{PQ}に$|T(s)|$個の要素をプッシュする．
+%  また，20行目で\texttt{PQ}に追加される要素は，$s$と$T(s)$のひとつの頂点との間の最短経路の上にある．
+%  これは，少なくとも一つの$t\in T(s)$が，$\sigma'_{st}(y)>0$であることを示し，
+%  $\Delta'_{s\bullet}(y)>0$が成り立つ．したがって，\texttt{PQ}に追加される要素は
+%  $T(s)\cup\{x|\Delta'_{s\bullet}(x)>0\}=\tau'(s)$である．
+%  したがって，アルゴリズム\ref{alg:decrease-betweenness}の
+%  \textproc{IncreaseBetweenness}の計算量は，
+%  重みグラフに対して$\mathcal{O}(\|\tau'(s)\|+|\tau'(s)|\log|\tau'(s)|)$で，
+%  重みなしグラフに対して$\mathcal{O}(\|\tau'(s)\|)$である．
+%\end{proof}
 
 定理\ref{thm:increase-betweenness-weight-complexity}より，全ての$s$に対して
 媒介中心性$B_x$を増加させるアルゴリズムの計算量は，
@@ -102,13 +107,24 @@ $\left\Vert V\right\Vert$を$V$の各頂点と接続する辺の数とする．
   \label{eq:full-incremental-betweenness-unweighted-complexity}
 \end{align}
 
+以上の議論から，重み付きグラフと重みなしグラフの媒介中心性を増減させるアルゴリズム全体の計算量は，
+それぞれ式\eqref{eq:full-betweenness-weighted-complexity}と
+式\eqref{eq:full-betweenness-unweighted-complexity}で与えられる．
+\begin{align}
+  &\mathcal{O}\left(\sum_{s\in S(v)}\|\tau(s)\|+|\tau(s)|\log|\tau(s)|+\|\tau'(s)\|+|\tau'(s)|\log|\tau'(s)|\right),
+  \label{eq:full-betweenness-weighted-complexity} \\
+  &\mathcal{O}\left(\sum_{s\in S(v)}\|\tau(s)\|+\|\tau'(s)\|\right).
+  \label{eq:full-betweenness-unweighted-complexity}
+\end{align}
+
 \section{辺挿入時の最短経路更新アルゴリズムの計算量}
 次の定理は，辺挿入時の最短経路変更アルゴリズムの計算量を示す．
 
 \begin{theorem}
   \label{thm:incremental-shortest-path-update}
+  重み付きグラフと重みなしグラフに対する
   アルゴリズム\ref{alg:incremental-algorithm}の\textproc{UpdateSSSP}の
-  重み付きグラフと重みなしグラフに対する計算量はそれぞれ
+  計算量はそれぞれ
   式\eqref{eq:incremental-shortest-path-update-weighted}と
   式\eqref{eq:incremental-shortest-path-update-unweighted}で与えられる．
   \begin{align}
@@ -167,8 +183,9 @@ $t\in T(u)$に対して\textproc{UpdateSTSP}を実行する．
 
 \begin{theorem}
   \label{thm:decremental-shortest-path-update}
+  重み付きグラフと重みなしグラフに対する
   アルゴリズム\ref{alg:decremental-algorithm}の\textproc{UpdateSSSP}の
-  重み付きグラフと重みなしグラフに対する計算量はそれぞれ
+  計算量はそれぞれ
   式\eqref{eq:decremental-shortest-path-update-weighted}と
   式\eqref{eq:decremental-shortest-path-update-unweighted}で与えられる．
   \begin{align}
@@ -224,15 +241,16 @@ $t\in T(u)$に対して\textproc{UpdateSTSP}を実行する．
 辺削除時の全頂点間の最短経路を更新する処理は
 $S(v)$と$T(u)$を求め，$s\in S(v)$に対して\textproc{UpdateSSSP}を，
 $t\in T(u)$に対して\textproc{UpdateSTSP}を実行する．
-よって，辺削除時の全頂点間の最短経路を更新する処理の計算量は，
-重み付きグラフと重みなしグラフに対してそれぞれ，
+よって，重み付きグラフと重みなしグラフにおける辺削除時の全頂点間の最短経路を
+更新する処理の計算量はそれぞれ
+式\eqref{eq:full-decremental-shortest-path-update-weighted}と
+式\eqref{eq:full-decremental-shortest-path-update-unweighted}で与えられる．
 \begin{align}
   &\mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|\log|T(s)|+\sum_{t\in T(u)}\|S(t)\|\log|S(t)|\right),
   \label{eq:full-decremental-shortest-path-update-weighted} \\
   &\mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|+\sum_{t\in T(u)}\|S(t)\|\right).
   \label{eq:full-decremental-shortest-path-update-unweighted}
-  \end{align}
-である．
+\end{align}
 
 本章の最後に，提案アルゴリズムの最悪計算量を評価する．
 重み付きグラフに対する媒介中心性増減アルゴリズムの最悪時間計算量は，
