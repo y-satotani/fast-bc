@@ -1,0 +1,174 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\selectcolormodel{cmyk}
+%\mode<presentation>
+\useoutertheme{infolines}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% custom colors
+\definecolor{i6blue}{cmyk}{1,0.305,0,0.06}
+\definecolor{i6bluedark}{rgb}{0.0156,0.2578,0.5625} 
+
+\definecolor{colorHeadlinefg}{HTML}{FFFFFF}
+\definecolor{colorHeadlinebg}{HTML}{0000CC}
+\definecolor{colorSlidebg}{HTML}{FFFFFF}
+\definecolor{colorFootlinefg}{HTML}{FFFFFF}
+\definecolor{colorFootlinebg}{HTML}{0000CC}
+\definecolor{colorBlocktitlefg}{HTML}{FFFFFF}
+\definecolor{colorBlocktitlebg}{HTML}{0000CC}
+\definecolor{colorblockbg}{HTML}{DDEEFF} % original: colorPosterbg
+
+% title colors and fonts
+\setbeamercolor{title}{fg=colorHeadlinefg,bg=colorHeadlinebg}
+
+% headline colors and fonts
+\setbeamercolor{frametitle}{fg=colorHeadlinefg,bg=colorHeadlinebg}
+\setbeamercolor{headline}{bg=colorHeadlinebg}
+\setbeamercolor{title in headline}{fg=colorHeadlinefg}
+\setbeamercolor{author in headline}{fg=colorHeadlinefg}
+\setbeamercolor{institute in headline}{fg=colorHeadlinefg}
+\setbeamercolor{separation line}{fg=colorSlidebg,bg=colorSlidebg}
+
+% footline colors and fonts
+%\setbeamercolor{footline}{fg=colorFootlinefg,bg=colorFootlinebg}
+\setbeamercolor{author in head/foot}{fg=colorFootlinefg,bg=colorFootlinebg}
+\setbeamercolor{title in head/foot}{fg=colorFootlinefg,bg=colorFootlinebg}
+\setbeamercolor{date in head/foot}{fg=colorFootlinefg,bg=colorFootlinebg}
+
+% body colors and fonts
+\setbeamercolor*{normal text}{fg=black,bg=colorSlidebg}
+
+% block environment
+\setbeamercolor*{block body}{fg=black,bg=colorblockbg}
+\setbeamercolor*{block title}{fg=colorBlocktitlefg,bg=colorBlocktitlebg}
+\setbeamerfont{block title}{size=\large}
+
+% example environment
+\setbeamercolor*{example title}{fg=colorBlocktitlefg,bg=colorBlocktitlebg}
+\setbeamerfont{example title}{size=\large,series=\bf}
+
+\setbeamercolor{alerted text}{fg=red}
+
+\setbeamertemplate{itemize items}[triangle]
+%\setbeamertemplate{navigation symbols}{}  % no navigation on a poster
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\imelaburl{
+  \href{http://www.momo.cs.okayama-u.ac.jp/~takahashi/lab.en.html}{
+    \texttt{http://www.momo.cs.okayama-u.ac.jp/\~{}takahashi/lab.en.html}
+  }
+}
+\def\imelablogo{figure/imelablogo}
+
+\defbeamertemplate{footline}{imelab}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.67\paperwidth,ht=4ex,dp=1ex,left]
+      {author in head/foot}%
+      \hspace*{1em}\href{http://www.momo.cs.okayama-u.ac.jp/~takahashi/lab.en.html}{\includegraphics[height=3ex]{\imelablogo}}%
+      \hspace*{1em}\usebeamerfont{author in head/foot}\imelaburl%
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.33\paperwidth,ht=4ex,dp=1ex,right]
+      {date in head/foot}%
+      \usebeamerfont{date in head/foot}\insertshortdate\hspace*{5ex}%
+      \insertframenumber{}\hspace{.5ex}/\hspace{.5ex}\inserttotalframenumber\hspace*{2ex}%
+    \end{beamercolorbox}%
+  }%
+}
+
+\def\makeIMELABtitle{
+  {
+    \setbeamertemplate{footline}[imelab]
+    \ifbeamer@inframe
+    \PackageWarning{beamerthemeIMELAB}{makeIMELABtitle should be out of frame}{}
+    \titlepage
+    \else
+    \begin{frame}
+      \titlepage
+    \end{frame}
+    \fi
+  }
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setbeamertemplate{block begin}{
+  \vskip.75ex
+  \begin{beamercolorbox}[leftskip=.5ex,colsep*=.75ex]{block title}%
+    \usebeamerfont*{block title}\insertblocktitle
+  \end{beamercolorbox}%
+      {\ifbeamercolorempty[bg]{block body}{}{\nointerlineskip\vskip-0.5pt}}%
+      \usebeamerfont{block body}%
+      \begin{beamercolorbox}[colsep*=.75ex,sep=.75ex,vmode]{block body}%
+        \ifbeamercolorempty[bg]{block body}{\vskip-.25ex}{\vskip-.75ex}\vbox{}%
+}
+\setbeamertemplate{block end}{
+  \end{beamercolorbox}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setbeamertemplate{headline}{}
+%\setbeamertemplate{headline}{  
+%  \leavevmode
+%  \begin{beamercolorbox}[wd=\paperwidth]{headline}
+%			\centering
+%        \vskip2ex
+%        \usebeamercolor{title in headline}{\color{fg}\textbf{\LARGE{\inserttitle}}\\[1ex]}
+%        \vskip2ex
+%        \usebeamercolor{author in headline}{\color{fg}\large{\insertauthor}\\[1ex]}
+%        \vskip1ex
+%        \usebeamercolor{institute in headline}{\color{fg}\large{\insertinstitute}\\[1ex]}
+%  \end{beamercolorbox}
+
+%  \begin{beamercolorbox}[wd=\paperwidth]{lower separation line head}
+%    \rule{0pt}{2pt}
+%  \end{beamercolorbox}
+%}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\setbeamertemplate{footline}{
+%  \begin{beamercolorbox}[wd=\paperwidth]{upper separation line foot}
+%    \rule{0pt}{2pt}
+%  \end{beamercolorbox}
+%  
+%  \begin{beamercolorbox}[ht=7ex,leftskip=1cm,rightskip=1cm]{footline}%
+%    \hfill \raisebox{-0.4cm}{\insertfooter}
+%    \vskip1ex
+%  \end{beamercolorbox}
+
+%  \begin{beamercolorbox}[wd=\paperwidth]{lower separation line foot}
+%    \rule{0pt}{2pt}
+%  \end{beamercolorbox}
+%}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\@ifpackageloaded{biblatex}{
+  % See https://tex.stackexchange.com/a/397276
+  % See https://tex.stackexchange.com/a/396754/28146
+  \makeatletter
+  \newbibmacro*{hypercite}{%
+    \renewcommand{\@makefntext}[1]{\noindent\normalfont##1}%
+    \footnotetext{%
+      \blxmkbibnote{foot}{%
+        \printtext[labelnumberwidth]{%
+          \printfield{prefixnumber}%
+          \printfield{labelnumber}}%
+        \addspace
+        \printnames[][1-1]{author}
+        \setunit{\addcomma\addspace}
+        %\printfield{title}
+        \printfield{journaltitle}\printfield{booktitle}
+        \setunit{\addcomma\addspace}
+        \printfield{year}
+  }}}
+  
+  \DeclareCiteCommand
+      {\hypercite}%
+      {\usebibmacro{cite:init}}
+      {\usebibmacro{hypercite}}
+      {}
+      {\usebibmacro{cite:dump}}
+      
+  % Redefine the \footcite command to use the reference number
+  \renewcommand{\footcite}[1]{\cite{#1}\hypercite{#1}}
+  \makeatother
+}{}
