@@ -1,13 +1,13 @@
 pdf := $(patsubst %.R,%.pdf,$(shell ls | grep R))
-eps := $(patsubst %.R,%.eps,$(shell ls | grep R))
+png := $(patsubst %.R,%.png,$(shell ls | grep R))
 
 .PHONY: all clean
 
-all: $(pdf) $(eps)
+all: $(pdf) $(png)
 
 %.pdf: %.R
 	Rscript $<
-%.eps: %.pdf
-	inkscape -z -o $@ -d 300 $<
+%.png: %.pdf
+	inkscape -z -o $@ -d 150 $<
 clean:
-	rm *.pdf *.eps
+	rm *.pdf *.png
