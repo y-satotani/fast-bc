@@ -62,10 +62,14 @@ sorting=debug
 
 \makeIMELABtitle
 
+\begin{frame}{概要}
+  \tableofcontents
+\end{frame}
+
 \section{背景・目的}
 \begin{frame}[t]{研究背景}
   \begin{itemize}
-  \item \alert{媒介中心性}\footcite{01Freeman1977}：ネットワークの頂点の重要度を示す．
+  \item \alert{媒介中心性}\footcite{Freeman1977}：ネットワークの頂点の重要度を示す．
   \item[] 鉄道網における駅，社会ネットワークにおける人など
   \end{itemize}
   \begin{columns}[T]
@@ -115,55 +119,32 @@ sorting=debug
   \alert{TODO}
 \end{frame}
 
+\begin{frame}{時限ネットワークの媒介中心性}
+  \alert{TODO}
+\end{frame}
+
 \begin{frame}{関連研究}
   \alert{TODO}
 \end{frame}
 
-\begin{frame}{研究目的}
-  \alert{TODO}
-\end{frame}
-
 \section{提案アルゴリズム}
-\begin{frame}{アルゴリズムの概要}
-  \begin{itemize}
-  \item 基本アイデア：既存の二つの方法を応用
-    \begin{itemize}
-    \item RamalingamとRepsの最短経路更新法
-    \item Bergaminiらの媒介中心性更新法
-    \end{itemize}
-  \end{itemize}
-  \begin{itemize}
-  \item 記号
-    \begin{itemize}
-    \item $s$から$t$への最短経路長：$d_{st}$(削除後は$d'_{st}$)
-    \item $s$から$t$への最短経路数：$\sigma_{st}$(削除後は$\sigma'_{st}$)
-    \item $s$と$v$のペア依存度：$\delta_{s}(v)$(削除後は$\delta'_{s}(v)$)
-    \item $v$の媒介中心性：$B_v$(削除後は$B'_v$)
-    \end{itemize}
-  \end{itemize}
+\begin{frame}{提案アルゴリズム}
+  \alert{TODO}
 \end{frame}
 
 \begin{frame}{影響を受ける頂点}
   \alert{TODO}
 \end{frame}
 
-\begin{frame}{媒介中心性更新 -- 変化量の定義}
+\begin{frame}{$\Delta_{s\bullet}(x)$を求めるアルゴリズム}
   \alert{TODO}
 \end{frame}
 
-\begin{frame}{媒介中心性更新 -- 変化量の計算}
+\begin{frame}{最短経路の性質}
   \alert{TODO}
 \end{frame}
 
-\begin{frame}{最短経路更新 -- \alert{挿入時}}
-  \alert{何かしら}
-\end{frame}
-
-\begin{frame}{最短経路更新 -- \alert{削除時}}
-  \alert{何かしら}
-\end{frame}
-
-\begin{frame}{時間計算量の解析}
+\begin{frame}{辺削除時の最短経路更新法(Ramalingam and Reps)}
   \alert{TODO}
 \end{frame}
 
@@ -172,15 +153,11 @@ sorting=debug
   \alert{TODO}
 \end{frame}
 
-\begin{frame}{性能比較}
+\begin{frame}{Brandes法との性能比較}
   \alert{TODO}
 \end{frame}
 
-\begin{frame}{計算量の検証}
-  \alert{TODO}
-\end{frame}
-
-\begin{frame}{道路ネットワークへの応用}
+\begin{frame}{道路ネットワークの媒介中心性の最大値の最小化}
   \alert{TODO}
 \end{frame}
 
