@@ -188,9 +188,9 @@ station_edges = sorted(
 )
 station_color = [bc[G_draw.edges[e]['station_name']] for e in station_edges]
 
-width = 5
+width = 7
 plt.figure(figsize=(width, width * (pos_max_y-pos_min_y) / (pos_max_x-pos_min_x)))
-nx.draw_networkx_edges(G_draw, pos, width=0.5)
+nx.draw_networkx_edges(G_draw, pos, width=0.3)
 nx.draw_networkx_edges(
     G_draw, pos, station_edges, width=3, edge_color=station_color,
     edge_cmap=plt.cm.YlGnBu
