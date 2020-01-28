@@ -67,35 +67,39 @@ sorting=debug
 \end{frame}
 
 \section{背景・目的}
-\begin{frame}[t]{研究背景}
+\begin{frame}[t]{研究背景 -- 媒介中心性}
   \begin{itemize}
-  \item \alert{媒介中心性}\footcite{Freeman1977}：ネットワークの頂点の重要度を示す．
-  \item[] 鉄道網における駅，社会ネットワークにおける人など
+  \item \alert{媒介中心性}\footcite{Freeman1977}：ネットワークのノードの重要度を測る．
+  \item[] 例：鉄道網における駅
   \end{itemize}
-  \begin{columns}[T]
-    \begin{column}{.49\textwidth}
-      \begin{itemize}
-      \item[] \begin{equation*}
-        B_v=\sum_{s\neq v}\sum_{t\neq v,s}\frac{\sigma_{st}(v)}{\sigma_{st}}.
+  \begin{columns}
+    \begin{column}{.4\textwidth}
+      \begin{equation*}
+        B_v=\sum_{s\neq v}\sum_{t\neq v,s}\frac{\sigma_{st}(v)}{\sigma_{st}},
       \end{equation*}
-        \begin{itemize}
-        \item $\sigma_{st}$：$s$と$t$間の最短経路の数，
-        \item $\sigma_{st}(v)$：$s$と$t$間の最短経路の内$v$を通るものの数．
-        \end{itemize}
-        \medskip
-      \item 媒介中心性が高い\\$\rightarrow$多くの最短経路が通る
+    \end{column}
+    \begin{column}{.6\textwidth}
+      \begin{itemize}
+      \item $\sigma_{st}(v)$：$s$と$t$間の最短経路のうち\\$v$を通るものの数，
+      \item $\sigma_{st}$：$s$と$t$間の最短経路の数．
       \end{itemize}
     \end{column}
-    \begin{column}{.49\textwidth}
-      \includegraphics[width=.9\columnwidth]{tokyo.pdf}
-    \end{column}
   \end{columns}
+  \medskip
+  \begin{itemize}
+  \item 媒介中心性の値が高い$\rightarrow$\alert{多くの最短経路が通る}ので重要
+  \end{itemize}
+  \vspace{-.5em}
+  \begin{center}
+    %\includegraphics[width=.7\columnwidth]{tokyo-metro-betweenness.pdf}
+    \includegraphics[width=.7\columnwidth]{tokyo-metro-betweenness.png}
+  \end{center}
 \end{frame}
 
 \begin{frame}{媒介中心性の計算例}
-  \vspace{-2em}
   \begin{columns}
     \begin{column}{.6\textwidth}
+      頂点$v$の媒介中心性の値$B_v$は
       \begin{flalign*}
         B_v&=\sum_{s\neq v}\sum_{t\neq s,v}\frac{\sigma_{st}(v)}{\sigma_{st}}\\
         &=\frac{\sigma_{wx}(v)}{\sigma_{wx}}+\frac{\sigma_{wy}(v)}{\sigma_{wy}}
@@ -103,7 +107,7 @@ sorting=debug
         &+\frac{\sigma_{xy}(v)}{\sigma_{xy}}+\frac{\sigma_{xz}(v)}{\sigma_{xz}}
         +\frac{\sigma_{yz}(v)}{\sigma_{yz}}+\cdots\\
         &=\frac{0}{1}+\frac{0}{1}+\frac{1}{1}+\frac{0}{1}+\frac{2}{2}+\frac{1}{1}\cdots\\
-        &=6
+        &=6.
       \end{flalign*}
       同様に，$B_w=B_y=2,\:B_x=B_z=0$．
     \end{column}
@@ -113,10 +117,57 @@ sorting=debug
       \input{graph-bc.pdf_tex}
     \end{column}
   \end{columns}
+  \medskip
+  計算量：\alert{$\mathcal{O}(|V|^3)$}
+\end{frame}
+
+\begin{frame}{Brandesの定理}
+  \begin{itemize}
+  \item ペア依存度
+    $\delta_{s\bullet}(v)=\sum_{t\neq s,v}\sigma_{st}(v)/\sigma_{st}$
+  \item 媒介中心性
+    $B_v=\sum_{s\neq v}\colorlet{oldcolor}{.}\usebeamercolor[fg]{alerted text}\fbox{$\color{oldcolor}\sum_{t\neq s,v}\sigma_{st}(v)/\sigma_{st}$}\color{oldcolor}=\sum_{s\neq v}\delta_{s\bullet}(v)$
+  \item $\delta_{s\bullet}(v)$を高速に計算したい
+  \end{itemize}
+  \begin{theorem}[Brandes]\rm
+    \label{th:implicit-dependency}
+    グラフ$G=(V,E)$の異なる頂点$s,v$について，頂点$v$の$s$に対するペア依存度$\delta_{s\bullet}(v)$は次式を満たす．
+    \begin{equation*}
+      \delta_{s\bullet}(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_{s\bullet}(w)).
+    \end{equation*}
+    ただし，$E_s$は$s$から各頂点への最短経路の辺集合である．
+  \end{theorem}
+  \begin{flushright}
+    \alert{次で例を説明}
+  \end{flushright}
 \end{frame}
 
 \begin{frame}{Brandesのアルゴリズム}
-  \alert{TODO}
+  \begin{columns}
+    \begin{column}{.49\textwidth}
+      右図において
+      \begin{equation*}\small
+        \begin{aligned}
+          \delta_{s\bullet}(v)&=\frac{\sigma_{sv}}{\sigma_{sw_1}}(1+\delta_{s\bullet}(w_1)) \\
+          &+\frac{\sigma_{sv}}{\sigma_{sw_2}}(1+\delta_{s\bullet}(w_2)) \\
+          &+\frac{\sigma_{sv}}{\sigma_{sw_3}}(1+\delta_{s\bullet}(w_3))
+        \end{aligned}
+      \end{equation*}
+    \end{column}
+    \begin{column}{.49\textwidth}
+      \centering
+      \def\svgwidth{.9\columnwidth}
+      \input{implicit-dependency.pdf_tex}
+    \end{column}
+  \end{columns}
+  \medskip
+  \begin{enumerate}
+  \item $s$からの最短経路$E_s$を計算
+  \item 最短距離の降順に頂点を走査（$w$とする）
+  \item $(v,w)$が最短経路に含まれるような$v$に対して
+  \item[] $\delta_{s\bullet}(v)\gets\delta_{s\bullet}(v)+\colorlet{oldcolor}{.}\usebeamercolor[fg]{alerted text}\fbox{$\color{oldcolor}\sigma_{sv}/\sigma_{sw}(1+\delta_{s\bullet}(w))$}\color{oldcolor}$
+  \end{enumerate}
+  計算量：\alert{$\mathcal{O}(|V|^2\log |V|+|V||E|)$}
 \end{frame}
 
 \begin{frame}{時限ネットワークの媒介中心性}
