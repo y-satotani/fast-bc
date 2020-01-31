@@ -170,12 +170,41 @@ sorting=debug
   計算量：\alert{$\mathcal{O}(|V|^2\log |V|+|V||E|)$}
 \end{frame}
 
-\begin{frame}{時限ネットワークの媒介中心性}
-  \alert{TODO}
+\begin{frame}{時変ネットワークの媒介中心性}
+  \begin{columns}
+    \begin{column}{.5\textwidth}
+      \begin{itemize}
+      \item 実際のネットワークはリンクの追加や削除がある\alert{時変ネットワーク}
+      \item[] 例：友人関係の発生，道路の取り壊し
+      \item 時限ネットワークの媒介中心性計算
+      \item 操作によって影響を受ける部分のみを計算できるのでは?
+      \end{itemize}
+    \end{column}
+    \begin{column}{.5\textwidth}
+      \includegraphics[width=.9\columnwidth]{road-sta.pdf}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}{関連研究}
-  \alert{TODO}
+  \begin{itemize}
+  \item 時変ネットワークの媒介中心性更新法
+  \item Minimum union cycleを更新\cite{Lee2012,Singh2015}
+  \item Hypergraph sketch\cite{Yoshida2014}を更新する\cite{Hayashi2015}，
+  \item 近似法を応用\cite{Bergamini2015a,Bergamini2015b}
+  \item \alert{最短経路と共に媒介中心性を更新}
+  \end{itemize}
+  \centering
+  \begin{tabular}{lll}
+    \hline
+    アルゴリズム & 最短経路更新アルゴリズム & 辺の操作 \\ \hline
+    Kasら\cite{Kas2013} & RamalingamとReps\cite{Ramalingam1996} & 挿入 \\ \hline
+    Nasreら\cite{Nasre2014a} & Kargerら\cite{Karger1993} & 挿入 \\ \hline
+    Nasreら\cite{Nasre2014b} & DemetrescuとItaliano\cite{Demetrescu2003} & 削除 \\ \hline
+    Pontecorviら\cite{Pontecorvi2015} & DemetrescuとItaliano\cite{Demetrescu2003} & 挿入/削除 \\ \hline
+    Bergaminiら\cite{Bergamini2017} & RamalingamとReps\cite{Ramalingam1996} & 挿入 \\ \hline
+    \alert{本研究} & \alert{RamalingamとReps}\cite{Ramalingam1996} & \alert{削除} \\ \hline
+  \end{tabular}
 \end{frame}
 
 \section{提案アルゴリズム}
