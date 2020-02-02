@@ -3,7 +3,7 @@
 
 本章では研究背景としてネットワーク科学および，中心性とその一種である媒介中心性について
 説明する．その後，関連研究として媒介中心性を計算するアルゴリズムを説明する．
-最後に，本研究の目的を示して，本稿の構成を説明する．
+最後に，本研究の目的を示して，本論文の構成を説明する．
 
 \section{ネットワーク科学}
 
@@ -38,7 +38,7 @@
 ノードペア$(s,t)$の最短経路数$\sigma_{st}$に占める対象ノード$v$を通る最短経路数
 $\sigma_{st}(v)$の割合$\sigma_{st}(v)/\sigma_{st}$を全ノードペアについて
 足し合わせたものである．
-あるノードの媒介中心性が高いならば，そのノードには比較的多くの最短経路が通っていることとなり，
+あるノードの媒介中心性が高ければ，そのノードには比較的多くの最短経路が通っていることとなり，
 道路ネットワークや通信ネットワークにおいて重要なノードであると言える．
 
 \section{関連研究}
@@ -62,7 +62,7 @@ Brandesのアルゴリズムが提案されて以来，そのアイデアを発�
 媒介中心性を計算する．
 
 一方，現実にある多くのネットワークはノードやリンクの追加や削除が起こる時変ネットワーク\cite{Holme2012}
-である．時変ネットワークに対しては，Brandesのアルゴリズムで始めから計算するより，
+である．時変ネットワークに対しては，Brandesのアルゴリズムで初めから計算するより，
 変更に対する差分のみを計算する方がより効率的であると期待できる．
 そのような考えから，時変ネットワークのノードの媒介中心性の値を効率的に更新する方法も提案されている．
 Minimum union cycleと呼ばれる閉路の集合と媒介中心性を保持し，変更に対してそれらを更新する方法
@@ -89,15 +89,15 @@ Kasらは，RamalingamとRepsの最短経路更新法\cite{Ramalingam1996}を応
   \centering
   \caption{最短経路と共に媒介中心性を更新するアルゴリズム}
   \label{tab:comparison-of-algorithms}
-  \begin{tabular}{ccc}
+  \begin{tabular}{lll}
     \hline
     アルゴリズム & 最短経路更新アルゴリズム & 辺の操作 \\ \hline
-    Kasら\cite{Kas2013} & Ramalingamら\cite{Ramalingam1996} & 挿入 \\ \hline
+    Kasら\cite{Kas2013} & RamalingamとReps\cite{Ramalingam1996} & 挿入 \\ \hline
     Nasreら\cite{Nasre2014a} & Kargerら\cite{Karger1993} & 挿入 \\ \hline
-    Nasreら\cite{Nasre2014b} & Demetrescuら\cite{Demetrescu2003} & 削除 \\ \hline
-    Pontecorviら\cite{Pontecorvi2015} & Demetrescuら\cite{Demetrescu2003} & 挿入/削除 \\ \hline
-    Bergaminiら\cite{Bergamini2017} & Ramalingamら\cite{Ramalingam1996} & 挿入 \\ \hline
-    本研究 & Ramalingamら\cite{Ramalingam1996} & 削除 \\ \hline
+    Nasreら\cite{Nasre2014b} & DemetrescuとItaliano\cite{Demetrescu2003} & 削除 \\ \hline
+    Pontecorviら\cite{Pontecorvi2015} & DemetrescuとItaliano\cite{Demetrescu2003} & 挿入/削除 \\ \hline
+    Bergaminiら\cite{Bergamini2017} & RamalingamとReps\cite{Ramalingam1996} & 挿入 \\ \hline
+    本研究 & RamalingamとReps\cite{Ramalingam1996} & 削除 \\ \hline
   \end{tabular}
 \end{table}
 
@@ -106,10 +106,10 @@ Kasらは，RamalingamとRepsの最短経路更新法\cite{Ramalingam1996}を応
 現在まで多くの媒介中心性更新アルゴリズムが提案されてきたが，
 RamalingamとRepsの方法に基づく辺削除時の媒介中心性更新アルゴリズムは知られていない．
 そこで，本研究ではRamalingamとRepsの最短経路更新法に基づく辺削除時の媒介中心性更新法を提案する．
-それと同時に本稿では，RamalingamとRepsの最短経路更新法に基づく辺挿入時の媒介中心性更新法を説明する．
+それと同時に本論文では，RamalingamとRepsの最短経路更新法に基づく辺挿入時の媒介中心性更新法を説明する．
 また，それらの方法の有用性を理論解析および数値実験によって検証する．
 
-本稿の以降の構成は次のとおりである．
+本論文の以降の構成は次のとおりである．
 続く第\ref{chap:preliminary}章で後の議論で必要なグラフの数学的表現や，最短経路，媒介中心性について説明をして，
 第\ref{chap:algorithm}章でRamalingamとRepsの方法に基づく，
 辺削除時の媒介中心性更新アルゴリズムを提案する．

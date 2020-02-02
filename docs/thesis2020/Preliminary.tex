@@ -8,7 +8,7 @@
 \section{グラフの数学的表現}
 \label{sect:graph-theory}
 
-\textbf{グラフ}とは，ふたつの集合$V$と$E$の組$G=(V,E)$で，
+\textbf{グラフ}とは，二つの集合$V$と$E$の組$G=(V,E)$で定義される．ここで
 $E$は$E\subseteq V^2$を満たす．つまり，$E$は$V$の元の二つ組から成る集合の部分集合である．
 $V$を\textbf{頂点集合}とよび，その元を\textbf{頂点}とよぶ．
 また，頂点集合の要素数$|V|$を\textbf{頂点数}とよぶ．
@@ -241,7 +241,7 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
 
 依存度$\delta_{s\bullet}(v)$を効率的に計算する方法について，次の性質が知られている．
 
-\begin{lemma}
+\begin{lemma}[Brandes\cite{Brandes2001}]
   \label{lemma:implicit-dependency-part}
   グラフ$G=(V,E)$の異なる頂点$s,t$について，$\sigma_{st}=1$ならば，
   頂点$v$の$s$に対するペア依存度は式\eqref{eq:implicit-dependency-part}を満たす．
@@ -251,10 +251,13 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
   \end{equation}
 \end{lemma}
 \begin{proof}
-  この補題は，図\ref{fig:implicit-dependency-1}のようにすべての最短経路の辺と頂点を形成している
-  頂点$s$の木構造であることを表している．したがって，頂点$s$から頂点$t$までの
-  すべての経路もしくは，それ以外の経路上に頂点$v$は存在する．
-  例えば，頂点$v$は$w_1,w_2,w_3$の最短経路上に存在する．
+  異なる頂点$s,t$が$\sigma_{st}=1$を満たすならば，
+  $E_{s}$は図\ref{fig:implicit-dependency-1}に示すような木である．
+  すると，全ての頂点$v$は全ての$E_{st}$の上にあるか，
+  どの$E_{st}$の上にもないかのどちらか一方である．
+  すなわち，$\delta_{st}(v)$は$1$か$0$である．
+  加えて，$v$は$E_s$において$v$を祖先にもつ頂点への最短経路の上にある．
+  したがって，\eqref{eq:implicit-dependency-part}が成り立つ．
 \end{proof}
 
 \begin{figure}[tb]
@@ -265,31 +268,32 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
   \label{fig:implicit-dependency-1}
 \end{figure}
 
-さらに$\sigma_{st}>1$のような一般的な場合も，次の性質が知られている．
+さらに$\sigma_{st}\geq 1$のような一般的な場合も，次の性質が知られている．
 
-\begin{theorem}
+\begin{theorem}[Brandes\cite{Brandes2001}]
   \label{th:implicit-dependency}
   グラフ$G=(V,E)$の異なる頂点$s,v$について，
   頂点$v$の$s$に対するペア依存度は式\eqref{eq:implicit-dependency}を満たす．
   \begin{equation}
     \label{eq:implicit-dependency}
-    \delta_{s\bullet}(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_{s\bullet}(w)).
+    \delta_{s\bullet}(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_{s\bullet}(w))
   \end{equation}
 \end{theorem}
 \begin{proof}
-  $E_{st}$の上に$v$があるような$t$に対してのみ$\delta_{st}(v)>0$が成り立ち，このような
-  最短経路は$v\in\mathcal{P}_{E_{st}}(w)$を満たす辺$(v,w)$をひとつだけもつ．
-  このような状況は，図\ref{fig:implicit-dependency-2}のように，
-  図\ref{fig:implicit-dependency-1}の場合より複雑である．
+  $\sigma_{st}\geq 1$を満たす場合，$s$からの最短経路$E_s$は図\ref{fig:implicit-dependency-2}に示したような有向非巡回グラフである．
+  このような場合も，$v$が$E_{st}$の上にあるときのみ$\delta_{st}(v)>0$が成り立つ．
+  また，$E_{st}$の上にある頂点$v$と$v\in\mathcal{P}(w)$を満たす頂点$w$との間には
+  辺$(v,w)$がただ一つ存在する．
 
   辺$e\in E$を含むように拡張したペア依存度を$\delta_{st}(v,e)=\sigma_{st}(v,e)/\sigma_{st}$で定義する．
   ただし，$\sigma_{st}(v,e)$は$s$から$t$への最短経路の中で$v$と$e$を通るものの個数とする．
-  つまり，
-  \[ \delta_{s\bullet}(v)=\sum_{t\in V}\delta_{st}(v)=\sum_{t\in V}\sum_{(v,w)\in E_s}\delta_{st}(v,\{v,w\})=\sum_{(v,w)\in E_s}\sum_{t\in V}\delta_{st}(v,(v,w)). \]
+  すると，
+  \[ \delta_{s\bullet}(v)=\sum_{t\in V}\delta_{st}(v)=\sum_{t\in V}\sum_{(v,w)\in E_s}\delta_{st}(v,\{v,w\})=\sum_{(v,w)\in E_s}\sum_{t\in V}\delta_{st}(v,(v,w)) \]
+  が成り立つ．
 
-  頂点$w$は$\mathcal{P}_{E_s}(w)$を満たすとする．すると，$s$から$w$への
+  頂点$w$は$\mathcal{P}_{E_s}(w)$を満たすと仮定する．すると，$s$から$w$への
   $\sigma_{sw}$個の最短経路のうち，$\sigma_{sv}$個の最短経路は$s$から$v$を通り，
-  $(v,w)$を通る．つまり，$s$と$t$と$v$と$(v,w)$のペア依存度は，次で求められる．
+  $(v,w)$を通る．よって，$s$と$t$と$v$と$(v,w)$のペア依存度は，次で求められる．
   \begin{equation*}
     \delta_{st}(v,\{v,w\})=
     \begin{cases}

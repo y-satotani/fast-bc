@@ -53,9 +53,9 @@ $\left\Vert V\right\Vert$を$V$の各頂点と接続する辺の数とする．
 式\eqref{eq:full-decremental-betweenness-weighted-complexity}と
 式\eqref{eq:full-decremental-betweenness-unweighted-complexity}で与えられる．
 \begin{align}
-  &\mathcal{O}\left(\sum_{s\in S(v)}\|\tau(s)\|+|\tau(s)|\log|\tau(s)|\right),
+  &\mathcal{O}\left(\sum_{s\in S(v)}\|\tau(s)\|+|\tau(s)|\log|\tau(s)|\right)
   \label{eq:full-decremental-betweenness-weighted-complexity} \\
-  &\mathcal{O}\left(\sum_{s\in S(v)}\|\tau(s)\|\right).
+  &\mathcal{O}\left(\sum_{s\in S(v)}\|\tau(s)\|\right)
   \label{eq:full-decremental-betweenness-unweighted-complexity}
 \end{align}
 
@@ -101,9 +101,9 @@ $\left\Vert V\right\Vert$を$V$の各頂点と接続する辺の数とする．
 式\eqref{eq:full-incremental-betweenness-weighted-complexity}と
 式\eqref{eq:full-incremental-betweenness-unweighted-complexity}で与えられる．
 \begin{align}
-  &\mathcal{O}\left(\sum_{s\in S(v)}\|\tau'(s)\|+|\tau'(s)|\log|\tau'(s)|\right),
+  &\mathcal{O}\left(\sum_{s\in S(v)}\|\tau'(s)\|+|\tau'(s)|\log|\tau'(s)|\right)
   \label{eq:full-incremental-betweenness-weighted-complexity} \\
-  &\mathcal{O}\left(\sum_{s\in S(v)}\|\tau'(s)\|\right).
+  &\mathcal{O}\left(\sum_{s\in S(v)}\|\tau'(s)\|\right)
   \label{eq:full-incremental-betweenness-unweighted-complexity}
 \end{align}
 
@@ -111,9 +111,9 @@ $\left\Vert V\right\Vert$を$V$の各頂点と接続する辺の数とする．
 それぞれ式\eqref{eq:full-betweenness-weighted-complexity}と
 式\eqref{eq:full-betweenness-unweighted-complexity}で与えられる．
 \begin{align}
-  &\mathcal{O}\left(\sum_{s\in S(v)}\|\tau(s)\|+|\tau(s)|\log|\tau(s)|+\|\tau'(s)\|+|\tau'(s)|\log|\tau'(s)|\right),
+  &\mathcal{O}\left(\sum_{s\in S(v)}\|\tau(s)\|+|\tau(s)|\log|\tau(s)|+\|\tau'(s)\|+|\tau'(s)|\log|\tau'(s)|\right)
   \label{eq:full-betweenness-weighted-complexity} \\
-  &\mathcal{O}\left(\sum_{s\in S(v)}\|\tau(s)\|+\|\tau'(s)\|\right).
+  &\mathcal{O}\left(\sum_{s\in S(v)}\|\tau(s)\|+\|\tau'(s)\|\right)
   \label{eq:full-betweenness-unweighted-complexity}
 \end{align}
 
@@ -171,9 +171,9 @@ $t\in T(u)$に対して\textproc{UpdateSTSP}を実行する．
 よって，辺挿入時の全頂点間の最短経路を更新する処理の計算量は，
 重み付きグラフと重みなしグラフに対してそれぞれ，
 \begin{align}
-  &\mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|\log|T(s)|+\sum_{t\in T(u)}\|S(t)\|\log|S(t)|\right),
+  &\mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|\log|T(s)|+\sum_{t\in T(u)}\|S(t)\|\log|S(t)|\right)
   \label{eq:full-incremental-shortest-path-update-weighted} \\
-  &\mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|+\sum_{t\in T(u)}\|S(t)\|\right).
+  &\mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|+\sum_{t\in T(u)}\|S(t)\|\right)
   \label{eq:full-incremental-shortest-path-update-unweighted}
   \end{align}
 である．
@@ -246,9 +246,9 @@ $t\in T(u)$に対して\textproc{UpdateSTSP}を実行する．
 式\eqref{eq:full-decremental-shortest-path-update-weighted}と
 式\eqref{eq:full-decremental-shortest-path-update-unweighted}で与えられる．
 \begin{align}
-  &\mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|\log|T(s)|+\sum_{t\in T(u)}\|S(t)\|\log|S(t)|\right),
+  &\mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|\log|T(s)|+\sum_{t\in T(u)}\|S(t)\|\log|S(t)|\right)
   \label{eq:full-decremental-shortest-path-update-weighted} \\
-  &\mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|+\sum_{t\in T(u)}\|S(t)\|\right).
+  &\mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|+\sum_{t\in T(u)}\|S(t)\|\right)
   \label{eq:full-decremental-shortest-path-update-unweighted}
 \end{align}
 

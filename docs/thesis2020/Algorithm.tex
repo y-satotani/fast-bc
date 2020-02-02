@@ -25,18 +25,18 @@ $\Delta_{s\bullet}(x)$で表す\cite{Bergamini2017}．
 つまり，$\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x)$である．
 同様に，$\Delta'_{s\bullet}(x)=\sum_{t\in T(s)}\delta'_{st}(x)$とする．
 
-挿入と削除共通の処理の流れは以下である．
+挿入と削除に共通する処理の流れは以下のとおりである．
 まず，$T(u)$および$S(v)$を計算する．
 各$s\in S(v)$に対して以下を実行する．
-1. $x\in V$に対する$\Delta_{s\bullet}(x)$を求めて，媒介中心性の値$B_x$から減算する．
+初めに$x\in V$に対する$\Delta_{s\bullet}(x)$を求めて，媒介中心性の値$B_x$から減算する．
 つまり，$B''(x):=B(x)-\sum_{s\in S(v)}\Delta_{s\bullet}(x)$を計算する．
-2. 各$t\in V$の$d_{st}$および$\sigma_{st}$を更新する．
-3. $x\in V$に対する$\Delta'_{s\bullet}(x)$を求めて，
+次に，各$t\in V$の$d_{st}$および$\sigma_{st}$を更新する．
+さらに，$x\in V$に対する$\Delta'_{s\bullet}(x)$を求めて，
 減算された媒介中心性の値$B''_s$に加算する．
 つまり，$B'(x):=B''(x)+\sum_{s\in S(v)}\Delta'_{s\bullet}(x)$を計算する．
 最後に，$t\in T(u)$に対して各$s\in V$の$d_{st}$および$\sigma_{st}$を更新する．
 
-最後に，全体的なアルゴリズムをアルゴリズム\ref{alg:proposed-algorithm-full}に示す．
+全体的なアルゴリズムをアルゴリズム\ref{alg:proposed-algorithm-full}に示す．
 以降，媒介中心性の値を減少および増加させるアルゴリズムを説明した後，
 挿入操作および削除操作それぞれに対する最短経路更新アルゴリズムを説明する．
 
@@ -183,8 +183,9 @@ $\Delta'_{s\bullet}(x)$についても同様の手順で計算できる．
 \begin{proof}
   $E_{st}=E'_{st}$ならば$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$であることは自明である．
 
-  逆は，図\ref{fig:general-shortest-paths-weighted}のような$E_{st}$を，
-  $d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$を満たすように，$E_{st}\neq E'_{st}$にすることを考える．
+  逆は背理法を用いて証明する．
+  つまり，図\ref{fig:general-shortest-paths-weighted}に示した$E_{st}$に対する操作のうち，
+  $d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$を満たすものは存在しないことを証明する．
   図において，同じ$L_i$に含まれる頂点$v$について$d_{sv}$および$d_{vt}$は同一とする．
 
   挿入時，長さが$L_i$間の距離より長い辺を挿入すると，$E_{st}=E'_{st}$を満たす．
@@ -195,8 +196,8 @@ $\Delta'_{s\bullet}(x)$についても同様の手順で計算できる．
   また，$e\in E_{st}$である辺を削除すると，$d_{st}\neq d'_{st}$または$\sigma_{st}\neq\sigma'_{st}$となる．
 
   したがって$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$を満たすように，
-  $E_{st}\neq E'_{st}$とすることは不可能で，逆も成り立つ．
-
+  $E_{st}\neq E'_{st}$とすることは不可能である．
+  ゆえに$d_{st}=d'_{st}$かつ$\sigma_{st}=\sigma'_{st}$ならば$E_{st}=E'_{st}$である．
 \end{proof}
 \begin{figure}
   \centering
@@ -206,11 +207,11 @@ $\Delta'_{s\bullet}(x)$についても同様の手順で計算できる．
   \label{fig:general-shortest-paths-weighted}
 \end{figure}
 
-以下，一辺挿入と一辺削除それぞれの操作に対する最短経路更新法を説明する．
+以下では，一辺挿入と一辺削除それぞれの操作に対する最短経路更新法を説明する．
 
 \section{一辺挿入時の最短経路更新法}
 \label{sect:update-apsp-on-insert}
-本節では，グラフにひとつの辺が挿入されたときの最短経路を更新する方法を説明する．
+本節では，グラフに一つの辺が挿入されたときの最短経路を更新する方法を説明する．
 $G=(V,E)$に辺$e=(v,w) \not\in E$を挿入して得られるグラフを$G'=(V,E')$とする．
 まず，ある頂点ペア$s,t$の間の最短経路が削除によって変化するための条件を示す．
 
@@ -226,7 +227,7 @@ $G=(V,E)$に辺$e=(v,w) \not\in E$を挿入して得られるグラフを$G'=(V,
   $E_{st}'\neq E_{st}$が成り立つならば，定理
   \ref{thm:condition-of-invariability-of-shortest-path}より，
   $d'_{st}\neq d_{st}$または$\sigma'_{st}\neq\sigma_{st}$が成り立つ，
-  このとき，新たに挿入された辺は$(u,v)$のひとつで，これが新たな最短経路に含まれるので，
+  このとき，新たに挿入された辺は$(u,v)$の一つで，これが新たな最短経路に含まれるので，
   $d_{st}\geq d'_{st}=d_{su}+l'_{uv}+d_{vt}$が成り立つ．
 
   逆に，式\eqref{eq:update-augdist-on-insert}が成り立つならば，
@@ -271,7 +272,7 @@ $\sigma'_{st}$を計算する方法を説明する．
 $s$と$t$，$S$と$T$，$\mathcal{S}$と$\mathcal{P}$をそれぞれ入れ替えることによって得られる．
 
 \begin{algorithm}[tb]
-  \caption{頂点$s$について，辺$(u,v)$の挿入時の$d_{st}$と$\sigma_{st}$を更新するアルゴリズム}
+  \caption{辺$(u,v)$の挿入時の$d_{st}$と$\sigma_{st}$を更新するアルゴリズム}
   \label{alg:incremental-algorithm}
   \begin{algorithmic}[1]\small
     \Procedure{UpdateSSSP}{$s$}
@@ -297,7 +298,7 @@ $s$と$t$，$S$と$T$，$\mathcal{S}$と$\mathcal{P}$をそれぞれ入れ替え
 
 \section{一辺削除時の最短経路更新法}
 \label{sect:update-apsp-on-delete}
-本節では，グラフからひとつの辺が削除されたときの最短経路を更新する方法を説明する．
+本節では，グラフから一つの辺が削除されたときの最短経路を更新する方法を説明する．
 $G=(V,E)$に辺$(u,v)\in E$を削除して得られるグラフを$G'=(V,E')$とする．
 まず，ある頂点ペア$s,t$の間の最短経路が削除によって変化するための条件を示す．
 
@@ -314,7 +315,7 @@ $G=(V,E)$に辺$(u,v)\in E$を削除して得られるグラフを$G'=(V,E')$と
   $E_{st}'\neq E_{st}$が成り立つならば，定理
   \ref{thm:condition-of-invariability-of-shortest-path}より，
   $d'_{st}\neq d_{st}$または$\sigma'_{st}\neq\sigma_{st}$が成り立つ，
-  このとき，削除された辺は$(u,v)$のひとつで，これが削除前の最短経路に含まれていたので，
+  このとき，削除された辺は$(u,v)$の一つで，これが削除前の最短経路に含まれていたので，
   $d_{st}=d_{su}+l_{uv}+d_{vt}$が成り立つ．
 
   逆に，式\eqref{eq:update-augdist-on-delete}が成り立つならば，
@@ -366,7 +367,7 @@ $\min\{d_{sx}+l_{xy}|y\in\mathcal{P}(x)\land y\notin T(s)\}$とする．
 $s$と$t$，$S$と$T$，$\mathcal{S}$と$\mathcal{P}$をそれぞれ入れ替えることによって得られる．
 
 \begin{algorithm}[tb]
-  \caption{頂点$s$について，辺$(u,v)$の削除時の$d_{st}$と$\sigma_{st}$を更新するアルゴリズム}
+  \caption{辺$(u,v)$の削除時の$d_{st}$と$\sigma_{st}$を更新するアルゴリズム}
   \label{alg:decremental-algorithm}
   \begin{algorithmic}[1]\small
     \Procedure{UpdateSSSP}{$s$}
