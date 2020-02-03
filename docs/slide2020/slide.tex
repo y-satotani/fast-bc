@@ -217,24 +217,82 @@ sorting=debug
 \end{frame}
   
 \section{提案アルゴリズム}
-\begin{frame}{提案アルゴリズム}
-  \alert{TODO}
+\begin{frame}[allowframebreaks]{提案アルゴリズム}
+  \alert{TODO} 整形
+  \begin{itemize}\small
+    \item 辺$(u,v)$削除時の媒介中心性の値を更新するアルゴリズムを提案する．
+    \item 削除の操作後であることを明示するため，記号$'$をつける．
+    \item 頂点$t$に対して，辺操作によって$t$への最短経路が変化する頂点の集合を$S(t)$と表す．
+    \item 同様に，頂点$s$に対して，辺操作によって$s$からの最短経路が変化する頂点の集合を$T(s)$と表す．
+    \item 影響を受ける依存度の総和$\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x)$\cite{31Bergamini2017}．
+  \end{itemize}
+
+  \begin{algorithmic}[1]\footnotesize
+    \Procedure{UpdateBetweenness}{}
+    \ForAll{$s\in S(v)$}
+    \State $\textproc{DecreaseBetweenness}(s)$
+    \Comment{$B_x$を$\sum_{s\neq x}\Delta_{s\bullet}(x)$だけ減少}
+    \State $\textproc{UpdateSSSP}(s)$
+    \Comment{$d_{st}$と$\sigma_{st}$を更新}
+    \State $\textproc{IncreaseBetweenness}(s)$
+    \Comment{$B_x$を$\sum_{s\neq x}\Delta'_{s\bullet}(x)$だけ増加}
+    \EndFor
+    \ForAll{$t\in T(u)$}
+    \State $\textproc{UpdateSTSP}(t)$
+    \Comment{$d_{st}$と$\sigma_{st}$を更新}
+    \EndFor
+    \EndProcedure
+  \end{algorithmic}
 \end{frame}
 
 \begin{frame}{影響を受ける頂点}
-  \alert{TODO}
+  \begin{lemma}
+    $s,t\in V$に対して，$E_{st}'\neq E_{st}$であるための必要十分条件は
+    \[ d_{su}+l_{uv}+d_{vt}=d_{st} \]
+    を満たすことである．
+  \end{lemma}
+
+  \alert{TODO} 証明
+
+  補題から$T(s)$と$S(x)$の具体的な内容がわかる
+  \begin{itemize}
+  \item $T(x)=\{t|t\in V\land d_{xt}=d_{xu}+l_{uv}+d_{vt}\}$
+  \item $S(x)=\{s|s\in V\land d_{sx}=d_{su}+l_{uv}+d_{vx}\}$
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{$\Delta_{s\bullet}(x)$を求めるアルゴリズム}
-  \alert{TODO}
-\end{frame}
+  
+  \begin{theorem}[Bergamini et.al.\cite{31Bergamini2017}]\small
+    任意の$s\in S(v)$と$x\in V$について，次式が成り立つ．
+    \begin{equation*}
+      \Delta_{s\bullet}(x)
+      =\sum_{y\in\mathcal{S}_G(x)\cap T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}(1+\Delta_{s\bullet}(y))
+      +\sum_{y\in\mathcal{S}_G(x)\setminus T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\Delta_{s\bullet}(y)
+    \end{equation*}
+  \end{theorem}
 
-\begin{frame}{最短経路の性質}
-  \alert{TODO}
+  \alert{TODO} 計算法
+
+  $\Delta'_{s\bullet}(x)$も同様
 \end{frame}
 
 \begin{frame}{辺削除時の最短経路更新法(Ramalingam and Reps)}
   \alert{TODO}
+  \begin{itemize}
+  \item $\sigma'_{st}$は距離$d'_{st}$の昇順に計算する必要がある．
+  \item[] しかしそのような並びは自明ではない．
+  \item RamalingamとRepsの方法に基づく方法で$d'_{st}$と$\sigma'_{st}$を正しい順序で計算する．
+  \end{itemize}
+
+  \begin{enumerate}
+  \item 各$x\in T(s)$について，削除の影響を受けない頂点を先行にもつ頂点，つまり，
+  $\exists y\in\mathcal{P}(x),\,y\notin T(s)$を満たす頂点を優先度付きキューに
+  挿入する．
+  \item このとき，頂点$x$の優先度を
+    $\min\{d_{sx}+l_{xy}|y\in\mathcal{P}(x)\land y\notin T(s)\}$とする．
+  \item 以降，Dijkstra法に基づき，最短経路を計算
+  \end{enumerate}
 \end{frame}
 
 \section{数値実験}
@@ -293,6 +351,32 @@ sorting=debug
   \nocite{33Rozemberczki2019b}
   \nocite{34OpenStreetMap}
   \printbibliography[title=]
+\end{frame}
+
+\section{付録}
+\begin{frame}{Why $\Delta_{s\bullet}(x)$ and $\Delta'_{s\bullet}(x)$ works}
+  \begin{theorem}
+    任意の$s,x\in V$に対して
+    \begin{equation*}
+      \delta'_{s\bullet}(x)-\delta_{s\bullet}(x)=\Delta'_{s\bullet}(x)-\Delta_{s\bullet}(x)
+    \end{equation*}
+    が成り立つ．
+  \end{theorem}
+  \begin{proof}
+    任意の$t\notin T(s)$に対して，$\sigma_{st}=\sigma'_{st}$である．
+    さらに，$t\notin T(s)$の条件下で，任意の$x\in V$について
+    $\sigma_{st}(x)=\sigma'_{st}(x)$が成り立つ．したがって，次が成り立つ．
+    \begin{equation*}
+      \begin{aligned}
+        \delta'_{s\bullet}(x)-\delta_{s\bullet}(x)
+        &=\sum_{t\neq x}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right) \\
+        &=\sum_{t\in T(s)}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right)
+        +\sum_{t\notin T(s)}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right) \\
+        &=\sum_{t\in T(s)}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right) \\
+        &=\Delta'_{s\bullet}(x)-\Delta_{s\bullet}(x)
+      \end{aligned}
+    \end{equation*}
+  \end{proof}
 \end{frame}
 
 \end{document}
