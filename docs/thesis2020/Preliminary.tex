@@ -251,10 +251,10 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
   \end{equation}
 \end{lemma}
 \begin{proof}
-  異なる頂点$s,t$が$\sigma_{st}=1$を満たすならば，
+  異なる頂点$s,t$が$\sigma_{st}=1$を満たすならば，頂点$s$から他の頂点への最短経路
   $E_{s}$は図\ref{fig:implicit-dependency-1}に示すような木である．
-  すると，全ての頂点$v$は全ての$E_{st}$の上にあるか，
-  どの$E_{st}$の上にもないかのどちらか一方である．
+  そのため，全ての頂点$v$は全ての$E_{st}$の上にあるか，
+  どの$E_{st}$の上にも無いかのどちらかである．
   すなわち，$\delta_{st}(v)$は$1$か$0$である．
   加えて，$v$は$E_s$において$v$を祖先にもつ頂点への最短経路の上にある．
   したがって，\eqref{eq:implicit-dependency-part}が成り立つ．
@@ -268,7 +268,7 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
   \label{fig:implicit-dependency-1}
 \end{figure}
 
-さらに$\sigma_{st}\geq 1$のような一般的な場合も，次の性質が知られている．
+さらに$\sigma_{st}\geq 1$を満たす一般的な場合についても次の性質が知られている．
 
 \begin{theorem}[Brandes\cite{Brandes2001}]
   \label{th:implicit-dependency}
@@ -281,8 +281,8 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
 \end{theorem}
 \begin{proof}
   $\sigma_{st}\geq 1$を満たす場合，$s$からの最短経路$E_s$は図\ref{fig:implicit-dependency-2}に示したような有向非巡回グラフである．
-  このような場合も，$v$が$E_{st}$の上にあるときのみ$\delta_{st}(v)>0$が成り立つ．
-  また，$E_{st}$の上にある頂点$v$と$v\in\mathcal{P}(w)$を満たす頂点$w$との間には
+  この場合も，$v$が$E_{st}$の上にあるときのみ$\delta_{st}(v)>0$が成り立つ．
+  また，$E_{st}$の上にある頂点$v$と$v\in\mathcal{P}_{E_s}(w)$を満たす頂点$w$との間には
   辺$(v,w)$がただ一つ存在する．
 
   辺$e\in E$を含むように拡張したペア依存度を$\delta_{st}(v,e)=\sigma_{st}(v,e)/\sigma_{st}$で定義する．
@@ -295,7 +295,7 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
   $\sigma_{sw}$個の最短経路のうち，$\sigma_{sv}$個の最短経路は$s$から$v$を通り，
   $(v,w)$を通る．よって，$s$と$t$と$v$と$(v,w)$のペア依存度は，次で求められる．
   \begin{equation*}
-    \delta_{st}(v,\{v,w\})=
+    \delta_{st}(v,(v,w))=
     \begin{cases}
       \cfrac{\sigma_{sv}}{\sigma_{sw}}, & t=w\text{のとき} \\
       \cfrac{\sigma_{sv}}{\sigma_{sw}}\cdot\cfrac{\sigma_{st}(w)}{\sigma_{st}} & t\neq w\text{のとき}
