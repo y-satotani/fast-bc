@@ -218,17 +218,16 @@ sorting=debug
   
 \section{提案アルゴリズム}
 \begin{frame}[allowframebreaks]{提案アルゴリズム}
-  \alert{TODO} 整形
+  記号について
   \begin{itemize}\small
-    \item 辺$(u,v)$削除時の媒介中心性の値を更新するアルゴリズムを提案する．
-    \item 削除の操作後であることを明示するため，記号$'$をつける．
-    \item 頂点$t$に対して，辺操作によって$t$への最短経路が変化する頂点の集合を$S(t)$と表す．
-    \item 同様に，頂点$s$に対して，辺操作によって$s$からの最短経路が変化する頂点の集合を$T(s)$と表す．
-    \item 影響を受ける依存度の総和$\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x)$\cite{31Bergamini2017}．
+    \item 辺$(u,v)$が削除されたと考える
+    \item 記号$'$：削除後であることを表す（例：$G'$）
+    \item $S(t)$：辺削除によって$t$への最短経路が変化する頂点の集合
+    \item $T(s)$：辺削除によって$s$からの最短経路が変化する頂点の集合
+    \item $\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x)$：削除の影響を受ける依存度の総和\cite{31Bergamini2017}
   \end{itemize}
-
+  アルゴリズムの概略
   \begin{algorithmic}[1]\footnotesize
-    \Procedure{UpdateBetweenness}{}
     \ForAll{$s\in S(v)$}
     \State $\textproc{DecreaseBetweenness}(s)$
     \Comment{$B_x$を$\sum_{s\neq x}\Delta_{s\bullet}(x)$だけ減少}
@@ -241,24 +240,32 @@ sorting=debug
     \State $\textproc{UpdateSTSP}(t)$
     \Comment{$d_{st}$と$\sigma_{st}$を更新}
     \EndFor
-    \EndProcedure
   \end{algorithmic}
 \end{frame}
 
 \begin{frame}{影響を受ける頂点}
+  $T(x)$と$S(x)$の具体的な内容を求める
   \begin{lemma}
-    $s,t\in V$に対して，$E_{st}'\neq E_{st}$であるための必要十分条件は
-    \[ d_{su}+l_{uv}+d_{vt}=d_{st} \]
-    を満たすことである．
+    頂点$s,t$に対して，$E_{st}'\neq E_{st}$であるための必要十分条件は$d_{su}+l_{uv}+d_{vt}=d_{st}$を満たすことである．
   \end{lemma}
-
-  \alert{TODO} 証明
-
-  補題から$T(s)$と$S(x)$の具体的な内容がわかる
+  \begin{columns}[T]
+    \begin{column}{0.60\textwidth}
+      \begin{itemize}
+      \item $E_{st}'\neq E_{st}$ならば，$(u,v)$は最短経路の上にある
+      \item すると，$d_{su}+l_{uv}+d_{vt}=d_{st}$が成り立つ
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.38\textwidth}
+      \centering
+      \def\svgwidth{.9\columnwidth}
+      \input{condition-affection.pdf_tex}
+    \end{column}
+  \end{columns}
   \begin{itemize}
-  \item $T(x)=\{t|t\in V\land d_{xt}=d_{xu}+l_{uv}+d_{vt}\}$
-  \item $S(x)=\{s|s\in V\land d_{sx}=d_{su}+l_{uv}+d_{vx}\}$
+  \item $T(x)=\{t\,|\,d_{xt}=d_{xu}+l_{uv}+d_{vt}\}$
+  \item $S(x)=\{s\,|\,d_{sx}=d_{su}+l_{uv}+d_{vx}\}$
   \end{itemize}
+  両方とも，\alert{深さ優先探索}で計算可能
 \end{frame}
 
 \begin{frame}{$\Delta_{s\bullet}(x)$を求めるアルゴリズム}
@@ -280,7 +287,7 @@ sorting=debug
 \begin{frame}{辺削除時の最短経路更新法(Ramalingam and Reps)}
   \alert{TODO}
   \begin{itemize}
-  \item $\sigma'_{st}$は距離$d'_{st}$の昇順に計算する必要がある．
+  \item 距離$d'_{st}$の昇順に計算する必要がある．
   \item[] しかしそのような並びは自明ではない．
   \item RamalingamとRepsの方法に基づく方法で$d'_{st}$と$\sigma'_{st}$を正しい順序で計算する．
   \end{itemize}
