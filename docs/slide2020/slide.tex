@@ -130,7 +130,7 @@ sorting=debug
     $B_v=\sum_{s\neq v}\colorlet{oldcolor}{.}\usebeamercolor[fg]{alerted text}\fbox{$\color{oldcolor}\sum_{t\neq s,v}\sigma_{st}(v)/\sigma_{st}$}\color{oldcolor}=\sum_{s\neq v}\delta_{s\bullet}(v)$
   \item $\delta_{s\bullet}(v)$を高速に計算したい
   \end{itemize}
-  \begin{theorem}[Brandes]\rm
+  \begin{theorem}[Brandes \cite{06Brandes2001}]\rm
     \label{th:implicit-dependency}
     グラフ$G=(V,E)$の異なる頂点$s,v$について，頂点$v$の$s$に対するペア依存度$\delta_{s\bullet}(v)$は次式を満たす．
     \begin{equation*}
@@ -227,7 +227,7 @@ sorting=debug
     \item $\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x)$：削除の影響を受ける依存度の総和\cite{31Bergamini2017}
   \end{itemize}
   アルゴリズムの概略
-  \begin{algorithmic}[1]\footnotesize
+  \begin{algorithmic}\footnotesize
     \ForAll{$s\in S(v)$}
     \State $\textproc{DecreaseBetweenness}(s)$
     \Comment{$B_x$を$\sum_{s\neq x}\Delta_{s\bullet}(x)$だけ減少}
@@ -270,7 +270,7 @@ sorting=debug
 
 \begin{frame}{$\Delta_{s\bullet}(x)$を求めるアルゴリズム}
   
-  \begin{theorem}[Bergamini et.al.\cite{31Bergamini2017}]\small
+  \begin{theorem}[Bergamini et al.\cite{31Bergamini2017}]\small
     任意の$s\in S(v)$と$x\in V$について，次式が成り立つ．
     \begin{equation*}
       \Delta_{s\bullet}(x)
@@ -278,10 +278,21 @@ sorting=debug
       +\sum_{y\in\mathcal{S}_G(x)\setminus T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\Delta_{s\bullet}(y)
     \end{equation*}
   \end{theorem}
-
-  \alert{TODO} 計算法
-
-  $\Delta'_{s\bullet}(x)$も同様
+  \begin{columns}
+    \begin{column}{.49\textwidth}
+      \begin{itemize}
+      \item Brandesのアルゴリズムと同様に$s$から遠い順に走査する
+      \item ただし，$s$と$t\in T(s)$の最短経路の間にある頂点のみを走査する
+      \item $T(s)$に含まれているかどうかで加算する値は異なる
+      \end{itemize}
+    \end{column}
+    \begin{column}{.49\textwidth}
+      \centering
+      \def\svgwidth{.9\columnwidth}
+      \input{calculate-affected-delta.pdf_tex}
+    \end{column}
+  \end{columns}
+  $\Delta'_{s\bullet}(x)$も同様に計算する
 \end{frame}
 
 \begin{frame}{辺削除時の最短経路更新法(Ramalingam and Reps)}
