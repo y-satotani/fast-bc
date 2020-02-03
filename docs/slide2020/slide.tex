@@ -274,8 +274,8 @@ sorting=debug
     任意の$s\in S(v)$と$x\in V$について，次式が成り立つ．
     \begin{equation*}
       \Delta_{s\bullet}(x)
-      =\sum_{y\in\mathcal{S}_G(x)\cap T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}(1+\Delta_{s\bullet}(y))
-      +\sum_{y\in\mathcal{S}_G(x)\setminus T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\Delta_{s\bullet}(y)
+      =\sum_{y\in\mathcal{S}_{G_s}(x)\cap T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}(1+\Delta_{s\bullet}(y))
+      +\sum_{y\in\mathcal{S}_{G_s}(x)\setminus T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\Delta_{s\bullet}(y)
     \end{equation*}
   \end{theorem}
   \begin{columns}
@@ -292,28 +292,38 @@ sorting=debug
       \input{calculate-affected-delta.pdf_tex}
     \end{column}
   \end{columns}
-  $\Delta'_{s\bullet}(x)$も同様に計算する
+  $\Delta'_{s\bullet}(x)$も同様に計算可能
 \end{frame}
 
 \begin{frame}{辺削除時の最短経路更新法(Ramalingam and Reps)}
-  \alert{TODO}
   \begin{itemize}
-  \item 距離$d'_{st}$の昇順に計算する必要がある．
-  \item[] しかしそのような並びは自明ではない．
-  \item RamalingamとRepsの方法に基づく方法で$d'_{st}$と$\sigma'_{st}$を正しい順序で計算する．
+  \item 更新後の距離の昇順に計算する必要がある
+  \item[] しかしそのような並びは\alert{自明ではない}
+  \item RamalingamとRepsの方法に基づき正しい順序で最短経路を更新する
   \end{itemize}
-
-  \begin{enumerate}
-  \item 各$x\in T(s)$について，削除の影響を受けない頂点を先行にもつ頂点，つまり，
-  $\exists y\in\mathcal{P}(x),\,y\notin T(s)$を満たす頂点を優先度付きキューに
-  挿入する．
-  \item このとき，頂点$x$の優先度を
-    $\min\{d_{sx}+l_{xy}|y\in\mathcal{P}(x)\land y\notin T(s)\}$とする．
-  \item 以降，Dijkstra法に基づき，最短経路を計算
-  \end{enumerate}
+  \begin{columns}
+    \begin{column}{.60\textwidth}
+      \begin{enumerate}
+      \item $x\in T(s)$のうち，$y\notin T(s)$を先行にもつ$x$はすぐに更新可能
+      \item その距離と最短経路数はそれぞれ
+        \begin{equation*}
+          \begin{aligned}
+            d'_{sx}&=\min\{d_{sx}+l_{xy}|y\in\mathcal{P}(x)\setminus T(s)\} \\
+            \sigma'_{sx}&=\sum_{y\in \mathcal{P}_{G_s}(x)}\sigma_{sy}
+          \end{aligned}
+        \end{equation*}
+      \item 以降，更新が完了した頂点から広げるように距離と最短経路数を更新
+      \end{enumerate}
+    \end{column}
+    \begin{column}{.39\textwidth}
+      \centering
+      \def\svgwidth{.95\columnwidth}
+      \input{updating-sssp.pdf_tex}
+    \end{column}
+  \end{columns}
 \end{frame}
 
-\section{数値実験}
+\section{性能評価}
 \begin{frame}{数値実験}
   \alert{TODO}
 \end{frame}
