@@ -6,6 +6,7 @@
 \def\input@path{{./figure/}{./table/}}
 \makeatother
 \usepackage[
+sorting=debug,
 style=ieee,backend=bibtex,
 texencoding=utf8,bibencoding=utf8,
 dashed=false,
@@ -69,7 +70,7 @@ sorting=debug
 \section{背景・目的}
 \begin{frame}[t]{研究背景 -- 媒介中心性}
   \begin{itemize}
-  \item \alert{媒介中心性}\footcite{Freeman1977}：ネットワークのノードの重要度を測る．
+  \item \alert{媒介中心性}\footcite{05Freeman1977}：ネットワークのノードの重要度を測る．
   \item[] 例：鉄道網における駅
   \end{itemize}
   \begin{columns}
@@ -189,21 +190,21 @@ sorting=debug
 \begin{frame}{関連研究}
   \begin{itemize}
   \item 時変ネットワークの媒介中心性更新法
-  \item Minimum union cycleを更新\cite{Lee2012,Singh2015}
-  \item Hypergraph sketch\cite{Yoshida2014}を更新する\cite{Hayashi2015}，
-  \item 近似法を応用\cite{Bergamini2015a,Bergamini2015b}
+  \item Minimum union cycleを更新\cite{19Lee2012,20Singh2015}
+  \item Hypergraph sketch\cite{17Yoshida2014}を更新する\cite{21Hayashi2015}，
+  \item 近似法を応用\cite{22Bergamini2015a,23Bergamini2015b}
   \item \alert{最短経路と共に媒介中心性を更新}
   \end{itemize}
   \centering
   \begin{tabular}{lll}
     \hline
     アルゴリズム & 最短経路更新アルゴリズム & 辺の操作 \\ \hline
-    Kasら\cite{Kas2013} & RamalingamとReps\cite{Ramalingam1996} & 挿入 \\ \hline
-    Nasreら\cite{Nasre2014a} & Kargerら\cite{Karger1993} & 挿入 \\ \hline
-    Nasreら\cite{Nasre2014b} & DemetrescuとItaliano\cite{Demetrescu2003} & 削除 \\ \hline
-    Pontecorviら\cite{Pontecorvi2015} & DemetrescuとItaliano\cite{Demetrescu2003} & 挿入/削除 \\ \hline
-    Bergaminiら\cite{Bergamini2017} & RamalingamとReps\cite{Ramalingam1996} & 挿入 \\ \hline
-    \alert{本研究} & \alert{RamalingamとReps}\cite{Ramalingam1996} & \alert{削除} \\ \hline
+    Kasら\cite{25Kas2013} & RamalingamとReps\cite{24Ramalingam1996} & 挿入 \\ \hline
+    Nasreら\cite{27Nasre2014a} & Kargerら\cite{26Karger1993} & 挿入 \\ \hline
+    Nasreら\cite{29Nasre2014b} & DemetrescuとItaliano\cite{28Demetrescu2003} & 削除 \\ \hline
+    Pontecorviら\cite{30Pontecorvi2015} & DemetrescuとItaliano\cite{28Demetrescu2003} & 挿入/削除 \\ \hline
+    Bergaminiら\cite{31Bergamini2017} & RamalingamとReps\cite{24Ramalingam1996} & 挿入 \\ \hline
+    \alert{本研究} & \alert{RamalingamとReps}\cite{24Ramalingam1996} & \alert{削除} \\ \hline
   \end{tabular}
 \end{frame}
 
@@ -249,6 +250,40 @@ sorting=debug
 \appendix
 \section{参考文献}
 \begin{frame}[allowframebreaks]{参考文献}
+  \nocite{01Watts1998}
+  \nocite{02Barabasi1999}
+  \nocite{03Beauchamp1965}
+  \nocite{04Bonacich1991}
+  \nocite{05Freeman1977}
+  \nocite{06Brandes2001}
+  \nocite{07Puzis2012}
+  \nocite{08Bentert2018}
+  \nocite{09Erdos2015}
+  \nocite{10Bader2006}
+  \nocite{11Tan2009}
+  \nocite{12Edmonds2010}
+  \nocite{13Bernaschi2016}
+  \nocite{14Brandes2007}
+  \nocite{15Bader2007}
+  \nocite{16Pfeffer2012}
+  \nocite{17Yoshida2014}
+  \nocite{18Holme2012}
+  \nocite{19Lee2012}
+  \nocite{20Singh2015}
+  \nocite{21Hayashi2015}
+  \nocite{22Bergamini2015a}
+  \nocite{23Bergamini2015b}
+  \nocite{24Ramalingam1996}
+  \nocite{25Kas2013}
+  \nocite{26Karger1993}
+  \nocite{27Nasre2014a}
+  \nocite{28Demetrescu2003}
+  \nocite{29Nasre2014b}
+  \nocite{30Pontecorvi2015}
+  \nocite{31Bergamini2017}
+  \nocite{32Leskovec2016}
+  \nocite{33Rozemberczki2019b}
+  \nocite{34OpenStreetMap}
   \printbibliography[title=]
 \end{frame}
 
