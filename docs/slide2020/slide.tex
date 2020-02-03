@@ -175,10 +175,11 @@ sorting=debug
   \begin{columns}
     \begin{column}{.5\textwidth}
       \begin{itemize}
-      \item 実際のネットワークはリンクの追加や削除がある\alert{時変ネットワーク}
-      \item[] 例：友人関係の発生，道路の取り壊し
-      \item 時限ネットワークの媒介中心性計算
-      \item 操作によって影響を受ける部分のみを計算できるのでは?
+      \item 現実のネットワークは変化する
+      \item[] \alert{時変ネットワーク}
+      \item[] 例：フォロー，道路の建設
+      \item 時変ネットワークの媒介中心性計算
+      \item 影響を受ける部分のみを効率的に計算したい
       \end{itemize}
     \end{column}
     \begin{column}{.5\textwidth}
@@ -188,26 +189,33 @@ sorting=debug
 \end{frame}
 
 \begin{frame}{関連研究}
-  \begin{itemize}
-  \item 時変ネットワークの媒介中心性更新法
+  時変ネットワークの媒介中心性更新法
+  \begin{itemize}\small
   \item Minimum union cycleを更新\cite{19Lee2012,20Singh2015}
   \item Hypergraph sketch\cite{17Yoshida2014}を更新する\cite{21Hayashi2015}，
   \item 近似法を応用\cite{22Bergamini2015a,23Bergamini2015b}
   \item \alert{最短経路と共に媒介中心性を更新}
   \end{itemize}
-  \centering
-  \begin{tabular}{lll}
-    \hline
-    アルゴリズム & 最短経路更新アルゴリズム & 辺の操作 \\ \hline
-    Kasら\cite{25Kas2013} & RamalingamとReps\cite{24Ramalingam1996} & 挿入 \\ \hline
-    Nasreら\cite{27Nasre2014a} & Kargerら\cite{26Karger1993} & 挿入 \\ \hline
-    Nasreら\cite{29Nasre2014b} & DemetrescuとItaliano\cite{28Demetrescu2003} & 削除 \\ \hline
-    Pontecorviら\cite{30Pontecorvi2015} & DemetrescuとItaliano\cite{28Demetrescu2003} & 挿入/削除 \\ \hline
-    Bergaminiら\cite{31Bergamini2017} & RamalingamとReps\cite{24Ramalingam1996} & 挿入 \\ \hline
-    \alert{本研究} & \alert{RamalingamとReps}\cite{24Ramalingam1996} & \alert{削除} \\ \hline
-  \end{tabular}
+  \begin{center}
+    \scriptsize
+    \begin{tabular}{lll}
+      \hline
+      アルゴリズム & 最短経路更新アルゴリズム & 辺の操作 \\ \hline
+      Kasら\cite{25Kas2013} & RamalingamとReps\cite{24Ramalingam1996} & 挿入 \\ \hline
+      Nasreら\cite{27Nasre2014a} & Kargerら\cite{26Karger1993} & 挿入 \\ \hline
+      Nasreら\cite{29Nasre2014b} & DemetrescuとItaliano\cite{28Demetrescu2003} & 削除 \\ \hline
+      Pontecorviら\cite{30Pontecorvi2015} & DemetrescuとItaliano\cite{28Demetrescu2003} & 挿入/削除 \\ \hline
+      Bergaminiら\cite{31Bergamini2017} & RamalingamとReps\cite{24Ramalingam1996} & 挿入 \\ \hline
+      \alert{本研究} & \alert{RamalingamとReps}\cite{24Ramalingam1996} & \alert{削除} \\ \hline
+    \end{tabular}
+  \end{center}
+  \begin{block}{研究目的}
+    \small
+    RamalingamとRepsに基づく最短経路更新法を利用する \\
+    辺削除時の媒介中心性更新法の提案と評価
+  \end{block}
 \end{frame}
-
+  
 \section{提案アルゴリズム}
 \begin{frame}{提案アルゴリズム}
   \alert{TODO}
