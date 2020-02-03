@@ -307,7 +307,7 @@ $G=(V,E)$に辺$(u,v)\in E$を削除して得られるグラフを$G'=(V,E')$と
   $s,t\in V$に対して，$E_{st}'\neq E_{st}$であるための必要十分条件は
   $s,t$が式\eqref{eq:update-augdist-on-delete}を満たすことである．
   \begin{equation}
-    d_{sv}+l_{vw}+d_{wt}=d_{vt}
+    d_{su}+l_{uv}+d_{vt}=d_{st}
     \label{eq:update-augdist-on-delete}
   \end{equation}
 \end{lemma}
