@@ -264,7 +264,7 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
   \centering
   \def\svgwidth{.35\linewidth}
   \input{implicit-dependency-1.pdf_tex}
-  \caption{頂点$s$の木構造}
+  \caption{全ての頂点$t$について$\sigma_{st}=1$を満たす場合の頂点$s$からの最短経路}
   \label{fig:implicit-dependency-1}
 \end{figure}
 
@@ -318,7 +318,7 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
   \centering
   \def\svgwidth{.35\linewidth}
   \input{implicit-dependency-2.pdf_tex}
-  \caption{頂点$s$の木構造}
+  \caption{全ての頂点$t$について$\sigma_{st}\geq1$を満たす場合の頂点$s$からの最短経路}
   \label{fig:implicit-dependency-2}
 \end{figure}
 
@@ -338,7 +338,7 @@ $\delta_{s\bullet}(v)$の値を更新できるため，$\mathcal{O}(|E|)$の時�
 \begin{algorithm}[H]
   \caption{Brandesのアルゴリズム}
   \label{alg:brandes}
-  \begin{multicols*}{2}
+  %\begin{multicols*}{2}
     \begin{algorithmic}[1]\small
       \Procedure{Betweenness}{$G$}
       \State $B_x\gets 0,\:\forall x\in V$
@@ -378,6 +378,6 @@ $\delta_{s\bullet}(v)$の値を更新できるため，$\mathcal{O}(|E|)$の時�
       \EndFor
       \EndProcedure
     \end{algorithmic}
-  \end{multicols*}
+  %\end{multicols*}
 \end{algorithm}
 
