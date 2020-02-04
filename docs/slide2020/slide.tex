@@ -57,15 +57,15 @@ sorting=debug
 \title[媒介中心性更新法]{辺操作時の最短経路の更新を利用する \\ 媒介中心性更新法}
 \author[里谷]{里谷 佳紀}
 \institute[情数工研]{情報数理工学研究室}
-\date[試問]{\alert{試問の名前をかいてね} \\ 2020年2月12日}
+\date[研究発表会]{2019年度修士論文研究発表会 \\ 2020年2月12日}
 
 \begin{document}
 
 \makeIMELABtitle
 
-\begin{frame}{概要}
-  \tableofcontents
-\end{frame}
+%\begin{frame}{概要}
+%  \tableofcontents
+%\end{frame}
 
 \section{背景・目的}
 \begin{frame}[t]{研究背景 -- 媒介中心性}
@@ -324,21 +324,104 @@ sorting=debug
 \end{frame}
 
 \section{性能評価}
-\begin{frame}{数値実験}
-  \alert{TODO}
+\begin{frame}{時間計算量の評価}
+  \begin{itemize}\small
+    \item 媒介中心性を増減させるアルゴリズムの時間計算量
+    \begin{equation*}
+      \mathcal{O}\left(\sum_{s\in S(v)}\|\tau(s)\|+|\tau(s)|\log|\tau(s)|+\|\tau'(s)\|+|\tau'(s)|\log|\tau'(s)|\right)
+    \end{equation*}
+  \item[] $\tau(s),\,\tau'(s)$：アルゴリズムが走査した頂点の集合
+  \item[] $S(v)=\tau(s)=\tau'(s)=V$のときBrandesのアルゴリズムの計算量と同じ
+    \item 最短経路を更新するアルゴリズムの時間計算量
+    \begin{equation*}
+      \mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|\log|T(s)|+\sum_{t\in T(u)}\|S(t)\|\log|S(t)|\right)
+    \end{equation*}
+  \item[] $S(v)=T(u)=V$のときDijkstraのアルゴリズムの計算量と同じ
+  \end{itemize}
 \end{frame}
 
-\begin{frame}{Brandes法との性能比較}
+\begin{frame}[allowframebreaks]{Brandes法との性能比較（人工ネットワーク）}
   \alert{TODO}
+    はじめに，人工ネットワークと実ネットワークの両方の上でBrandes法と提案手法の性能を比較する．
+  性能の評価として，各方法の実行時間を採用する．
+  Brandes法に対して，アルゴリズム\ref{alg:brandes}を用いて辺操作後の各頂点の媒介中心性の値を計算する処理の実行時間を計測する．
+  また，提案手法に対して，アルゴリズム\ref{alg:proposed-algorithm-full}を用いて，
+  辺操作に伴う各頂点の媒介中心性の値の更新に要した実行時間を計測する．
+  
+  まず，人工ネットワークでの性能比較について説明する．
+  ネットワークモデルはRRGとBAの両方を用いた．
+  ネットワークのノード数$n$は$n\in\{100,200,\ldots,1000\}$とした．
+  各ネットワークの平均次数$k$は$k\in\{4,8\}$とした．
+  それぞれのネットワークの設定（ネットワークモデル，ノード数$n$，平均次数$k$の組合せ）に対して，
+  ネットワークを$50$個生成した．
+  生成されたネットワークに対してランダムに選択された辺の挿入または削除を$1$試行とし，
+  挿入と削除それぞれの試行を$100$回繰り返した．
+  
+  図\ref{fig:exp-artificial-order}はネットワークのノード数に対する
+  各アルゴリズムの実行時間の平均を比較したものである．
+  簡単のため，$k=4$の結果のみを示している．
+  図\ref{fig:exp-artificial-order}より，全てのネットワークモデルと辺操作に対して，
+  頂点数が増加するとともに提案手法の平均実行時間がBrandes法のものと比べて短くなっていることが分かる．
+  依存度を再計算する必要がある頂点ペアが頂点数の増加とともに比較的少なくなることが理由と考えられる．
+  
+  \begin{figure}[tb]
+    \centering
+    \includegraphics{exp-artificial-order.pdf}
+    \caption{頂点数に対する実行時間の比較}
+    \label{fig:exp-artificial-order}
+  \end{figure}
+  
+  表\ref{tab:exp-artificial}は様々な設定の人工ネットワークでの性能比較の結果を示す．
+  表\ref{tab:exp-artificial}より，重みなしBAネットワークなどの
+  いくつかのネットワークの設定において，提案手法よりBrandes法の方が実行時間の最大値が小さいことがわかる．
+  提案アルゴリズムが走査するノード数が比較的多い場合，提案手法はBrandes法に比べて，
+  メモリ領域を割当てや解放が頻繁に発生するためと考えられる．
+
+  \input{exp-artificial.tex}
 \end{frame}
 
-\begin{frame}{道路ネットワークの媒介中心性の最大値の最小化}
+\begin{frame}[allowframebreaks]{Brandes法との性能比較（実ネットワーク）}
   \alert{TODO}
+  次に，実ネットワークにおける性能比較の実験を説明する．
+  実ネットワークとして，Stanford large network dataset collection\cite{32Leskovec2016}
+  から取得したネットワークを用いる．
+  このデータセットには，社会ネットワークや通信ネットワーク，Wikipediaのトークネットワークなど，
+  多種多様なネットワークが含まれている．
+  この実験では，コラボレーションネットワーク（次表で`ca-'から始まる）と，
+  MUSAEプロジェクト\cite{33Rozemberczki2019b}にて取得されたネットワーク（`musae-'から始まる）と，
+  ビットコインプラットフォームでの信頼ネットワーク（`soc-sign-bitcoin'から始まる）と
+  %Wikipediaに関連するネットワーク（`wiki-'から始まる）を用いる．
+  StackExchangeから取得されたネットワーク（`sx-'から始まる）を用いる．
+  
+  各ネットワークに対して，ランダムに選択した辺の挿入または削除を$1$試行とし，
+  挿入と削除それぞれの試行を$20$回繰り返し，それぞれの方法の実行時間の平均値を算出した．
+  実ネットワークに対する性能比較の実験結果を表\ref{tab:exp-real}に示す．
+  表\ref{tab:exp-real}より，提案手法は実ネットワークでも効率よく計算でき，
+  幾何平均でおよそ$6.87$倍の性能であると確認できる．
+
+  \input{exp-real.tex}
 \end{frame}
 
 \section{まとめ}
-\begin{frame}{まとめ}
+\begin{frame}[allowframebreaks]{まとめ}
   \alert{TODO}
+  本論文では，RamalingamとRepsの最短経路更新アルゴリズムに基づく辺削除時の媒介中心性更新法を提案し，理論解析と実験によってその有効性を明らかにした．
+  提案したアルゴリズムは，まず操作の影響を受ける分だけ媒介中心性の値を減算し，次にRamalingamとRepsに基づく方法で最短経路を更新した後，操作の影響を受けた分だけ媒介中心性の値を加算するものである．
+  
+  理論解析では，提案したアルゴリズムの時間計算量を導出し評価した．
+  具体的には，提案アルゴリズムを媒介中心性増減アルゴリズムと最短経路更新アルゴリズムの二つに分け，
+  それぞれのアルゴリズムの時間計算量を導出し，
+  既存法であるBrandesのアルゴリズムとDijkstraのアルゴリズムとそれぞれ比較した．
+  その結果，両アルゴリズムの時間計算量は各アルゴリズムによって走査される頂点の数が少ないとき，
+  既存アルゴリズムの時間計算量よりも小さいことを示した．
+  
+  実験では，提案アルゴリズムとBrandesのアルゴリズムの性能を比較した．
+  比較の結果，人工ネットワークと実ネットワーク両方で提案アルゴリズムの方がBrandesのアルゴリズムよりも媒介中心性の値を高速に更新することを示した．
+  特に，実ネットワークにおける性能比較の結果から，提案アルゴリズムはBrandesのアルゴリズムと比べて$6.87$倍の性能をもつことを示した．
+  さらに，提案アルゴリズムを応用して，媒介中心性の最大値を最小および最大にする辺操作の探索を行った．
+  
+  今後の目標は，提案アルゴリズムを複数の辺操作に対応できるように拡張することと，
+  媒介中心性の最大値が最小であるようなグラフを遺伝アルゴリズムを基に探索するアルゴリズムの開発である．
 \end{frame}
 
 \appendix
@@ -405,6 +488,25 @@ sorting=debug
       \end{aligned}
     \end{equation*}
   \end{proof}
+\end{frame}
+
+\begin{frame}{実験環境}
+  \alert{TODO}
+  本章では，提案したアルゴリズムの有効性を検証するための実験を行う．
+  まず，提案手法とBrandes法の性能を比較する実験について説明する．
+  次に，第\ref{chap:complexity-analysis}章で導出した時間計算量を検証する実験の説明をする．
+  最後に，提案手法の応用例として，道路ネットワークを頑健にするような辺操作の探索およびその
+  結果について説明する．
+  
+  ここで，実験で用いるネットワークについて簡単に説明する．
+  人工ネットワークとして，ランダム正則グラフ（以下，RRGと略記）とBarab{\'{a}}si-Albertモデル（BAと略記）を用いる．
+  人工ネットワークに対して，各辺に$1$から$5$までの整数をランダムに選択して重みとして付与する．
+  また，実ネットワークとして，Stanford large network dataset collection\cite{32Leskovec2016}から取得したネットワークを用いる．
+  これらのネットワークの重みを除去して，重みなしネットワークとして扱う．
+  
+  すべての実験は Intel\textsuperscript\textregistered Xeon\textsuperscript\textregistered CPU E-2620 v4, 64GB RAM 上で行われた．
+  実験に用いたプログラムは gcc 7.2.0 によって, -O3 最適化フラグを付与してコンパイルされた．
+  プログラムのソースコードは github.com/y-satotani/dynamic-betweenness で入手できる．
 \end{frame}
 
 \end{document}
