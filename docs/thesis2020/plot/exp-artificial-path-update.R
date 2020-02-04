@@ -70,12 +70,11 @@ make_gp = function(is_weighted_, query_) {
         data_time %>% filter(`is-weighted` == is_weighted_, query == query_),
         aes(`pred-time-path`, `time-path`)
     ) +
-        geom_point(colour = 'royalblue', alpha = 0.2) +
+        geom_point(colour = '#56ac83', alpha = 0.2) +
         geom_abline(
             aes(slope = slope, intercept = intercept),
             data = linear_models %>%
-                filter(`is-weighted` == is_weighted_, query == query_),
-            size = 0.25
+                filter(`is-weighted` == is_weighted_, query == query_)
         ) +
         guides(
             colour = guide_legend(
@@ -100,4 +99,4 @@ gp <- plot_grid(
     label_size = 10,
     labels = c('a', 'b', 'c', 'd')
 )
-ggsave(out_file, gp, cairo_pdf, width = 10, height = 10, units = 'cm')
+ggsave(out_file, gp, cairo_pdf, width = 12, height = 10, units = 'cm')

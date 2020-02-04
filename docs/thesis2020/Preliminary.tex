@@ -288,7 +288,7 @@ Brandes~\cite{Brandes2001}によって提案されたアルゴリズムである
   辺$e\in E$を含むように拡張したペア依存度を$\delta_{st}(v,e)=\sigma_{st}(v,e)/\sigma_{st}$で定義する．
   ただし，$\sigma_{st}(v,e)$は$s$から$t$への最短経路の中で$v$と$e$を通るものの個数とする．
   すると，
-  \[ \delta_{s\bullet}(v)=\sum_{t\in V}\delta_{st}(v)=\sum_{t\in V}\sum_{(v,w)\in E_s}\delta_{st}(v,\{v,w\})=\sum_{(v,w)\in E_s}\sum_{t\in V}\delta_{st}(v,(v,w)) \]
+  \[ \delta_{s\bullet}(v)=\sum_{t\in V}\delta_{st}(v)=\sum_{t\in V}\sum_{(v,w)\in E_s}\delta_{st}(v,(v,w))=\sum_{(v,w)\in E_s}\sum_{t\in V}\delta_{st}(v,(v,w)) \]
   が成り立つ．
 
   頂点$w$は$\mathcal{P}_{E_s}(w)$を満たすと仮定する．すると，$s$から$w$への

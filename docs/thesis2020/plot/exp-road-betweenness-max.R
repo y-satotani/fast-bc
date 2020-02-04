@@ -28,7 +28,7 @@ gp <- ggplot(data_dynamic, aes(query, `bc-after-max`, colour = `query`)) +
     geom_hline(yintercept = bc_max) +
     xlab('操作') +
     ylab('操作後の媒介中心性の最大値') +
-    scale_colour_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    scale_colour_viridis(discrete = TRUE, begin = 0.65, end = 0.9) +
     theme(
         legend.title = element_blank(),
         legend.position = 'none',
