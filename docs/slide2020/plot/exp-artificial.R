@@ -4,7 +4,7 @@ library(tidyr)
 library(ggplot2)
 library(viridis)
 library(latex2exp)
-theme_set(theme_light(base_size = 8, base_family = 'IPAexGothic'))
+theme_set(theme_light(base_size = 9, base_family = 'IPAexGothic'))
 out_file <- paste0(sub('^--file=(.+)\\.R$', '\\1', basename(commandArgs()[4])), '.pdf')
 
 data_time <- read_csv('../../res/data/artificial-performance-comparison.csv') %>%
@@ -13,7 +13,7 @@ data_time <- read_csv('../../res/data/artificial-performance-comparison.csv') %>
         c('topology', 'order', 'degree', NA, NA, 'net-seed', NA)
     ) %>%
     mutate(order = as.numeric(order), degree = as.numeric(degree)) %>%
-    filter(degree == 4, topology == 'RRG') %>%
+    filter(degree == 4, `is-weighted` == 'unweighted', query == 'delete') %>%
     group_by(topology, order, degree, query, `is-weighted`) %>%
     summarise(
         `proposed-mean` = mean(`time-proposed`),
@@ -33,7 +33,7 @@ data_time <- read_csv('../../res/data/artificial-performance-comparison.csv') %>
         topology = factor(
             topology,
             levels = c('RRG', 'BA'),
-            labels = c('RRG', 'BA')
+            labels = c('ランダム正則グラフ', 'Barabási–Albertモデル')
         ),
         query = factor(
             `query`,
@@ -47,16 +47,14 @@ data_time <- read_csv('../../res/data/artificial-performance-comparison.csv') %>
         )
     ) %>%
     mutate(
-        setting = paste(`is-weighted`, topology, method)
+        setting = paste(method)
     ) %>%
     mutate(
         setting = factor(
             setting,
             levels = c(
-                '重み付き RRG Brandes法',
-                '重みなし RRG Brandes法',
-                '重み付き RRG 提案手法',
-                '重みなし RRG 提案手法'
+                'Brandes法',
+                '提案手法'
             )
         )
     )
@@ -66,11 +64,10 @@ gp <- ggplot(
     aes(order, time, colour = setting, shape = setting, linetype = setting)
 ) +
     geom_line() + geom_point() +
-    facet_grid(cols = vars(query)) +
-    xlab('頂点数') + ylab('実行時間(s)') +
+    facet_grid(rows = vars(topology)) +
+    xlab('ノード数') + ylab('実行時間(s)') +
     scale_x_log10() + scale_y_log10() +
     scale_colour_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
-    guides(colour = guide_legend(nrow = 2, byrow = TRUE)) +
     theme(
         legend.title = element_blank(),
         legend.position = 'top',
@@ -78,4 +75,4 @@ gp <- ggplot(
         strip.background = element_blank()
     )
 
-ggsave(out_file, gp, cairo_pdf, width = 10, height = 6.5, units = 'cm')
+ggsave(out_file, gp, cairo_pdf, width = 6, height = 8, units = 'cm')
