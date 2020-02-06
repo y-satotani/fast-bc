@@ -52,6 +52,7 @@ sorting=debug
 \setbeamertemplate{frametitle continuation}[from second][（続き）]
 %\setbeamertemplate{note page}[plain] % 基本これで
 \setbeamertemplate{note page}{ % ちょこっとカスタマイズ
+  \vspace{.5em}
   \insertslideintonotes{.30}
   \hfill
   {\tiny ページ\insertframenumber{}/\inserttotalframenumber}
@@ -111,9 +112,25 @@ sorting=debug
   \end{itemize}
   \vspace{-.5em}
   \begin{center}
-    %\includegraphics[width=.7\columnwidth]{tokyo-metro-betweenness.pdf}
-    \includegraphics[width=.7\columnwidth]{tokyo-metro-betweenness.png}
+    \includegraphics[width=.55\columnwidth]{tokyo-metro-betweenness.png}
   \end{center}
+  \note[item]{まず研究背景として媒介中心性について説明します．}
+  \note[item]{
+    媒介中心性とはネットワークのノードの重要度を測る中心性と呼ばれる指標のひとつです．
+  }
+  \note[item]{媒介中心性の定義はこちらの式で与えられます．}
+  \note[item]{
+    ここで，$\sigma_{st}(v)$は$s$と$t$間の最短経路のうち$v$を通るものの数を，
+    $\sigma_{st}$は$s$と$t$間の最短経路の数を表します．
+  }
+  \note[item]{
+    あるノードの媒介中心性の値が高いと，そのノードの上に多くの最短経路が通っているので，
+    重要であると言えます．
+  }
+  \note[item]{
+    例えば，こちらにネットワークの図がありますが，媒介中心性の値が大きくなるほど色を濃くしています．
+    ネットワークの中央付近のノードは最短経路が多く通っているため，濃く表示されています．
+  }
 \end{frame}
 
 \begin{frame}{媒介中心性の計算例}
@@ -139,19 +156,31 @@ sorting=debug
   \end{columns}
   \medskip
   計算量：\alert{$\mathcal{O}(|V|^3)$}
+  \note[item]{ここで定義に従った媒介中心性の計算の例を示します．}
+  \note[item]{右に示したグラフの$v$の媒介中心性は，このように計算されます．}
+  \note[item]{
+    ここで，定義に従った方法で全ての頂点の媒介中心性の値を計算したときの計算量について考えます．
+  }
+  \note[item]{
+    総和記号の赤枠の部分から，和は頂点数$|V|$の二乗だけ繰り返されます．
+    そのため，全ての頂点の媒介中心性の値の計算の計算量は$|V|$の三乗オーダです．
+  }
+  \note[item]{
+    これでは，頂点数の増加とともに計算時間が膨大になり，巨大なネットワークの解析は困難です．
+  }
 \end{frame}
 
 \begin{frame}{Brandesの定理}
   \begin{itemize}
-  \item ペア依存度
+  \item 依存度
     $\delta_{s\bullet}(v)=\sum_{t\neq s,v}\sigma_{st}(v)/\sigma_{st}$
   \item 媒介中心性
     $B_v=\sum_{s\neq v}\colorlet{oldcolor}{.}\usebeamercolor[fg]{alerted text}\fbox{$\color{oldcolor}\sum_{t\neq s,v}\sigma_{st}(v)/\sigma_{st}$}\color{oldcolor}=\sum_{s\neq v}\delta_{s\bullet}(v)$
   \item $\delta_{s\bullet}(v)$を高速に計算したい
   \end{itemize}
-  \begin{theorem}[Brandes \cite{06Brandes2001}]\rm
+  \begin{theorem}[Brandes \footcite{06Brandes2001}]\rm
     \label{th:implicit-dependency}
-    グラフ$G=(V,E)$の異なる頂点$s,v$について，頂点$v$の$s$に対するペア依存度$\delta_{s\bullet}(v)$は次式を満たす．
+    グラフ$G=(V,E)$の異なる頂点$s,v$について，頂点$v$の$s$に対する依存度$\delta_{s\bullet}(v)$は次式を満たす．
     \begin{equation*}
       \delta_{s\bullet}(v)=\sum_{(v,w)\in E_s}\frac{\sigma_{sv}}{\sigma_{sw}}(1+\delta_{s\bullet}(w)).
     \end{equation*}
@@ -160,6 +189,22 @@ sorting=debug
   \begin{flushright}
     \alert{次で例を説明}
   \end{flushright}
+  \note[item]{
+    媒介中心性の値を高速に計算するため，Brandesは依存度と呼ばれる値を高速に計算しました．
+  }
+  \note[item]{
+    依存度とは，$\sigma_{st}(v)/\sigma_{st}$を$t$について総和を取ったものです．
+  }
+  \note[item]{
+    依存度の定義を使うと，媒介中心性の定義のこの部分が依存度に置き換わり，
+    依存度を$s$について総和を取ったものを計算することで計算できます．
+  }
+  \note[item]{
+    ここで依存度を高速に計算するため，Brandesは次の定理を示しました．
+    この定理は，$s$に対する$v$の依存度は最短経路上で$v$の一つ後の頂点$w$の依存度から計算
+    出来ることを示しています．
+  }
+  \note[item]{この定理を用いた計算例を次に示します．}
 \end{frame}
 
 \begin{frame}{Brandesのアルゴリズム}
@@ -188,6 +233,20 @@ sorting=debug
   \item[] $\delta_{s\bullet}(v)\gets\delta_{s\bullet}(v)+\colorlet{oldcolor}{.}\usebeamercolor[fg]{alerted text}\fbox{$\color{oldcolor}\sigma_{sv}/\sigma_{sw}(1+\delta_{s\bullet}(w))$}\color{oldcolor}$
   \end{enumerate}
   計算量：\alert{$\mathcal{O}(|V|^2\log |V|+|V||E|)$}
+  \note[item]{ここでBrandesの定理を使った依存度の計算の例を示します．}
+  \note[item]{こちらの図に示した，頂点$s$からの最短経路で説明します．}
+  \note[item]{$s$に対する$v$の依存度は，定理からこの式で計算できます．}
+  \note[item]{ここで，最短経路の上で$v$の後継は$w$であることに注意します．}
+  \note[item]{
+    Brandesのアルゴリズムの手順を簡単に説明すると，こちらになります．
+    まず$s$からの最短経路を計算します．
+    その後，$s$から遠い順に頂点$w$を走査し，$w$の先行$v$に対して，この式で
+    $v$の依存度を更新します．
+  }
+  \note[item]{
+    Brandesのアルゴリズムで全ての頂点の媒介中心性を計算するときの計算量はこれで，
+    疎なネットワークに対してある程度高速に媒介中心性を計算できます．
+  }
 \end{frame}
 
 \begin{frame}{時変ネットワークの媒介中心性}
@@ -195,7 +254,7 @@ sorting=debug
     \begin{column}{.5\textwidth}
       \begin{itemize}
       \item 現実のネットワークは変化する
-      \item[] \alert{時変ネットワーク}
+      \item[] \alert{時変ネットワーク}\cite{18Holme2012}
       \item[] 例：フォロー，道路の建設
       \item 時変ネットワークの媒介中心性計算
       \item 影響を受ける部分のみを効率的に計算したい
@@ -205,6 +264,23 @@ sorting=debug
       \includegraphics[width=.9\columnwidth]{road-sta.pdf}
     \end{column}
   \end{columns}
+  \note[item]{
+    先ほど説明したBrandesのアルゴリズムは，ネットワークにノードやリンクが追加されない，
+    時不変ネットワークに対して媒介中心性の値を計算します．
+  }
+  \note[item]{
+    しかし現実のネットワークは，例えばSNSでのフォローや道路の建設などによって，
+    その形が絶えず変化する時変ネットワークです．
+  }
+  \note[item]{
+    このようなネットワークに対しては，変化の差分にあたる部分のみを計算し，
+    媒介中心性の値を更新することで，
+    Brandesのアルゴリズムを初めから適用するよりも高速に計算できると期待できます．
+  }
+  \note[item]{
+    例えば，このネットワークにこのリンクを追加した場合，追加によって媒介中心性の値が
+    変化するノードは赤く示したこれらのノードです．
+  }
 \end{frame}
 
 \begin{frame}{関連研究}
@@ -233,6 +309,26 @@ sorting=debug
     RamalingamとRepsに基づく最短経路更新法を利用する \\
     辺削除時の媒介中心性更新法の提案と評価
   \end{block}
+  \note[item]{
+    そのため現在まで時変ネットワークの媒介中心性を更新する方法がいくつか提案されてきました．
+  }
+  \note[item]{
+    Minimum union cycleやHypergraph sketchといった，専用のデータ構造を利用する方法や，
+  }
+  \note[item]{
+    時不変ネットワークでも用いられた近似法を時変ネットワークに適用した方法の他に，
+  }
+  \note[item]{
+    最短経路を保持し，媒介中心性と共に更新する方法もいくつか提案されてきました．
+  }
+  \note[item]{
+    その中でも，RamalingamとRepsの最短経路更新アルゴリズムに基づく，
+    辺削除時の媒介中心性更新法はこれまで提案されていませんでした．
+  }
+  \note[item]{
+    そこで，この研究は，RamalingamとRepsの最短経路更新アルゴリズムに基づく，
+    辺削除時の媒介中心性更新法の提案と評価を目的とします．
+  }
 \end{frame}
   
 \section{提案アルゴリズム}
