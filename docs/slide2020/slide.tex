@@ -50,9 +50,17 @@ sorting=debug
 \usepackage{appendixnumberbeamer}
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{frametitle continuation}[from second][（続き）]
-\setbeamertemplate{section in toc}{\hspace{0.75em}\usebeamercolor[fg]{itemize item}$\blacktriangleright$\hspace{.5em}\usebeamercolor[fg]{normal text}\inserttocsection \\}
-\setbeamertemplate{subsection in toc}{\hspace{2em}\usebeamercolor[fg]{itemize item}\inserttocsubsectionnumber\hspace{.5em}\usebeamercolor[fg]{normal text}\inserttocsubsection \\}
-\newenvironment{enumalgo}{\begin{enumerate}\scriptsize\setlength\itemsep{0ex}\setlength\leftmargini{0ex}\setlength\leftmarginii{1em}\setlength\leftmarginiii{1em}}{\end{enumerate}}
+%\setbeamertemplate{note page}[plain] % 基本これで
+\setbeamertemplate{note page}{ % ちょこっとカスタマイズ
+  \insertslideintonotes{.30}
+  \hfill
+  {\tiny ページ\insertframenumber{}/\inserttotalframenumber}
+  \noindent\rule{\textwidth}{.5pt}
+  {\scriptsize\insertnote}
+}
+\setbeameroption{show notes}
+%\setbeameroption{hide notes}
+%\setbeameroption{show only notes}
 
 \title[媒介中心性更新法]{辺操作時の最短経路の更新を利用する \\ 媒介中心性更新法}
 \author[里谷]{里谷 佳紀}
@@ -61,7 +69,18 @@ sorting=debug
 
 \begin{document}
 
-\makeIMELABtitle
+%\makeIMELABtitle
+{
+  \setbeamertemplate{footline}[imelab]
+  \begin{frame}
+    \titlepage
+    \note[item]{ノートなのだ}
+    \note[item]{情報数理工学研究室の里谷が}
+    \note[item]{辺操作時の最短経路の更新を利用する媒介中心性更新法}
+    \note[item]{という題目で発表します}
+    \note[item]{よろしくおねがいします}
+  \end{frame}
+}
 
 %\begin{frame}{概要}
 %  \tableofcontents
@@ -344,14 +363,17 @@ sorting=debug
   \begin{columns}
     \begin{column}{.5\textwidth}
       \begin{itemize}
-      \item 2種のネットワークモデル
-      \item 平均次数$\langle k\rangle=4$
-      \item ノード数$n\in\{100,200,\ldots,1000\}$
-      \item $50$個のネットワークに対し$100$試行繰り返し
-      \end{itemize}
-      \begin{itemize}
-      \item 両ネットワークモデルに対しても提案手法の方が高速に動作する
-      \item 頂点数の増加に対する実行時間の増加がBrandes法より緩やか
+      \item 実験について
+        \begin{itemize}
+        \item 2種のネットワークモデル
+        \item 平均次数$\langle k\rangle=4$
+        \item ノード数$n\in\{100,\ldots,1000\}$
+        \item $50$個のネットワーク
+        \item $100$試行繰り返し
+        \end{itemize}
+        \medskip
+      \item 提案手法の方が高速に動作する
+      \item 実行時間の増加がBrandes法より緩やか
       \item[] $\rightarrow$\alert{走査する頂点の数の増加が緩やか}
       \end{itemize}
     \end{column}
@@ -365,14 +387,19 @@ sorting=debug
   \begin{columns}
     \begin{column}{.5\textwidth}
       \begin{itemize}
-      \item SNAP\cite{32Leskovec2016}のデータセットを使用
-      \item $20$試行繰り返しの中央値を比較
-      \end{itemize}
-      \begin{itemize}
+      \item 実験について
+        \begin{itemize}
+        \item SNAP\cite{32Leskovec2016}のデータセット
+        \item $20$試行繰り返し
+        \item 中央値を比較
+        \end{itemize}
       \item ネットワークによって性能向上はまちまち
-      \item 実行時間比の最小値は$5.78\%$，最大値は$29.05\%$
-      \item 幾何平均でおよそ$14.67\%$の計算時間で更新可能
-      \item[] $\rightarrow$\alert{トポロジの得手不得手の存在}
+      \item 相対実行時間の
+        \begin{itemize}
+        \item 最小値：$5.78\%$
+        \item 最大値：$29.05\%$
+        \item 幾何平均：$14.67\%$
+        \end{itemize}
       \end{itemize}
     \end{column}
     \begin{column}{.5\textwidth}
