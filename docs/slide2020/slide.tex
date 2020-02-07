@@ -356,6 +356,24 @@ sorting=debug
     \Comment{$d_{st}$と$\sigma_{st}$を更新}
     \EndFor
   \end{algorithmic}
+  \note[item]{以降，本研究で提案するアルゴリズムについて説明します．}
+  \note[item]{
+    まず記号について説明します．
+    グラフから辺$(u,v)$が削除されたと考えます．
+    削除後の諸量にプライム記号をつけて，それが削除後であることを明示します．
+    $S(t)$と$T(s)$はそれぞれ辺削除によって$t$への，および$s$からの最短経路が変化する頂点の集合とします．
+    $S(t)$と$T(s)$の具体的な内容はあとで示します．
+    さらに$\Delta_{s\bullet}(x)$をこの通り定義します．
+    これは削除の影響を受ける依存度$\delta_{s\bullet}(x)$の総和です．
+  }
+  \note[item]{
+    アルゴリズムの大まかな流れは以下です．
+    各$s\in S(v)$に対して以下を実行します．
+    初めに$x\in V$に対する$\Delta_{s\bullet}(x)$を求めて，媒介中心性の値$B_x$から減算します．
+    次に，各$t\in V$の$d_{st}$および$\sigma_{st}$を更新します．
+    さらに，$x\in V$に対する$\Delta'_{s\bullet}(x)$を求めて，減算された媒介中心性の値$B''_s$に加算します．
+    最後に，$t\in T(u)$に対して各$s\in V$の$d_{st}$および$\sigma_{st}$を更新します．
+  }
 \end{frame}
 
 \begin{frame}{影響を受ける頂点}
@@ -381,10 +399,26 @@ sorting=debug
   \item $S(x)=\{s\,|\,d_{sx}=d_{su}+l_{uv}+d_{vx}\}$
   \end{itemize}
   両方とも，\alert{深さ優先探索}で計算可能
+  \note[item]{ここで$S(x)$と$T(x)$の具体的な内容を求めます．}
+  \note[item]{削除によって最短経路が変化する頂点ペアの条件について，こちらの補題を示しました．}
+  \note[item]{
+    読み上げますと，頂点$s,t$に対して，$E_{st}'\neq E_{st}$であるための
+    必要十分条件は$d_{su}+l_{uv}+d_{vt}=d_{st}$を満たすことです．
+  }
+  \note[item]{
+    その根拠は，最短経路が変化するならば，削除される辺$(u,v)$は最短経路の上にあり，
+    すると，$d_{su}+l_{uv}+d_{vt}=d_{st}$が成り立つためです．
+  }
+  \note[item]{
+    この補題によって，$S(x)$と$T(x)$の具体的な内容をこちらの通りに定義できます．
+  }
+  \note[item]{
+    実際に内容を求めるには，削除される辺に接続する頂点$v$または$v$を視点として，
+    深さ優先探索によって求められます．
+  }
 \end{frame}
 
 \begin{frame}{$\Delta_{s\bullet}(x)$を求めるアルゴリズム}
-  
   \begin{theorem}[Bergamini et al.\cite{31Bergamini2017}]\small
     任意の$s\in S(v)$と$x\in V$について，次式が成り立つ．
     \begin{equation*}
@@ -408,9 +442,27 @@ sorting=debug
     \end{column}
   \end{columns}
   $\Delta'_{s\bullet}(x)$も同様に計算可能
+  \note[item]{
+    次は影響を受ける頂点のペア依存度の総和である$\Delta_{s\bullet}(x)$を求める
+    方法について説明します．
+  }
+  \note[item]{
+    $\Delta_{s\bullet}(x)$について，この式が成り立つことが知られています．
+    この式は，影響を受ける頂点の，$x$についてのペア依存度の総和は，
+    最短経路上で$x$の後継の頂点についてのペア依存度の総和から求められることを示しています．
+  }
+  \note[item]{
+    この式を利用して$\Delta_{s\bullet}(x)$を求めるには，
+    Brandesのアルゴリズムと同様に，$s$から遠い順に走査します．
+  }
+  \note[item]{
+    ただし，Brandesのアルゴリズムでは全頂点を走査したのに対し，
+    この方法では，影響を受ける頂点と，$s$とそれらの最短経路上にある頂点のみを走査します．
+  }
+  \note[item]{$\Delta'_{s\bullet}(x)$も同様に計算できます．}
 \end{frame}
 
-\begin{frame}{辺削除時の最短経路更新法(Ramalingam and Reps)}
+\begin{frame}{辺削除時の最短経路更新法(Ramalingam and Reps\cite{24Ramalingam1996})}
   \begin{itemize}
   \item 更新後の距離の昇順に計算する必要がある
   \item[] しかしそのような並びは\alert{自明ではない}
@@ -436,6 +488,26 @@ sorting=debug
       \input{updating-sssp.pdf_tex}
     \end{column}
   \end{columns}
+  \note[item]{ここで，RamalingamとRepsに基づく変削除時の最短経路更新法について説明します．}
+  \note[item]{
+    RamalingamとRepsの方法ではDijkstramのアルゴリズムと同様に，
+    削除に影響される頂点集合$T(s)$の各要素を，更新後の距離の昇順に走査する必要があります．
+  }
+  \note[item]{
+    しかし，RamalingamとRepsの方法で知られている通り，
+    $T(s)$の各要素を昇順に走査することは自明ではなく，計算時に判断する必要があります．
+  }
+  \note[item]{
+    そこで提案手法では以下のアイディアで正しい順序で走査し，最短経路を更新します．
+  }
+  \note[item]{
+    まず，影響を受ける頂点$x$のうち，影響を受けない頂点を先行にもつものは
+    この式で削除後の$s$からの距離と最短経路数を更新できます．
+  }
+  \note[item]{
+    あとは，Dijkstraのアルゴリズムの要領で更新が完了した頂点から広げるように
+    $s$からの距離と最短経路数を更新します．
+  }
 \end{frame}
 
 \section{性能評価}
