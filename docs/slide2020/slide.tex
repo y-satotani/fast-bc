@@ -171,7 +171,8 @@ sorting=debug
 \end{frame}
 
 \begin{frame}{Brandesの定理}
-  \begin{itemize}
+  \begin{itemize}\small
+  \item ペア依存度 $\delta_{st}(v)=\sigma_{st}(v)/\sigma_{st}$
   \item 依存度
     $\delta_{s\bullet}(v)=\sum_{t\neq s,v}\sigma_{st}(v)/\sigma_{st}$
   \item 媒介中心性
@@ -339,15 +340,15 @@ sorting=debug
     \item 記号$'$：削除後であることを表す（例：$G'$）
     \item $S(t)$：辺削除によって$t$への最短経路が変化する頂点の集合
     \item $T(s)$：辺削除によって$s$からの最短経路が変化する頂点の集合
-    \item $\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x)$：削除の影響を受ける依存度の総和\cite{31Bergamini2017}
+    \item $\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x)$：削除の影響を受けるペア依存度の総和\cite{31Bergamini2017}
   \end{itemize}
-  アルゴリズムの概略
+  アルゴリズムの大まかな流れ
   \begin{algorithmic}\footnotesize
     \ForAll{$s\in S(v)$}
     \State $\textproc{DecreaseBetweenness}(s)$
-    \Comment{$B_x$を$\sum_{s\neq x}\Delta_{s\bullet}(x)$だけ減少}
+    \Comment{\alert{$B_x$を$\sum_{s\neq x}\Delta_{s\bullet}(x)$だけ減少}}
     \State $\textproc{UpdateSSSP}(s)$
-    \Comment{$d_{st}$と$\sigma_{st}$を更新}
+    \Comment{\alert{$d_{st}$と$\sigma_{st}$を更新}}
     \State $\textproc{IncreaseBetweenness}(s)$
     \Comment{$B_x$を$\sum_{s\neq x}\Delta'_{s\bullet}(x)$だけ増加}
     \EndFor
@@ -518,13 +519,31 @@ sorting=debug
       \mathcal{O}\left(\sum_{s\in S(v)}\|\tau(s)\|+|\tau(s)|\log|\tau(s)|+\|\tau'(s)\|+|\tau'(s)|\log|\tau'(s)|\right)
     \end{equation*}
   \item[] $\tau(s),\,\tau'(s)$：アルゴリズムが走査した頂点の集合
-  \item[] $S(v)=\tau(s)=\tau'(s)=V$のときBrandesのアルゴリズムの計算量と同じ
+  \item[] \alert{$S(v)=\tau(s)=\tau'(s)=V$}のときBrandesのアルゴリズムの計算量と同じ
     \item 最短経路を更新するアルゴリズムの時間計算量
     \begin{equation*}
       \mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|\log|T(s)|+\sum_{t\in T(u)}\|S(t)\|\log|S(t)|\right)
     \end{equation*}
-  \item[] $S(v)=T(u)=V$のときDijkstraのアルゴリズムの計算量と同じ
+  \item[] \alert{$S(v)=T(u)=V$}のときDijkstraのアルゴリズムの計算量と同じ
+  \item 通常は$V$より小さい$\rightarrow$\alert{高速に動作}
   \end{itemize}
+  \note[item]{以降，提案したアルゴリズムの性能を評価します．}
+  \note[item]{まず，時間計算量を既存のものと比較します．}
+  \note[item]{
+    媒介中心性を増減させるアルゴリズムの時間計算量はこちらです．
+    この計算量は，影響を受ける頂点の集合$S(v)$とアルゴリズムが走査した頂点の集合
+    $\tau(s)$および$\tau'(s)$が頂点集合$V$と一致するとき，
+    Brandesのアルゴリズムと同じ計算量になります．
+  }
+  \note[item]{
+    最短経路を更新するアルゴリズムの時間計算量はこちらです．
+    この計算量は，影響を受ける頂点の集合$S(v)$と$T(u)$が頂点集合$V$と一致するとき，
+    Dijkstraのアルゴリズムと同じ計算量になります．
+  }
+  \note[item]{
+    これらの頂点集合は頂点集合$V$の部分集合で，通常は$V$より小さくなるので，
+    その分高速に動作することが期待できます．
+  }
 \end{frame}
 
 \begin{frame}[allowframebreaks]{Brandes法との性能比較（人工ネットワーク）}
