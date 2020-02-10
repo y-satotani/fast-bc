@@ -83,9 +83,52 @@ sorting=debug
   \end{frame}
 }
 
-%\begin{frame}{概要}
-%  \tableofcontents
-%\end{frame}
+\begin{frame}{概要}
+  \begin{itemize}
+  \item 背景
+    \begin{itemize}
+    \item ネットワークの中の重要なノードを見つけたい（アキレス腱）
+    \item[] $\rightarrow$\alert{媒介中心性}はノードの重要さを表す
+    \item Brandes法：媒介中心性の値を高速に計算する
+    \item 現実のネットワークは\alert{絶えず変化し続ける}
+    \item[] $\rightarrow$変化の影響を受ける部分だけを更新してさらに高速化
+    \end{itemize}
+  \item 提案手法
+    \begin{itemize}
+    \item 辺削除時に最短経路と共に媒介中心性を更新する手法
+    \end{itemize}
+    \begin{enumerate}
+    \item 媒介中心性の値を影響を受ける分だけ\alert{減算}
+    \item \alert{最短経路を更新}
+    \item 媒介中心性の値を影響を受ける分だけ\alert{加算}
+    \end{enumerate}
+  \item 結果
+    \begin{itemize}
+    \item 計算量を比較$\rightarrow$Brandes法以下の計算量
+    \item 実験により比較$\rightarrow$Brandes法の$14.67\%$の実行時間で更新可能
+    \end{itemize}
+  \end{itemize}
+  \note[item]{
+    ネットワークの中の重要なノードを見つけることはネットワーク解析において重要な課題です．
+  }
+  \note[item]{ノードの重要さを測る指標として媒介中心性がよく用いられます．}
+  \note[item]{媒介中心性の値を高速に計算する方法としてBrandesのアルゴリズムが知られてます．}
+  \note[item]{
+    しかし現実のネットワークはノードやリンクの挿入や削除によって絶えずその形を変化させ続けています．
+    そのようなネットワークの媒介中心性を求める場合，変化の影響を受ける部分だけを更新してさらなる高速化が期待できます．
+  }
+  \note[item]{
+    そこで，この研究では，最短経路の更新を利用して媒介中心性を更新するアルゴリズムを提案し，評価します．
+  }
+  \note[item]{
+    アルゴリズムは，まず，影響を受ける分だけ媒介中心性の値を減算したあと，最短経路を更新し，
+    最後に影響を受ける分だけ媒介中心性の値を加算することで媒介中心性を更新します．
+  }
+  \note[item]{
+    アルゴリズムの評価の結果，提案手法は，Brandes法以下の計算量を達成し，
+    実ネットワークに対してBrandes法の$14.67\%$の実行時間で更新することを確認しました．
+  }
+\end{frame}
 
 \section{背景・目的}
 \begin{frame}[t]{研究背景 -- 媒介中心性}
