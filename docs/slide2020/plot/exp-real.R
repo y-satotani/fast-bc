@@ -2,7 +2,6 @@ library(readr)
 library(tidyr)
 library(dplyr)
 library(ggplot2)
-library(viridis)
 theme_set(theme_light(base_size = 8, base_family = 'IPAexGothic'))
 out_file <- paste0(sub('^--file=(.+)\\.R$', '\\1', basename(commandArgs()[4])), '.pdf')
 
@@ -58,7 +57,9 @@ gp <- ggplot(
     data_time, aes(network, ratio, fill = method)
 ) +
     geom_bar(stat = 'identity', position = position_dodge()) +
-    scale_fill_viridis(discrete = TRUE, begin = 0.1, end = 0.9) +
+    scale_fill_manual(
+        values = c('Brandes法' = '#3d3b6f', '提案手法' = '#c73634')
+    ) +
     scale_x_discrete(limits = rev(levels(data_time$network))) +
     coord_flip() +
     ylab('相対実行時間') +
