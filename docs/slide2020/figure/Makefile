@@ -9,7 +9,7 @@ all: $(pdf) $(png)
 	inkscape -z -o $@ --export-latex $<
 
 %.png: %.svg
-	inkscape -z -o $@ -d 150 $<
+	inkscape -z -o $@ -d 300 $<
 
 clean:
 	rm *.pdf *.pdf_tex *.png
