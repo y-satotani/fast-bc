@@ -132,32 +132,32 @@ sorting=debug
 
 \section{背景・目的}
 \begin{frame}[t]{研究背景 -- 媒介中心性}
-  \begin{itemize}
-  \item \alert{媒介中心性}\footcite{05Freeman1977}：ネットワークのノードの重要度を測る．
-  \item[] 例：鉄道網における駅
-  \end{itemize}
   \begin{columns}
-    \begin{column}{.4\textwidth}
-      \begin{equation*}
-        B_v=\sum_{s\neq v}\sum_{t\neq v,s}\frac{\sigma_{st}(v)}{\sigma_{st}},
-      \end{equation*}
-    \end{column}
-    \begin{column}{.6\textwidth}
+    \begin{column}{.59\textwidth}
       \begin{itemize}
-      \item $\sigma_{st}(v)$：$s$と$t$間の最短経路のうち\\$v$を通るものの数，
-      \item $\sigma_{st}$：$s$と$t$間の最短経路の数．
+      \item \alert{媒介中心性}\cite{05Freeman1977}：ノードの重要度を測る
+      \item[] 例：鉄道網における駅
+      \end{itemize}
+      \medskip
+      \begin{equation*}
+        B_v=\sum_{s\neq v}\sum_{t\neq v,s}\frac{\sigma_{st}(v)}{\sigma_{st}}
+      \end{equation*}
+      \begin{itemize}\small
+      \item $\sigma_{st}(v)$：$s$と$t$間の最短経路のうち\\$v$を通るものの数
+      \item $\sigma_{st}$：$s$と$t$間の最短経路の数
+      \end{itemize}
+      \begin{itemize}
+      \item 媒介中心性の値が高い$\rightarrow$\\\alert{多くの最短経路が通る}ので重要
+      \item 単純法の計算量：\alert{$\mathcal{O}(|V|^3)$}
       \end{itemize}
     \end{column}
+    \begin{column}{.4\textwidth}
+      \centering
+      \includegraphics[angle=90,height=.77\textheight]{tokyo-metro-betweenness.png}
+    \end{column}
   \end{columns}
-  \medskip
-  \begin{itemize}
-  \item 媒介中心性の値が高い$\rightarrow$\alert{多くの最短経路が通る}ので重要
-  \end{itemize}
-  \vspace{-.5em}
-  \begin{center}
-    \includegraphics[width=.55\columnwidth]{tokyo-metro-betweenness.png}
-  \end{center}
-  \note[item]{まず研究背景として媒介中心性について説明します．}
+  \hypercite{05Freeman1977}
+  \note[item]{以降，各要素について詳しくのべます．まず，研究背景として媒介中心性について説明します．}
   \note[item]{
     媒介中心性とはネットワークのノードの重要度を測る中心性と呼ばれる指標のひとつです．
   }
@@ -174,44 +174,50 @@ sorting=debug
     例えば，こちらにネットワークの図がありますが，媒介中心性の値が大きくなるほど色を濃くしています．
     ネットワークの中央付近のノードは最短経路が多く通っているため，濃く表示されています．
   }
-\end{frame}
-
-\begin{frame}{媒介中心性の計算例}
-  \begin{columns}
-    \begin{column}{.6\textwidth}
-      頂点$v$の媒介中心性の値$B_v$は
-      \begin{flalign*}
-        B_v&=\sum_{s\neq v}\sum_{t\neq s,v}\frac{\sigma_{st}(v)}{\sigma_{st}}\\
-        &=\frac{\sigma_{wx}(v)}{\sigma_{wx}}+\frac{\sigma_{wy}(v)}{\sigma_{wy}}
-        +\frac{\sigma_{wz}(v)}{\sigma_{wz}}\\
-        &+\frac{\sigma_{xy}(v)}{\sigma_{xy}}+\frac{\sigma_{xz}(v)}{\sigma_{xz}}
-        +\frac{\sigma_{yz}(v)}{\sigma_{yz}}+\cdots\\
-        &=\frac{0}{1}+\frac{0}{1}+\frac{1}{1}+\frac{0}{1}+\frac{2}{2}+\frac{1}{1}\cdots\\
-        &=6.
-      \end{flalign*}
-      同様に，$B_w=B_y=2,\:B_x=B_z=0$．
-    \end{column}
-    \begin{column}{.39\textwidth}
-      \centering
-      \def\svgwidth{.9\linewidth}
-      \input{graph-bc.pdf_tex}
-    \end{column}
-  \end{columns}
-  \medskip
-  計算量：\alert{$\mathcal{O}(|V|^3)$}
-  \note[item]{ここで定義に従った媒介中心性の計算の例を示します．}
-  \note[item]{右に示したグラフの$v$の媒介中心性は，このように計算されます．}
   \note[item]{
-    ここで，定義に従った方法で全ての頂点の媒介中心性の値を計算したときの計算量について考えます．
-  }
-  \note[item]{
-    総和記号の赤枠の部分から，和は頂点数$|V|$の二乗だけ繰り返されます．
+    定義通りに媒介中心性を計算するアルゴリズムは，
+    総和記号のこの部分から，和は頂点数$|V|$の二乗だけ繰り返されます．
     そのため，全ての頂点の媒介中心性の値の計算の計算量は$|V|$の三乗オーダです．
-  }
-  \note[item]{
     これでは，頂点数の増加とともに計算時間が膨大になり，巨大なネットワークの解析は困難です．
   }
 \end{frame}
+
+%\begin{frame}{媒介中心性の計算例}
+%  \begin{columns}
+%    \begin{column}{.6\textwidth}
+%      頂点$v$の媒介中心性の値$B_v$は
+%      \begin{flalign*}
+%        B_v&=\sum_{s\neq v}\sum_{t\neq s,v}\frac{\sigma_{st}(v)}{\sigma_{st}}\\
+%        &=\frac{\sigma_{wx}(v)}{\sigma_{wx}}+\frac{\sigma_{wy}(v)}{\sigma_{wy}}
+%        +\frac{\sigma_{wz}(v)}{\sigma_{wz}}\\
+%        &+\frac{\sigma_{xy}(v)}{\sigma_{xy}}+\frac{\sigma_{xz}(v)}{\sigma_{xz}}
+%        +\frac{\sigma_{yz}(v)}{\sigma_{yz}}+\cdots\\
+%        &=\frac{0}{1}+\frac{0}{1}+\frac{1}{1}+\frac{0}{1}+\frac{2}{2}+\frac{1}{1}\cdots\\
+%        &=6.
+%      \end{flalign*}
+%      同様に，$B_w=B_y=2,\:B_x=B_z=0$．
+%    \end{column}
+%    \begin{column}{.39\textwidth}
+%      \centering
+%      \def\svgwidth{.9\linewidth}
+%      \input{graph-bc.pdf_tex}
+%    \end{column}
+%  \end{columns}
+%  \medskip
+%  計算量：\alert{$\mathcal{O}(|V|^3)$}
+%  \note[item]{ここで定義に従った媒介中心性の計算の例を示します．}
+%  \note[item]{右に示したグラフの$v$の媒介中心性は，このように計算されます．}
+%  \note[item]{
+%    ここで，定義に従った方法で全ての頂点の媒介中心性の値を計算したときの計算量について考えます．
+%  }
+%  \note[item]{
+%    総和記号の赤枠の部分から，和は頂点数$|V|$の二乗だけ繰り返されます．
+%    そのため，全ての頂点の媒介中心性の値の計算の計算量は$|V|$の三乗オーダです．
+%  }
+%  \note[item]{
+%    これでは，頂点数の増加とともに計算時間が膨大になり，巨大なネットワークの解析は困難です．
+%  }
+%\end{frame}
 
 \begin{frame}{Brandesの定理}
   \begin{itemize}\small
