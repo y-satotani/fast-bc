@@ -59,9 +59,9 @@ sorting=debug
   \noindent\rule{\textwidth}{.5pt}
   {\scriptsize\insertnote}
 }
-\setbeameroption{show notes}
-%\setbeameroption{hide notes}
-%\setbeameroption{show only notes}
+\setbeameroption{show notes} % スライド+ノート
+%\setbeameroption{hide notes} % スライドのみ
+%\setbeameroption{show only notes} % ノートのみ
 
 \title[媒介中心性更新法]{辺操作時の最短経路の更新を利用する \\ 媒介中心性更新法}
 \author[里谷]{里谷 佳紀}
@@ -282,7 +282,8 @@ sorting=debug
   }
   \note[item]{
     例えば，このネットワークにこのリンクを追加した場合，追加によって媒介中心性の値が
-    変化するノードは赤く示したこれらのノードです．
+    変化するノードは赤く示したこれらのノードで，ネットワーク全体のノードに比べて
+    かなり少ないです．
   }
 \end{frame}
 
@@ -375,9 +376,9 @@ sorting=debug
   }
   \note[item]{
     アルゴリズムの大まかな流れは以下です．
-    初めに$x\in V$に対する$\Delta_{s\bullet}(x)$を求めて，媒介中心性の値$B_x$から減算します．
-    次に，各$t\in V$の$d_{st}$および$\sigma_{st}$を更新します．
-    さらに，$x\in V$に対する$\Delta'_{s\bullet}(x)$を求めて，減算された媒介中心性の値$B''_s$に加算します．
+    初めに影響を受ける頂点に対するペア依存度の総和を求めて，媒介中心性の値$B_x$から減算します．
+    次に，削除時の最短経路を更新します．
+    最後に影響を受ける頂点に対するペア依存度の総和を求めて，媒介中心性の値$B_x$に加算します．
   }
 \end{frame}
 
@@ -407,18 +408,18 @@ sorting=debug
   \note[item]{ここで$S(x)$と$T(x)$の具体的な内容を求めます．}
   \note[item]{削除によって最短経路が変化する頂点ペアの条件について，こちらの補題を示しました．}
   \note[item]{
-    読み上げますと，頂点$s,t$に対して，$E_{st}'\neq E_{st}$であるための
-    必要十分条件は$d_{su}+l_{uv}+d_{vt}=d_{st}$を満たすことです．
+    読み上げますと，頂点$s,t$に対して，最短経路が変化するための
+    必要十分条件はこちらの式を満たすことです．
   }
   \note[item]{
     その根拠は，最短経路が変化するならば，削除される辺$(u,v)$は最短経路の上にあり，
-    すると，$d_{su}+l_{uv}+d_{vt}=d_{st}$が成り立つためです．
+    すると，この式が成り立つためです．
   }
   \note[item]{
     この補題によって，$S(x)$と$T(x)$の具体的な内容をこちらの通りに定義できます．
   }
   \note[item]{
-    実際に内容を求めるには，削除される辺に接続する頂点$v$または$v$を視点として，
+    実際に内容を求めるには，削除される辺に接続する頂点$u$または$v$を始点として，
     深さ優先探索によって求められます．
   }
 \end{frame}
@@ -454,7 +455,7 @@ sorting=debug
   \note[item]{
     $\Delta_{s\bullet}(x)$について，この式が成り立つことが知られています．
     この式は，影響を受ける頂点の，$x$についてのペア依存度の総和は，
-    最短経路上で$x$の後継の頂点についてのペア依存度の総和から求められることを示しています．
+    最短経路上で$x$の後継の頂点についての$\Delta_{s\bullet}$から求められることを示しています．
   }
   \note[item]{
     この式を利用して$\Delta_{s\bullet}(x)$を求めるには，
@@ -493,7 +494,7 @@ sorting=debug
       \input{updating-sssp.pdf_tex}
     \end{column}
   \end{columns}
-  \note[item]{ここで，RamalingamとRepsに基づく変削除時の最短経路更新法について説明します．}
+  \note[item]{ここで，RamalingamとRepsに基づく辺削除時の最短経路更新法について説明します．}
   \note[item]{
     RamalingamとRepsの方法ではDijkstramのアルゴリズムと同様に，
     削除に影響される頂点集合$T(s)$の各要素を，更新後の距離の昇順に走査する必要があります．
