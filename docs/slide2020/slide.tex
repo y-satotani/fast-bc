@@ -705,48 +705,40 @@ sorting=debug
 \end{frame}
 
 \section{付録}
-\begin{frame}{Why $\Delta_{s\bullet}(x)$ and $\Delta'_{s\bullet}(x)$ works}
-  \begin{theorem}
-    任意の$s,x\in V$に対して
+\begin{frame}{媒介中心性の値の増減}
+  \begin{theorem}\small
+    任意の$s,x\in V$に対して次式が成り立つ
     \begin{equation*}
       \delta'_{s\bullet}(x)-\delta_{s\bullet}(x)=\Delta'_{s\bullet}(x)-\Delta_{s\bullet}(x)
     \end{equation*}
-    が成り立つ．
   \end{theorem}
-  \begin{proof}
-    任意の$t\notin T(s)$に対して，$\sigma_{st}=\sigma'_{st}$である．
-    さらに，$t\notin T(s)$の条件下で，任意の$x\in V$について
-    $\sigma_{st}(x)=\sigma'_{st}(x)$が成り立つ．したがって，次が成り立つ．
-    \begin{equation*}
-      \begin{aligned}
-        \delta'_{s\bullet}(x)-\delta_{s\bullet}(x)
-        &=\sum_{t\neq x}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right) \\
-        &=\sum_{t\in T(s)}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right)
-        +\sum_{t\notin T(s)}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right) \\
-        &=\sum_{t\in T(s)}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right) \\
-        &=\Delta'_{s\bullet}(x)-\Delta_{s\bullet}(x)
-      \end{aligned}
-    \end{equation*}
-  \end{proof}
+  \begin{itemize}
+  \item 最短経路が変化しない$t\notin T(s)$に対して$\delta'_{st}(x)=\delta_{st}(x)$
+  \end{itemize}
+  \medskip
+  \scriptsize
+  任意の$t\notin T(s)$に対して，$\sigma_{st}=\sigma'_{st}$である．
+  さらに，$t\notin T(s)$の条件下で，任意の$x\in V$について
+  $\sigma_{st}(x)=\sigma'_{st}(x)$が成り立つ．したがって，次が成り立つ．
+  \begin{equation*}
+    \begin{aligned}
+      \delta'_{s\bullet}(x)-\delta_{s\bullet}(x)
+      &=\sum_{t\neq x}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right) \\
+      &=\sum_{t\in T(s)}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right)
+      +\sum_{t\notin T(s)}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right) \\
+      &=\sum_{t\in T(s)}\left(\frac{\sigma'_{st}(x)}{\sigma'_{st}}-\frac{\sigma_{st}(x)}{\sigma_{st}}\right) \\
+      &=\Delta'_{s\bullet}(x)-\Delta_{s\bullet}(x)
+    \end{aligned}
+  \end{equation*}
 \end{frame}
 
 \begin{frame}{実験環境}
-  \alert{TODO}
-  本章では，提案したアルゴリズムの有効性を検証するための実験を行う．
-  まず，提案手法とBrandes法の性能を比較する実験について説明する．
-  次に，第\ref{chap:complexity-analysis}章で導出した時間計算量を検証する実験の説明をする．
-  最後に，提案手法の応用例として，道路ネットワークを頑健にするような辺操作の探索およびその
-  結果について説明する．
-  
-  ここで，実験で用いるネットワークについて簡単に説明する．
-  人工ネットワークとして，ランダム正則グラフ（以下，RRGと略記）とBarab{\'{a}}si-Albertモデル（BAと略記）を用いる．
-  人工ネットワークに対して，各辺に$1$から$5$までの整数をランダムに選択して重みとして付与する．
-  また，実ネットワークとして，Stanford large network dataset collection\cite{32Leskovec2016}から取得したネットワークを用いる．
-  これらのネットワークの重みを除去して，重みなしネットワークとして扱う．
-  
-  すべての実験は Intel\textsuperscript\textregistered Xeon\textsuperscript\textregistered CPU E-2620 v4, 64GB RAM 上で行われた．
-  実験に用いたプログラムは gcc 7.2.0 によって, -O3 最適化フラグを付与してコンパイルされた．
-  プログラムのソースコードは github.com/y-satotani/dynamic-betweenness で入手できる．
+  \begin{itemize}
+  \item Intel\textsuperscript\textregistered Xeon\textsuperscript\textregistered CPU E-2620 v4
+  \item 64GB RAM
+  \item gcc 7.2.0 with -O3 flag
+  \item igraph 7.2
+  \end{itemize}
 \end{frame}
 
 \end{document}
