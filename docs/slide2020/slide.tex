@@ -397,21 +397,30 @@ sorting=debug
     \item $T(s)$：辺削除によって$s$からの最短経路が変化する頂点の集合
     \item $\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x)$：削除の影響を受けるペア依存度の総和\footcite{31Bergamini2017}
   \end{itemize}
+  \medskip
   アルゴリズムの大まかな流れ
-  \begin{algorithmic}\footnotesize
-    \ForAll{$s\in S(v)$}
-    \State $\textproc{DecreaseBetweenness}(s)$
-    \Comment{\alert{$B_x$を$\sum_{s\neq x}\Delta_{s\bullet}(x)$だけ減少}}
-    \State $\textproc{UpdateSSSP}(s)$
-    \Comment{\alert{$d_{st}$と$\sigma_{st}$を更新}}
-    \State $\textproc{IncreaseBetweenness}(s)$
-    \Comment{$B_x$を$\sum_{s\neq x}\Delta'_{s\bullet}(x)$だけ増加}
-    \EndFor
-    \ForAll{$t\in T(u)$}
-    \State $\textproc{UpdateSTSP}(t)$
-    \Comment{$d_{st}$と$\sigma_{st}$を更新}
-    \EndFor
-  \end{algorithmic}
+  \begin{enumerate}
+  \item 影響を受ける頂点（$S(v)$と$T(u)$）を計算
+  \item $B_x$を$\sum_{s\neq x}\Delta_{s\bullet}(x)$だけ減少
+  \item 最短経路（$d_{st}$と$\sigma_{st}$）を更新
+  \item $B_x$を$\sum_{s\neq x}\Delta'_{s\bullet}(x)$だけ増加
+  \end{enumerate}
+%  \begin{algorithmic}\footnotesize
+%    \ForAll{$s\in S(v)$}
+%    \Comment{\alert{影響を受ける頂点を計算}}
+%    \State $\textproc{DecreaseBetweenness}(s)$
+%    \Comment{\alert{$B_x$を$\sum_{s\neq x}\Delta_{s\bullet}(x)$だけ減少}}
+%    \State $\textproc{UpdateSSSP}(s)$
+%    \Comment{\alert{$d_{st}$と$\sigma_{st}$を更新}}
+%    \State $\textproc{IncreaseBetweenness}(s)$
+%    \Comment{$B_x$を$\sum_{s\neq x}\Delta'_{s\bullet}(x)$だけ増加}
+%    \EndFor
+%    \ForAll{$t\in T(u)$}
+%    \Comment{影響を受ける頂点を計算}
+%    \State $\textproc{UpdateSTSP}(t)$
+%    \Comment{$d_{st}$と$\sigma_{st}$を更新}
+%    \EndFor
+%  \end{algorithmic}
   \note[item]{以降，本研究で提案するアルゴリズムについて説明します．}
   \note[item]{グラフから辺$(u,v)$が削除されたと考えます．}
   \note[item]{
@@ -476,7 +485,8 @@ sorting=debug
   }
 \end{frame}
 
-\begin{frame}{$\Delta_{s\bullet}(x)$を求めるアルゴリズム}
+\begin{frame}{媒介中心性の増減}
+  増減のため各$s\in S(v)$の$\Delta_{s\bullet}(x)$を求める
   \begin{theorem}[Bergamini et al.\cite{31Bergamini2017}]\small
     任意の$s\in S(v)$と$x\in V$について，次式が成り立つ．
     \begin{equation*}
@@ -485,21 +495,21 @@ sorting=debug
       +\sum_{y\in\mathcal{S}_{G_s}(x)\setminus T(s)}\frac{\sigma_{sx}}{\sigma_{sy}}\Delta_{s\bullet}(y)
     \end{equation*}
   \end{theorem}
-  \begin{columns}
+  \begin{columns}[T]
     \begin{column}{.49\textwidth}
       \begin{itemize}
       \item Brandesのアルゴリズムと同様に$s$から遠い順に走査する
-      \item ただし，$s$と$t\in T(s)$の最短経路の間にある頂点のみを走査する
-      \item $T(s)$に含まれているかどうかで加算する値は異なる
+      \item $s$と$t\in T(s)$の最短経路の間にある頂点のみを走査する
+      \item $y\in T(s)$か$y\notin T(s)$かで加算する値は異なる
       \end{itemize}
+      $\Delta'_{s\bullet}(x)$も同様に計算可能
     \end{column}
-    \begin{column}{.49\textwidth}
+    \begin{column}{.45\textwidth}
       \centering
       \def\svgwidth{.9\columnwidth}
       \input{calculate-affected-delta.pdf_tex}
     \end{column}
   \end{columns}
-  $\Delta'_{s\bullet}(x)$も同様に計算可能
   \note[item]{
     次は影響を受ける頂点のペア依存度の総和である$\Delta_{s\bullet}(x)$を求める
     方法について説明します．
@@ -520,11 +530,11 @@ sorting=debug
   \note[item]{$\Delta'_{s\bullet}(x)$も同様に計算できます．}
 \end{frame}
 
-\begin{frame}{辺削除時の最短経路更新法(Ramalingam and Reps\footcite{24Ramalingam1996})}
+\begin{frame}{辺削除時の最短経路更新法}
   \begin{itemize}
   \item 更新後の距離の昇順に計算する必要がある
   \item[] しかしそのような並びは\alert{自明ではない}
-  \item RamalingamとRepsの方法に基づき正しい順序で最短経路を更新する
+  \item Ramalingam-Reps法\footcite{24Ramalingam1996}に基づき正しい順序で最短経路を更新する
   \end{itemize}
   \begin{columns}
     \begin{column}{.60\textwidth}
