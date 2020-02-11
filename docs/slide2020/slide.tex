@@ -336,47 +336,50 @@ sorting=debug
   }
 \end{frame}
 
-\begin{frame}{関連研究}
-  時変ネットワークの媒介中心性更新法
-  \begin{itemize}\small
-  \item Minimum union cycleを更新\cite{19Lee2012,20Singh2015}
-  \item Hypergraph sketch\cite{17Yoshida2014}を更新する\cite{21Hayashi2015}，
-  \item 近似法を応用\cite{22Bergamini2015a,23Bergamini2015b}
-  \item \alert{最短経路と共に媒介中心性を更新}
+\begin{frame}{研究目的}
+  \begin{itemize}
+  \item 辺削除時の媒介中心性更新法
+    \begin{itemize}
+    \item 最短経路と共に媒介中心性を更新（\alert{最短経路更新法}がベース）
+    \item 他の手法（専用データ構造を用いた手法，近似法）
+    \end{itemize}
   \end{itemize}
   \begin{center}
-    \scriptsize
+    \small
     \begin{tabular}{lll}
       \hline
-      アルゴリズム & 最短経路更新アルゴリズム & 辺の操作 \\ \hline
-      Kasら\cite{25Kas2013} & RamalingamとReps\cite{24Ramalingam1996} & 挿入 \\ \hline
-      Nasreら\cite{27Nasre2014a} & Kargerら\cite{26Karger1993} & 挿入 \\ \hline
-      Nasreら\cite{29Nasre2014b} & DemetrescuとItaliano\cite{28Demetrescu2003} & 削除 \\ \hline
-      Pontecorviら\cite{30Pontecorvi2015} & DemetrescuとItaliano\cite{28Demetrescu2003} & 挿入/削除 \\ \hline
-      Bergaminiら\cite{31Bergamini2017} & RamalingamとReps\cite{24Ramalingam1996} & 挿入 \\ \hline
-      \alert{本研究} & \alert{RamalingamとReps}\cite{24Ramalingam1996} & \alert{削除} \\ \hline
+      最短経路更新法 & 最悪時間計算量 & \alert{最悪空間計算量} \\ \hline
+      RamalingamとReps\cite{24Ramalingam1996} & $\mathcal{O}(|V|^2\log|V|+|E||V|)$ & $\mathcal{O}(|V|^2)$ \\ \hline
+      DemetrescuとItaliano\cite{28Demetrescu2003} & $\mathcal{O}(|V|^2\log^2|V|)$ & $\mathcal{O}(|V|^3)$ \\ \hline
     \end{tabular}
   \end{center}
-  \begin{block}{研究目的}
-    \small
-    RamalingamとRepsに基づく最短経路更新法を利用する \\
+  \begin{itemize}
+  \item Demetrescu-Italiano法に基づく媒介中心性更新法\footcite{29Nasre2014b}
+  \item[] 最悪空間計算量：$\mathcal{O}(|V|^3)$
+  \item Ramalingam-Reps法を用いることで\alert{空間計算量を削減}
+  \end{itemize}
+  \begin{block}{}
+    RamalingamとRepsの最短経路更新法を利用する \\
     辺削除時の媒介中心性更新法の提案と評価
   \end{block}
   \note[item]{
     そのため現在まで時変ネットワークの媒介中心性を更新する方法がいくつか提案されてきました．
   }
   \note[item]{
-    Minimum union cycleやHypergraph sketchといった，専用のデータ構造を利用する方法や，
+    専用のデータ構造を用いた手法や，時不変ネットワークで用いられた近似法を応用した手法の他に，
+    最短経路を保持し，媒介中心性と共に更新する方法も提案されてきました．
+    このような方法は，最短経路を更新するアルゴリズムに基づいています．
   }
   \note[item]{
-    時不変ネットワークでも用いられた近似法を時変ネットワークに適用した方法の他に，
+    こちらに，最短経路を更新する代表的なアルゴリズムを示しました．
   }
   \note[item]{
-    最短経路を保持し，媒介中心性と共に更新する方法もいくつか提案されてきました．
+    Demetrescu-Italiano法に基づく媒介中心性更新法がNasreらによって提案されましたが，
+    必要とする最悪空間計算量は頂点数の$3$乗のオーダで，大規模なネットワークの解析には不向きです．
   }
   \note[item]{
-    その中でも，RamalingamとRepsの最短経路更新アルゴリズムに基づく，
-    辺削除時の媒介中心性更新法はこれまで提案されていませんでした．
+    しかし，Ramalingam-Reps法の最悪空間計算量は頂点数の$2$乗オーダで，
+    この方法を基にする媒介中心性更新法の空間計算量は比較的小さいことが期待できます．
   }
   \note[item]{
     そこで，この研究は，RamalingamとRepsの最短経路更新アルゴリズムに基づく，
