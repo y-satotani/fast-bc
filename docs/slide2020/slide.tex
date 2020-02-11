@@ -98,6 +98,7 @@ sorting=debug
     \item 辺削除時に最短経路と共に媒介中心性を更新する手法
     \end{itemize}
     \begin{enumerate}
+    \item 影響を受ける頂点の集合を計算
     \item 媒介中心性の値を影響を受ける分だけ\alert{減算}
     \item \alert{最短経路を更新}
     \item 媒介中心性の値を影響を受ける分だけ\alert{加算}
@@ -405,6 +406,10 @@ sorting=debug
   \item 最短経路（$d_{st}$と$\sigma_{st}$）を更新
   \item $B_x$を$\sum_{s\neq x}\Delta'_{s\bullet}(x)$だけ増加
   \end{enumerate}
+  \begin{flushright}
+    \alert{次は先に結果を示します}
+  \end{flushright}
+
 %  \begin{algorithmic}\footnotesize
 %    \ForAll{$s\in S(v)$}
 %    \Comment{\alert{影響を受ける頂点を計算}}
@@ -421,6 +426,154 @@ sorting=debug
 %    \Comment{$d_{st}$と$\sigma_{st}$を更新}
 %    \EndFor
 %  \end{algorithmic}
+  \note[item]{以降，本研究で提案するアルゴリズムについて説明します．}
+  \note[item]{グラフから辺$(u,v)$が削除されたと考えます．}
+  \note[item]{
+    削除後の諸量にプライム記号をつけて，それが削除後であることを明示します．
+    例えば，削除後のグラフ$G$は$G'$で表します．
+  }
+  \note[item]{
+    $S(t)$と$T(s)$はそれぞれ辺削除によって$t$への，および$s$からの最短経路が変化する頂点の集合とします．
+    $S(t)$と$T(s)$の具体的な内容はあとで示します．
+  }
+  \note[item]{
+    さらに$\Delta_{s\bullet}(x)$をこの通り定義します．
+    これは削除の影響を受けるペア依存度$\delta_{st}(x)$の総和です．
+  }
+  \note[item]{
+    アルゴリズムの大まかな流れは以下です．
+    初めに影響を受ける頂点に対するペア依存度の総和を求めて，媒介中心性の値$B_x$から減算します．
+    次に，削除時の最短経路を更新します．
+    最後に影響を受ける頂点に対するペア依存度の総和を求めて，媒介中心性の値$B_x$に加算します．
+  }
+\end{frame}
+
+\section{性能評価}
+\begin{frame}[allowframebreaks]{Brandes法との性能比較（人工ネットワーク）}
+  \begin{columns}
+    \begin{column}{.5\textwidth}
+      \begin{itemize}
+      \item 実験について
+        \begin{itemize}
+        \item 2種のネットワークモデル
+        \item 平均次数$\langle k\rangle=4$
+        \item ノード数$n\in\{100,\ldots,1000\}$
+        \item $50$個のネットワーク
+        \item $100$試行繰り返し
+        \end{itemize}
+        \medskip
+      \item 提案手法の方が高速に動作する
+      \item 実行時間の増加がBrandes法より緩やか
+      \item[] $\rightarrow$\alert{走査する頂点の数の増加が緩やか}
+      \end{itemize}
+    \end{column}
+    \begin{column}{.5\textwidth}
+      \includegraphics[width=.9\columnwidth]{exp-artificial.pdf}
+    \end{column}
+  \end{columns}
+  \note[item]{次に，実験によって提案手法とBrandes法の性能を比較します．}
+  \note[item]{まず，人工ネットワークに対して性能比較を行います．}
+  \note[item]{実験をこのような設定で行いました．}
+  \note[item]{結果はこちらの図です．}
+  \note[item]{図より，どちらのネットワークモデルに対しても提案手法の方が高速に動作することがわかります．}
+  \note[item]{また，ノード数の増加に伴う提案手法の実行時間の増加がBrandes法より緩やかであることもわかります．}
+  \note[item]{このことから，走査する頂点数の増加も抑えられていることが推測されます．}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Brandes法との性能比較（実ネットワーク）}
+  \begin{columns}
+    \begin{column}{.5\textwidth}
+      \begin{itemize}
+      \item 実験について
+        \begin{itemize}
+        \item SNAP\cite{32Leskovec2016}のデータセット
+        \item $20$試行繰り返し
+        \item 中央値を比較
+        \end{itemize}
+      \item ネットワークによって性能向上はまちまち
+      \item 相対実行時間の
+        \begin{itemize}
+        \item 最小値：$5.78\%$
+        \item 最大値：$29.05\%$
+        \item 幾何平均：$14.67\%$
+        \end{itemize}
+      \end{itemize}
+    \end{column}
+    \begin{column}{.5\textwidth}
+      \includegraphics[width=.9\columnwidth]{exp-real.pdf}
+    \end{column}
+  \end{columns}
+  \hypercite{32Leskovec2016}
+  \note[item]{次に，実ネットワークに対して性能比較を行います．}
+  \note[item]{実験をこのような設定で行いました．}
+  \note[item]{結果はこちらの図です．}
+  \note[item]{
+    図はそれぞれのネットワークに対して，Brandes法の実行時間を$1$としたときの
+    提案手法の実行時間の相対値を表しています．
+  }
+  \note[item]{
+    図より，全てのネットワークに対して，提案手法の方が高速に動作していることがわかります．
+  }
+  \note[item]{
+    しかし，ネットワークによって提案手法の効果はまちまちなこともわかります．
+    つまり，最も良く性能向上した場合で実行時間が$5.78\%$になりますが，
+    逆に性能があまり向上しない場合では実行時間は$29.05\%$です．
+    幾何平均によると$14.67\%$の時間で実行できます．
+  }
+\end{frame}
+
+\begin{frame}{時間計算量の評価}
+  \begin{itemize}\small
+    \item 媒介中心性を増減させるアルゴリズムの時間計算量
+    \begin{equation*}
+      \mathcal{O}\left(\sum_{s\in S(v)}\left(\|\tau(s)\|+|\tau(s)|\log|\tau(s)|+\|\tau'(s)\|+|\tau'(s)|\log|\tau'(s)|\right)\right)
+    \end{equation*}
+  \item[] $\tau(s),\,\tau'(s)$：アルゴリズムが走査した頂点の集合
+  \item[] \alert{$S(v)=\tau(s)=\tau'(s)=V$}のときBrandesのアルゴリズムの計算量と同じ
+    \item 最短経路を更新するアルゴリズムの時間計算量
+    \begin{equation*}
+      \mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|\log|T(s)|+\sum_{t\in T(u)}\|S(t)\|\log|S(t)|\right)
+    \end{equation*}
+  \item[] \alert{$S(v)=T(u)=V$}のときDijkstraのアルゴリズムの計算量と同じ
+  \item 通常は$V$より小さい$\rightarrow$\alert{高速に動作}
+  \end{itemize}
+  \note[item]{以降，提案したアルゴリズムの性能を評価します．}
+  \note[item]{まず，時間計算量を既存のものと比較します．}
+  \note[item]{
+    媒介中心性を増減させるアルゴリズムの時間計算量はこちらです．
+    この計算量は，影響を受ける頂点の集合$S(v)$とアルゴリズムが走査した頂点の集合
+    $\tau(s)$および$\tau'(s)$が頂点集合$V$と一致するとき，
+    Brandesのアルゴリズムと同じ計算量になります．
+  }
+  \note[item]{
+    最短経路を更新するアルゴリズムの時間計算量はこちらです．
+    この計算量は，影響を受ける頂点の集合$S(v)$と$T(u)$が頂点集合$V$と一致するとき，
+    Dijkstraのアルゴリズムと同じ計算量になります．
+  }
+  \note[item]{
+    これらの頂点集合は頂点集合$V$の部分集合で，通常は$V$より小さくなるので，
+    その分高速に動作することが期待できます．
+  }
+\end{frame}
+
+\section{アルゴリズムの詳細}
+\begin{frame}[allowframebreaks]{提案アルゴリズム（再掲）}
+  記号について
+  \begin{itemize}\small
+    \item 辺$(u,v)$が削除されたと考える
+    \item 記号$'$：削除後であることを表す（例：$G'$）
+    \item $S(t)$：辺削除によって$t$への最短経路が変化する頂点の集合
+    \item $T(s)$：辺削除によって$s$からの最短経路が変化する頂点の集合
+    \item $\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x)$：削除の影響を受けるペア依存度の総和\footcite{31Bergamini2017}
+  \end{itemize}
+  \medskip
+  アルゴリズムの大まかな流れ
+  \begin{enumerate}
+  \item 影響を受ける頂点（$S(v)$と$T(u)$）を計算
+  \item $B_x$を$\sum_{s\neq x}\Delta_{s\bullet}(x)$だけ減少
+  \item 最短経路（$d_{st}$と$\sigma_{st}$）を更新
+  \item $B_x$を$\sum_{s\neq x}\Delta'_{s\bullet}(x)$だけ増加
+  \end{enumerate}
   \note[item]{以降，本研究で提案するアルゴリズムについて説明します．}
   \note[item]{グラフから辺$(u,v)$が削除されたと考えます．}
   \note[item]{
@@ -575,114 +728,6 @@ sorting=debug
   \note[item]{
     あとは，Dijkstraのアルゴリズムの要領で更新が完了した頂点から広げるように
     $s$からの距離と最短経路数を更新します．
-  }
-\end{frame}
-
-\section{性能評価}
-\begin{frame}{時間計算量の評価}
-  \begin{itemize}\small
-    \item 媒介中心性を増減させるアルゴリズムの時間計算量
-    \begin{equation*}
-      \mathcal{O}\left(\sum_{s\in S(v)}\|\tau(s)\|+|\tau(s)|\log|\tau(s)|+\|\tau'(s)\|+|\tau'(s)|\log|\tau'(s)|\right)
-    \end{equation*}
-  \item[] $\tau(s),\,\tau'(s)$：アルゴリズムが走査した頂点の集合
-  \item[] \alert{$S(v)=\tau(s)=\tau'(s)=V$}のときBrandesのアルゴリズムの計算量と同じ
-    \item 最短経路を更新するアルゴリズムの時間計算量
-    \begin{equation*}
-      \mathcal{O}\left(\sum_{s\in S(v)}\|T(s)\|\log|T(s)|+\sum_{t\in T(u)}\|S(t)\|\log|S(t)|\right)
-    \end{equation*}
-  \item[] \alert{$S(v)=T(u)=V$}のときDijkstraのアルゴリズムの計算量と同じ
-  \item 通常は$V$より小さい$\rightarrow$\alert{高速に動作}
-  \end{itemize}
-  \note[item]{以降，提案したアルゴリズムの性能を評価します．}
-  \note[item]{まず，時間計算量を既存のものと比較します．}
-  \note[item]{
-    媒介中心性を増減させるアルゴリズムの時間計算量はこちらです．
-    この計算量は，影響を受ける頂点の集合$S(v)$とアルゴリズムが走査した頂点の集合
-    $\tau(s)$および$\tau'(s)$が頂点集合$V$と一致するとき，
-    Brandesのアルゴリズムと同じ計算量になります．
-  }
-  \note[item]{
-    最短経路を更新するアルゴリズムの時間計算量はこちらです．
-    この計算量は，影響を受ける頂点の集合$S(v)$と$T(u)$が頂点集合$V$と一致するとき，
-    Dijkstraのアルゴリズムと同じ計算量になります．
-  }
-  \note[item]{
-    これらの頂点集合は頂点集合$V$の部分集合で，通常は$V$より小さくなるので，
-    その分高速に動作することが期待できます．
-  }
-\end{frame}
-
-\begin{frame}[allowframebreaks]{Brandes法との性能比較（人工ネットワーク）}
-  \begin{columns}
-    \begin{column}{.5\textwidth}
-      \begin{itemize}
-      \item 実験について
-        \begin{itemize}
-        \item 2種のネットワークモデル
-        \item 平均次数$\langle k\rangle=4$
-        \item ノード数$n\in\{100,\ldots,1000\}$
-        \item $50$個のネットワーク
-        \item $100$試行繰り返し
-        \end{itemize}
-        \medskip
-      \item 提案手法の方が高速に動作する
-      \item 実行時間の増加がBrandes法より緩やか
-      \item[] $\rightarrow$\alert{走査する頂点の数の増加が緩やか}
-      \end{itemize}
-    \end{column}
-    \begin{column}{.5\textwidth}
-      \includegraphics[width=.9\columnwidth]{exp-artificial.pdf}
-    \end{column}
-  \end{columns}
-  \note[item]{次に，実験によって提案手法とBrandes法の性能を比較します．}
-  \note[item]{まず，人工ネットワークに対して性能比較を行います．}
-  \note[item]{実験をこのような設定で行いました．}
-  \note[item]{結果はこちらの図です．}
-  \note[item]{図より，どちらのネットワークモデルに対しても提案手法の方が高速に動作することがわかります．}
-  \note[item]{また，ノード数の増加に伴う提案手法の実行時間の増加がBrandes法より緩やかであることもわかります．}
-  \note[item]{このことから，走査する頂点数の増加も抑えられていることが推測されます．}
-\end{frame}
-
-\begin{frame}[allowframebreaks]{Brandes法との性能比較（実ネットワーク）}
-  \begin{columns}
-    \begin{column}{.5\textwidth}
-      \begin{itemize}
-      \item 実験について
-        \begin{itemize}
-        \item SNAP\cite{32Leskovec2016}のデータセット
-        \item $20$試行繰り返し
-        \item 中央値を比較
-        \end{itemize}
-      \item ネットワークによって性能向上はまちまち
-      \item 相対実行時間の
-        \begin{itemize}
-        \item 最小値：$5.78\%$
-        \item 最大値：$29.05\%$
-        \item 幾何平均：$14.67\%$
-        \end{itemize}
-      \end{itemize}
-    \end{column}
-    \begin{column}{.5\textwidth}
-      \includegraphics[width=.9\columnwidth]{exp-real.pdf}
-    \end{column}
-  \end{columns}
-  \hypercite{32Leskovec2016}
-  \note[item]{次に，実ネットワークに対して性能比較を行います．}
-  \note[item]{実験をこのような設定で行いました．}
-  \note[item]{結果はこちらの図です．}
-  \note[item]{
-    図はそれぞれのネットワークに対して，Brandes法の実行時間を$1$としたときの
-    提案手法の実行時間の相対値を表しています．
-  }
-  \note[item]{
-    図より，全てのネットワークに対して，提案手法の方が高速に動作していることがわかります．
-  }
-  \note[item]{
-    しかし，ネットワークによって提案手法の効果はまちまちなこともわかります．
-    つまり，最も良く性能向上した場合で実行時間が$5.78\%$になりますが，
-    逆に性能があまり向上しない場合では実行時間は$29.05\%$です．
-    幾何平均によると$14.67\%$の時間で実行できます．
   }
 \end{frame}
 
