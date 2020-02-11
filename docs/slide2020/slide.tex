@@ -392,11 +392,12 @@ sorting=debug
 \begin{frame}[allowframebreaks]{提案アルゴリズム}
   記号について
   \begin{itemize}\small
-    \item 辺$(u,v)$が削除されたと考える
-    \item 記号$'$：削除後であることを表す（例：$G'$）
     \item $S(t)$：辺削除によって$t$への最短経路が変化する頂点の集合
     \item $T(s)$：辺削除によって$s$からの最短経路が変化する頂点の集合
-    \item $\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x)$：削除の影響を受けるペア依存度の総和\footcite{31Bergamini2017}
+    \item $\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x),\qquad\Delta'_{s\bullet}(x)=\sum_{t\in T(s)}\delta'_{st}(x)$：
+    \item[] 削除の影響を受けるペア依存度の総和\footcite{31Bergamini2017}
+    \item $\tau(s)=T(s)\cup\{t|\Delta_{s\bullet}(t)>0\},\qquad\tau'(s)=T(s)\cup\{t|\Delta'_{s\bullet}(t)>0\}$：
+    \item[] アルゴリズムによって走査された頂点の集合
   \end{itemize}
   \medskip
   アルゴリズムの大まかな流れ
@@ -528,7 +529,6 @@ sorting=debug
     \begin{equation*}
       \mathcal{O}\left(\sum_{s\in S(v)}\left(\|\tau(s)\|+|\tau(s)|\log|\tau(s)|+\|\tau'(s)\|+|\tau'(s)|\log|\tau'(s)|\right)\right)
     \end{equation*}
-  \item[] $\tau(s),\,\tau'(s)$：アルゴリズムが走査した頂点の集合
   \item[] \alert{$S(v)=\tau(s)=\tau'(s)=V$}のときBrandesのアルゴリズムの計算量と同じ
     \item 最短経路を更新するアルゴリズムの時間計算量
     \begin{equation*}
@@ -557,14 +557,11 @@ sorting=debug
 \end{frame}
 
 \section{アルゴリズムの詳細}
-\begin{frame}[allowframebreaks]{提案アルゴリズム（再掲）}
+\begin{frame}[allowframebreaks]{提案アルゴリズム}
   記号について
   \begin{itemize}\small
     \item 辺$(u,v)$が削除されたと考える
     \item 記号$'$：削除後であることを表す（例：$G'$）
-    \item $S(t)$：辺削除によって$t$への最短経路が変化する頂点の集合
-    \item $T(s)$：辺削除によって$s$からの最短経路が変化する頂点の集合
-    \item $\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x)$：削除の影響を受けるペア依存度の総和\footcite{31Bergamini2017}
   \end{itemize}
   \medskip
   アルゴリズムの大まかな流れ
