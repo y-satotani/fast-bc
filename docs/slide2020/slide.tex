@@ -154,7 +154,7 @@ sorting=debug
       \item $\sigma_{st}$：$s$と$t$間の最短経路の数
       \end{itemize}
       \begin{itemize}
-      \item 媒介中心性の値が高い$\rightarrow$\\\alert{多くの最短経路が通る}ので重要
+      \item 媒介中心性の値が高い\\$\rightarrow$\alert{多くの最短経路が通る}ので重要
       \item 単純法の計算量：\alert{$\mathcal{O}(|V|^3)$}
       \end{itemize}
     \end{column}
@@ -391,11 +391,13 @@ sorting=debug
 \begin{frame}[allowframebreaks]{提案アルゴリズム}
   記号について
   \begin{itemize}\small
-    \item $S(t)$：辺削除によって$t$への最短経路が変化する頂点の集合
-    \item $T(s)$：辺削除によって$s$からの最短経路が変化する頂点の集合
-    \item $\Delta_{s\bullet}(x)=\sum_{t\in T(s)}\delta_{st}(x),\quad\Delta'_{s\bullet}(x)=\sum_{t\in T(s)}\delta'_{st}(x)$：
+    \item \alert{$S(t)$}：辺削除によって$t$への最短経路が変化する頂点の集合
+    \item \alert{$T(s)$}：辺削除によって$s$からの最短経路が変化する頂点の集合
+    \item \alert{$\Delta_{s\bullet}(x)$}$=\sum_{t\in T(s)}\delta_{st}(x)$，
+      \alert{$\Delta'_{s\bullet}(x)$}$=\sum_{t\in T(s)}\delta'_{st}(x)$：
     \item[] 削除の影響を受けるペア依存度の総和\footcite{31Bergamini2017}
-    \item $\tau(s)=T(s)\cup\{t|\Delta_{s\bullet}(t)>0\},\quad\tau'(s)=T(s)\cup\{t|\Delta'_{s\bullet}(t)>0\}$：
+    \item \alert{$\tau(s)$}$=T(s)\cup\{t|\Delta_{s\bullet}(t)>0\}$，
+      \alert{$\tau'(s)$}$=T(s)\cup\{t|\Delta'_{s\bullet}(t)>0\}$：
     \item[] アルゴリズムによって走査された頂点の集合
   \end{itemize}
   \medskip
@@ -615,8 +617,7 @@ sorting=debug
   \note[item]{ここで$S(x)$と$T(x)$の具体的な内容を求めます．}
   \note[item]{削除によって最短経路が変化する頂点ペアの条件について，こちらの補題を示しました．}
   \note[item]{
-    読み上げますと，頂点$s,t$に対して，最短経路が変化するための
-    必要十分条件はこちらの式を満たすことです．
+    頂点$s,t$に対して，最短経路が変化するための必要十分条件はこちらの式を満たすことです．
   }
   \note[item]{
     その根拠は，最短経路が変化するならば，削除される辺$(u,v)$は最短経路の上にあり，
